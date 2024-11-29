@@ -23,6 +23,15 @@ bool checkPermission() {
             permissions.append(false);
     }
 
+    // Allow display of notifications / foreground service notifications (for API 33 and above)
+    r = QtAndroidPrivate::checkPermission("android.permission.POST_NOTIFICATIONS").result();
+    if (r != QtAndroidPrivate::Authorized)
+    {
+        r = QtAndroidPrivate::requestPermission("android.permission.POST_NOTIFICATIONS").result();
+        if (r == QtAndroidPrivate::Denied)
+            permissions.append(false);
+    }
+
     // r = QtAndroidPrivate::checkPermission("android.permission.WRITE_EXTERNAL_STORAGE").result();
     // if (r != QtAndroidPrivate::Authorized)
     // {
