@@ -53,7 +53,7 @@ qt_add_qml_module(appDinkplay
         ${UI}/images/musicIco/loop.png
         ${UI}/images/musicIco/loop1.png
         ${UI}/images/musicIco/loop2.png
-        ${UI}/images/dinkplay.mp3
+        ${UI}/images/musicIco/exercise.gif
     SOURCES
         Media.hpp Media.cpp
         Top.hpp Top.cpp

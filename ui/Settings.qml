@@ -15,10 +15,25 @@ ColumnLayout {
     spacing: 10
 
     Item {
+        id: intervalRunningAnimation
+        Layout.preferredWidth: parent.width
+        Layout.preferredHeight: 42 * 3
+        visible: Media.intervalStatus
+        enabled: Media.intervalStatus
+        AnimatedImage {
+            width: parent.width
+            height: parent.height
+            source: "images/musicIco/exercise.gif"
+            fillMode: AnimatedImage.PreserveAspectFit
+            paused: Media.player !== 1 /* pause when music player is paused */
+        }
+    }
+
+    Item {
         id: lapCountComponent
         Layout.preferredWidth: parent.width
         Layout.preferredHeight: 42
-        opacity: !Media.intervalStatus
+        visible: !Media.intervalStatus
         enabled: !Media.intervalStatus
         Text {
             id: lapCountText
@@ -50,7 +65,14 @@ ColumnLayout {
             color: "white"
             text: lapCount.value
             font.pointSize: 15
-            background : Item {}
+            background : Rectangle {
+                color: "black"
+                radius: 2
+                border {
+                    color: "#1777B7"
+                    width: 0.5
+                }
+            }
             onEditingFinished: {
                 lapCount.value = text
             }
@@ -61,7 +83,7 @@ ColumnLayout {
         id: lapDurationComponent
         Layout.preferredWidth: parent.width
         Layout.preferredHeight: 42
-        opacity: !Media.intervalStatus
+        visible: !Media.intervalStatus
         enabled: !Media.intervalStatus
         Text {
             id: lapDurText
@@ -93,7 +115,14 @@ ColumnLayout {
             color: "white"
             text: lapDuration.value
             font.pointSize: 15
-            background : Item {}
+            background : Rectangle {
+                color: "black"
+                radius: 2
+                border {
+                    color: "#1777B7"
+                    width: 0.5
+                }
+            }
             onEditingFinished: {
                 lapDuration.value = text
             }
@@ -104,7 +133,7 @@ ColumnLayout {
         id: restDurationComponent
         Layout.preferredWidth: parent.width
         Layout.preferredHeight: 42
-        opacity: !Media.intervalStatus
+        visible: !Media.intervalStatus
         enabled: !Media.intervalStatus
         Text {
             id: restDurText
@@ -136,7 +165,14 @@ ColumnLayout {
             color: "white"
             text: restDuration.value
             font.pointSize: 15
-            background : Item {}
+            background : Rectangle {
+                color: "black"
+                radius: 2
+                border {
+                    color: "#1777B7"
+                    width: 0.5
+                }
+            }
             onEditingFinished: {
                 restDuration.value = text
             }
