@@ -15,8 +15,6 @@
 #include <QStringList>
 #include <QSettings>
 
-#include <QDebug>
-
 #include "Media.hpp"
 
 class Directory : virtual public Media

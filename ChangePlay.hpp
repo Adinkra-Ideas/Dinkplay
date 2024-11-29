@@ -2,7 +2,6 @@
 #define CHANGEPLAY_HPP
 
 #include <QObject>
-// #include <QMediaPlayer>
 
 #include "Media.hpp"
 

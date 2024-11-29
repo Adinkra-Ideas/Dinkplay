@@ -4,49 +4,57 @@
 bool checkPermission() {
     QList<bool> permissions;
 
-    auto r = QtAndroidPrivate::checkPermission("android.permission.READ_EXTERNAL_STORAGE").result();
+    /* PERMISSION REQUIRED TO ACCESS AUDIO FILE TYPES IN DEVICE FROM OUR APP */
+    // Allow read of audio files (Granular Media Permissions) (for API 33 and above)
+    // https://developer.android.com/about/versions/13/behavior-changes-13#granular-media-permissions
+    auto r = QtAndroidPrivate::checkPermission("android.permission.READ_MEDIA_AUDIO").result();
+    if (r != QtAndroidPrivate::Authorized)
+    {
+        r = QtAndroidPrivate::requestPermission("android.permission.READ_MEDIA_AUDIO").result();
+        if (r == QtAndroidPrivate::Denied)
+            permissions.append(false);
+    }
+    // Allow read of all file types (for API 32 and below)
+    r = QtAndroidPrivate::checkPermission("android.permission.READ_EXTERNAL_STORAGE").result();
     if (r != QtAndroidPrivate::Authorized)
     {
         r = QtAndroidPrivate::requestPermission("android.permission.READ_EXTERNAL_STORAGE").result();
         if (r == QtAndroidPrivate::Denied)
             permissions.append(false);
     }
+
     // r = QtAndroidPrivate::checkPermission("android.permission.WRITE_EXTERNAL_STORAGE").result();
-    // qDebug() << "r2" << r;
     // if (r != QtAndroidPrivate::Authorized)
     // {
     //     r = QtAndroidPrivate::requestPermission("android.permission.WRITE_EXTERNAL_STORAGE").result();
-    //     qDebug() << "r20" << r;
     //     if (r == QtAndroidPrivate::Denied)
     //         permissions.append(false);
     // }
+
     // r = QtAndroidPrivate::checkPermission("android.permission.MANAGE_EXTERNAL_STORAGE").result();
-    // qDebug() << "r3" << r;
     // if (r != QtAndroidPrivate::Authorized)
     // {
     //     r = QtAndroidPrivate::requestPermission("android.permission.MANAGE_EXTERNAL_STORAGE").result();
-    //     qDebug() << "r30" << r;
     //     if (r == QtAndroidPrivate::Denied)
     //         permissions.append(false);
     // }
+
     // r = QtAndroidPrivate::checkPermission("android.permission.READ_MEDIA_IMAGES").result();
-    // qDebug() << "r4" << r;
     // if (r != QtAndroidPrivate::Authorized)
     // {
     //     r = QtAndroidPrivate::requestPermission("android.permission.READ_MEDIA_IMAGES").result();
-    //     qDebug() << "r40" << r;
     //     if (r == QtAndroidPrivate::Denied)
     //         permissions.append(false);
     // }
+
     // r = QtAndroidPrivate::checkPermission("android.permission.WRITE_MEDIA_IMAGES").result();
-    // qDebug() << "r5" << r;
     // if (r != QtAndroidPrivate::Authorized)
     // {
     //     r = QtAndroidPrivate::requestPermission("android.permission.WRITE_MEDIA_IMAGES").result();
-    //     qDebug() << "r50" << r;
     //     if (r == QtAndroidPrivate::Denied)
     //         permissions.append(false);
     // }
+
     return (permissions.count() != 5);
 }
 #endif
