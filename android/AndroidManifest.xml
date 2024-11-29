@@ -3,7 +3,11 @@
     <!-- %%INSERT_PERMISSIONS -->
     <!-- %%INSERT_FEATURES -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
+    <!-- isplay of notifications / foreground service notifications (for API 33 and above) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- isplay of notifications / foreground service notifications (for API 33 and above) -->
+
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
 
     <!-- Access Audio files (API 32 and below) -->

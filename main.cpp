@@ -14,6 +14,14 @@
 
 int main(int argc, char *argv[])
 {
+    #ifdef Q_OS_ANDROID
+    // Allow display of notifications / foreground service notifications (for API 33 and above)
+    auto r = QtAndroidPrivate::checkPermission("android.permission.POST_NOTIFICATIONS").result();
+    if (r != QtAndroidPrivate::Authorized)
+    {
+        r = QtAndroidPrivate::requestPermission("android.permission.POST_NOTIFICATIONS").result();
+    }
+    #endif
 
     QGuiApplication app(argc, argv);
 
