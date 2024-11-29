@@ -53,5 +53,10 @@ int main(int argc, char *argv[])
     // Calling the method to load the persisted
     // filepaths (if any) on startup.
     media.loadSavedPaths();
+
+    #ifdef Q_OS_ANDROID
+    QNativeInterface::QAndroidApplication::hideSplashScreen();
+    #endif
+
     return app.exec();
 }
