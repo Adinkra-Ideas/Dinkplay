@@ -153,10 +153,10 @@ void Directory::doAddDir() {
             soundsHash_[currDir_ + aMp3] = nullptr;
         }
     }
-    QStringList mp4 = dir.entryList(QStringList() << "*.mp4", QDir::Files);
-    for (QString &aMp4: mp4) {
-        videoPaths_.push_back(currDir_ + aMp4);
-    }
+    // QStringList mp4 = dir.entryList(QStringList() << "*.mp4", QDir::Files);
+    // for (QString &aMp4: mp4) {
+    //     videoPaths_.push_back(currDir_ + aMp4);
+    // }
 
     // preparing for store to localStorage onExit
     backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));

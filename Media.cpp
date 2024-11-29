@@ -5,7 +5,7 @@ Media::Media(QObject *parent) :
     repeat_{2} {
     // set iterator accordingly
     audIt_ = audioPaths_.begin();
-    vpIt_ = videoPaths_.begin();
+    // vpIt_ = videoPaths_.begin();
 }
 
 Media::~Media() {}

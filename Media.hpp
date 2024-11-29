@@ -105,7 +105,7 @@ signals:
 
     /********* Mostly Used from Player.cpp *************/
     // Whenever a playing sound changes
-    void playbackStateChanged();
+    void playbackStateChanged(QString newPath);
     /***************************************************/
 
     /******** Mostly used from here in media.cpp *******/
@@ -114,13 +114,14 @@ signals:
     /***************************************************/
 
 protected:
-    QStringList           videoPaths_;
-    QStringList::iterator       vpIt_; // iterator to videoPaths_
+    // QStringList           videoPaths_;
+    // QStringList::iterator       vpIt_; // iterator to videoPaths_
     QString                  currDir_; // Dir selected by the user, from where media files was last added
     quint8                    repeat_; // 0 == repeat none, 1 == repeat 1, 2 == repeat all
 
     QStringList           audioPaths_;  // holds all the mp3 files found in directory selected by the user for media search
     QStringList::iterator      audIt_;  // iterator to audioPaths_
+    QString       currentPlayingPath_;  // stores the filepath of currently active audio
     std::unordered_map<QString, ma_sound *> soundsHash_; // used as a storage for Holding audioPaths_ keys and their associated values == their decoded ma_sound.
 };
 

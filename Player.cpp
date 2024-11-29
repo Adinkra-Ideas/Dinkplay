@@ -83,6 +83,9 @@ void Player::setSource(const char * path) {
     // re-calibrate the qstringslist iterator
     audIt_ = audioPaths_.begin() + pos;
 
+    // set the current playing audio path to currentPlayingPath_
+    currentPlayingPath_ = path;
+
     // The idea is: although the soundsHash_ contains
     // all the mp3 files indexed from addDirectory(),
     // the ma_sound associated with a mp3 file will only
@@ -111,7 +114,7 @@ void Player::setSource(const char * path) {
     // set current playing state to "stopped"
     state_ = 0;
     // refresh the UI
-    emit playbackStateChanged();
+    emit playbackStateChanged(currentPlayingPath_);
 }
 
 /**
@@ -143,7 +146,7 @@ void Player::play() {
     // emit playing only if sounds started playing
     if (ma_sound_is_playing(soundsHash_[QString(*audIt_)])) {
         state_ = 1;
-        emit playbackStateChanged(); // 0 stopped, 1 playing, 2 paused
+        emit playbackStateChanged(currentPlayingPath_); // 0 stopped, 1 playing, 2 paused
     }
 }
 
@@ -164,7 +167,7 @@ void Player::pause() {
         // 0 stopped, 1 playing, 2 paused
         state_ = 2;
         //
-        emit playbackStateChanged();
+        emit playbackStateChanged(currentPlayingPath_);
     }
 }
 
@@ -280,7 +283,7 @@ void Player::stop() {
         // set state to "stopped"
         state_ = 0;
         // Refresh UI
-        emit playbackStateChanged();   // 0 stopped, 1 playing, 2 paused
+        emit playbackStateChanged(currentPlayingPath_);   // 0 stopped, 1 playing, 2 paused
     }
 }
 

@@ -10,8 +10,8 @@ Rectangle {
     signal playSignal;
     required property bool audioTab
     signal audioSignal;
-    property bool videoTab
-    signal videoSignal;
+    // property bool videoTab
+    // signal videoSignal;
     required property bool settingsTab
     signal settingsSignal;
 
@@ -67,24 +67,24 @@ Rectangle {
                 }
             }
         }
-        Item {
-            Layout.fillWidth: true;
-            Layout.fillHeight: true;
-            Image {
-                source: topControls.videoTab ? "images/musicIco/video_white.png" : "images/musicIco/video.png"
-                width: 30
-                height: 30
-                anchors.centerIn: parent
-                fillMode: Image.PreserveAspectFit
-            }
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    topControls.videoSignal()
-                    // we will change image here to active
-                }
-            }
-        }
+        // Item {
+        //     Layout.fillWidth: true;
+        //     Layout.fillHeight: true;
+        //     Image {
+        //         source: topControls.videoTab ? "images/musicIco/video_white.png" : "images/musicIco/video.png"
+        //         width: 30
+        //         height: 30
+        //         anchors.centerIn: parent
+        //         fillMode: Image.PreserveAspectFit
+        //     }
+        //     MouseArea {
+        //         anchors.fill: parent
+        //         onClicked: {
+        //             topControls.videoSignal()
+        //             // we will change image here to active
+        //         }
+        //     }
+        // }
         Item {
             id: add
             Layout.fillWidth: true;

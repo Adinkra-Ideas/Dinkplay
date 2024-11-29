@@ -43,11 +43,11 @@ Window {
                 width: root.width
                 visible: true
             }
-            Video {
-                id: videoPage
-                width: root.width
-                visible: false
-            }
+            // Video {
+            //     id: videoPage
+            //     width: root.width
+            //     visible: false
+            // }
             Settings {
                 id: settingsPage
                 width: root.width
@@ -96,7 +96,7 @@ Window {
             height: 40
             playingTab: playingPage.visible
             audioTab: audioPage.visible
-            videoTab: videoPage.visible
+            // videoTab: videoPage.visible
             settingsTab: settingsPage.visible
 
             // onClickSet the play tab active and bring put the playing window into view
@@ -110,11 +110,11 @@ Window {
                 view.contentHeight = audioPage.height
                 audioPage.visible = true
             }
-            onVideoSignal: {
-                hideAllTabs()
-                view.contentHeight = videoPage.height
-                videoPage.visible = true
-            }
+            // onVideoSignal: {
+            //     hideAllTabs()
+            //     view.contentHeight = videoPage.height
+            //     videoPage.visible = true
+            // }
             onSettingsSignal: {
                 hideAllTabs()
                 view.contentHeight = settingsPage.height
@@ -123,7 +123,7 @@ Window {
             function hideAllTabs() {
                 playingPage.visible = false
                 audioPage.visible = false
-                videoPage.visible = false
+                // videoPage.visible = false
                 settingsPage.visible = false
             }
         }
