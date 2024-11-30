@@ -6,22 +6,10 @@ import android.os.IBinder;
 import android.util.Log;
 import android.content.Intent;
 import android.content.Context;
-import android.app.PendingIntent;
-import androidx.core.app.ActivityCompat;
-import android.Manifest;
-import android.content.pm.PackageManager;
-
 import android.widget.Toast;
 
-import android.R;
-import android.os.Build;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import androidx.core.app.NotificationCompat;
 import android.content.ComponentName;
 import android.content.ServiceConnection;
-
 import com.denkplay.states.DenkService;
 
 public class DenkActivity extends QtActivity {
@@ -38,6 +26,8 @@ public class DenkActivity extends QtActivity {
         super.onCreate(savedInstanceState);
         context = this;
         myState_ = 0;
+
+        Toast.makeText(this, "Starting Dinkplay..", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -64,29 +54,30 @@ public class DenkActivity extends QtActivity {
         super.onStop();
         myState_ = 4;
         // Log.d("Rachit", "In Stop Method");
+        // Log.d("Rachit", Boolean.toString(serviceBinded_));
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unbindService(connection);
+        serviceBinded_ = false;
     }
 
     @Override
     public ComponentName startForegroundService(Intent intent) {
-        Log.d("Rachit", "cccccccccccccccccccIn Stop Method");
         ComponentName componentName = super.startForegroundService(intent);
 
-        // // Bind to LocalService.
-        Intent bindIntent = new Intent(this, DenkService.class);
-        bindService(bindIntent, connection, 0);
-        // bindService(bindIntent, connection, Context.BIND_AUTO_CREATE);
+        // Bind to DenkService.
+        bindService(intent, connection, 0);
 
-        // theService_.playing_ = false;
-        // Log.d("Rachit", Boolean.toString(serviceBinded_));
-        // Log.d("Rachit", Boolean.toString(theService_.playing_));
         return componentName;
     }
-    /** Defines callbacks for service binding, passed to bindService(). */
+
+    /** connection is simply 2 callbacks. one used by bindService(), the other used by unbindService() */
     private ServiceConnection connection = new ServiceConnection() {
         @Override
-        public void onServiceConnected(ComponentName className,
-                IBinder service) {
-            Log.d("Rachit", "bounded");
+        public void onServiceConnected(ComponentName className, IBinder service) {
             // We've bound to DenkService, cast the IBinder and get DenkService instance.
             DenkService.MyBinder binder = (DenkService.MyBinder) service;
             theService_ = binder.getService();
@@ -100,19 +91,15 @@ public class DenkActivity extends QtActivity {
         }
     };
 
+    /*
+    * We want to access the method inside service from
+    * Cpp. This method is just to enable CPP reach the
+    * setPlayPauseIconInService() method inside the
+    * binded service instance theService_
+    */
     public void setPlayPauseIconInActivity(boolean playing) {
         theService_.setPlayPauseIconInService(playing);
     }
-
-
-    // PendingIntent.getForegroundService() Just calls the Service's onStartCommand() directly.
-    // Maybe its because of the flags we're using.
-    // I tested this by overriding the startForegroundService() and startService() implementation
-    // from main activity. The lines I printed there only gets printed when the service is started
-    // from C++. Never gets printed when the PendingIntent.getService / getForegroundService calls
-
-
-    // **********************************************
 
     /**
       * Called from frontend to decide what
@@ -132,6 +119,5 @@ public class DenkActivity extends QtActivity {
             System.exit(0);
         }
     }
-
 
 }

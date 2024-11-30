@@ -9,11 +9,11 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.widget.Toast;
 import android.app.ActivityManager;
-import android.content.ServiceConnection;
-import android.content.ComponentName;
+// import android.content.ServiceConnection;
+// import android.content.ComponentName;
 
 import android.R;
-import android.os.Build;
+// import android.os.Build;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import androidx.core.app.NotificationCompat;
@@ -26,7 +26,7 @@ public class DenkService extends QtService
 {
     private static native void sendToQt(String message);
 
-    private Context context;
+    private Context context = null;
     private int ret_;
 
     public boolean playing_ = false;
@@ -61,11 +61,6 @@ public class DenkService extends QtService
      // we will move the lines to a declarative function
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // Toast.makeText(context, "Starting Dinkplay..", Toast.LENGTH_SHORT).show();
-
-        Log.d("Rachit", "cervice called");
-        Log.d("Rachitcurr", Boolean.toString(playing_));
-
         // Filter the intent and inform CPP if it was
         // a click from prev, play or pause
         String actionRcvd = intent.getAction();
@@ -180,9 +175,3 @@ public class DenkService extends QtService
     // }
 
 }
-
-
-// LOGIC
-// bool playPause = false; // everything is paused by default ('play' will be shown on screen)
-// all of the other buttons besides pause button, that gets clicked sets it to true. ('pause' will be shown while true)
-// only pause button sets it to false ('play' will be shown on screen)

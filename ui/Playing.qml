@@ -1,5 +1,4 @@
 import QtQuick
-// import QtMultimedia
 import QtQuick.Layouts
 import QtQuick.Effects
 
@@ -116,48 +115,4 @@ Item {
         }
     }
 
-
-    //     Image {
-    //         id: playPauseIco
-    //         source: (playMusic.playbackState === MediaPlayer.PlayingState) ? "images/musicIco/pause.png" : "images/musicIco/play.png";
-    //         width: playProps.width * 0.16;
-    //         height: playProps.width * 0.16;
-    //         anchors.horizontalCenter: parent.horizontalCenter;
-    //         anchors.bottom: parent.bottom;
-    //         // anchors.topMargin: 15
-    //         MouseArea {
-    //             id: playPause
-    //             anchors.fill: parent
-    //             onPressed:  {
-    //                 (playMusic.playbackState === MediaPlayer.PlayingState) ? playMusic.pause() : playMusic.play();
-    //             }
-    //         }
-    //     }
-    //     Image {
-    //         id: prevIco
-    //         source: "images/musicIco/prev.png";
-    //         width: playProps.width * 0.16;
-    //         height: playProps.width * 0.16;
-    //         anchors.left: parent.left;
-    //         anchors.leftMargin: 10
-    //         anchors.bottom: playPauseIco.bottom;
-    //     }
-    //     Image {
-    //         id: nextIco
-    //         source: "images/musicIco/next.png";
-    //         width: playProps.width * 0.16;
-    //         height: playProps.width * 0.16;
-    //         anchors.right: parent.right;
-    //         anchors.rightMargin: 10
-    //         anchors.bottom: playPauseIco.bottom;
-    //     }
-    // }
-
-    // MediaPlayer {
-    //     id: playMusic
-    //     source: "images/dinkplay.mp3";
-    //     autoPlay: false
-    //     loops: MediaPlayer.Infinite
-    //     audioOutput: AudioOutput {}
-    // }
 }

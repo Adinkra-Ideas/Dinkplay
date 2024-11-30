@@ -11,7 +11,7 @@ Item {
             topMargin: 55       // TopControls height == 40
             leftMargin: 10
             rightMargin: 10
-            bottomMargin: 150    // MediaControls height == 55
+            bottomMargin: 55    // MediaControls height == 55
         }
         clip: true
 
