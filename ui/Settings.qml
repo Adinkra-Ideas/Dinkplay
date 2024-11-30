@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 
 ColumnLayout {
-    anchors{
+    anchors {
         top: parent.top
         left: parent.left
         right: parent.right
@@ -37,7 +37,7 @@ ColumnLayout {
         enabled: !Media.intervalStatus
         Text {
             id: lapCountText
-            text: "Lap Count: (Secs)"
+            text: "How Many Laps?"
             color: "white"
             font.pointSize: 13
         }
@@ -87,7 +87,7 @@ ColumnLayout {
         enabled: !Media.intervalStatus
         Text {
             id: lapDurText
-            text: "Duration for each Lap: (Secs)"
+            text: "Duration For Each Lap: (Secs)"
             color: "white"
             font.pointSize: 13
         }
@@ -137,7 +137,7 @@ ColumnLayout {
         enabled: !Media.intervalStatus
         Text {
             id: restDurText
-            text: "Rest: (Secs)"
+            text: "Duration for Resting: (Secs)"
             color: "white"
             font.pointSize: 13
         }
