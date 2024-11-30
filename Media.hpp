@@ -66,7 +66,7 @@ public:
     virtual void    stopAnyCurrentPlaying() = 0;
     virtual void    play() = 0;
     virtual void    pause() = 0;
-    virtual void    playOrPause() = 0;
+    // virtual void    playOrPause() = 0;
     virtual QString getTitle() = 0;
     /*************************************************/
 
@@ -83,6 +83,7 @@ public:
 
     /******* Implemented in Top.cpp ***************/
     virtual void killAllThreads() = 0;
+    virtual void notifyJavaSeviceAboutPlaying(bool isplaying) = 0;
     /**********************************************/
 
 public slots:

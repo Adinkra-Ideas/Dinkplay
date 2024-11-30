@@ -9,7 +9,9 @@ static void logJavaResponse(JNIEnv *env, jobject /*thiz*/, jstring value)
     if (javaMsg == QString("((((Prev))))")) {
         Top::myInstance->changePlay(false);
     } else if (javaMsg == QString("((((Play))))")) {
-        Top::myInstance->playOrPause();
+        Top::myInstance->play();
+    } else if (javaMsg == QString("((((Pause))))")) {
+        Top::myInstance->pause();
     } else if (javaMsg == QString("((((Next))))")) {
         Top::myInstance->changePlay(true);
     }
@@ -47,8 +49,8 @@ Top::Top(QObject * parent) :
         "(Landroid/content/Intent;)Landroid/content/ComponentName;",
         serviceIntent.handle().object() );
 
-    // preserve the foreground service instance returned
-    javaObject.swap(theStartedService);
+    // preserve the Activity to javaObject for future use
+    javaObject.swap(activity);
     #endif
 
     myInstance = this;
@@ -64,9 +66,18 @@ void Top::killAllThreads() {
 // will comment
 void Top::checkForBackPress() {
     #ifdef Q_OS_ANDROID
-    auto activity = QJniObject(QNativeInterface::QAndroidApplication::context());
-    activity.callObjectMethod(
+    // auto activity = QJniObject(QNativeInterface::QAndroidApplication::context());
+    javaObject.callObjectMethod(
         "myBackPressManager",
         "()V" );
+    #endif
+}
+
+void Top::notifyJavaSeviceAboutPlaying(bool isplaying) {
+    #ifdef Q_OS_ANDROID
+    javaObject.callObjectMethod(
+        "setPlayPauseIconInActivity",
+        "(Z)V",
+        isplaying );
     #endif
 }

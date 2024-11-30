@@ -19,6 +19,7 @@ apply plugin: qtGradlePluginType
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     implementation 'androidx.core:core:1.13.1'
+    implementation 'androidx.media:media:1.6.0'
 }
 
 android {

@@ -115,6 +115,8 @@ void Player::setSource(const char * path) {
     state_ = 0;
     // refresh the UI
     emit playbackStateChanged(currentPlayingPath_);
+    //
+    notifyJavaSeviceAboutPlaying(false);
 }
 
 /**
@@ -147,6 +149,7 @@ void Player::play() {
     if (ma_sound_is_playing(soundsHash_[QString(*audIt_)])) {
         state_ = 1;
         emit playbackStateChanged(currentPlayingPath_); // 0 stopped, 1 playing, 2 paused
+        notifyJavaSeviceAboutPlaying(true);
     }
 }
 
@@ -168,6 +171,8 @@ void Player::pause() {
         state_ = 2;
         //
         emit playbackStateChanged(currentPlayingPath_);
+        //
+        notifyJavaSeviceAboutPlaying(false);
     }
 }
 
@@ -177,17 +182,17 @@ void Player::pause() {
   * because Frontend needs to know.
   * @returns void
   */
-void Player::playOrPause() {
-    if (!engineInit_ || audioPaths_.isEmpty()) {
-        return ;
-    }
+// void Player::playOrPause() {
+//     if (!engineInit_ || audioPaths_.isEmpty()) {
+//         return ;
+//     }
 
-    if (ma_sound_is_playing(soundsHash_[QString(*audIt_)])) {
-        pause();
-    } else {
-        play();
-    }
-}
+//     if (ma_sound_is_playing(soundsHash_[QString(*audIt_)])) {
+//         pause();
+//     } else {
+//         play();
+//     }
+// }
 
 /**
   * Simply providing a medium through
@@ -284,6 +289,8 @@ void Player::stop() {
         state_ = 0;
         // Refresh UI
         emit playbackStateChanged(currentPlayingPath_);   // 0 stopped, 1 playing, 2 paused
+        //
+        notifyJavaSeviceAboutPlaying(false);
     }
 }
 

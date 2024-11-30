@@ -29,7 +29,7 @@ public:
 
     void    play() override;
     void    pause() override;
-    void    playOrPause() override;
+    // void    playOrPause() override;
     void    stop();
 
 protected:

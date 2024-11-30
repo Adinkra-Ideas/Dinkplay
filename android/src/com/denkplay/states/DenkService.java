@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.app.PendingIntent;
 import android.util.Log;
 import android.os.IBinder;
+import android.os.Binder;
 import android.os.Bundle;
 import android.widget.Toast;
 import android.app.ActivityManager;
@@ -16,6 +17,8 @@ import android.os.Build;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import androidx.core.app.NotificationCompat;
+import androidx.media.app.NotificationCompat.MediaStyle;
+import android.graphics.BitmapFactory;
 
 import org.qtproject.qt.android.bindings.QtService;
 
@@ -25,6 +28,8 @@ public class DenkService extends QtService
 
     private Context context;
     private int ret_;
+
+    public boolean playing_ = false;
 
     DenkService denkService;
 
@@ -58,6 +63,9 @@ public class DenkService extends QtService
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Toast.makeText(context, "Starting Dinkplay..", Toast.LENGTH_SHORT).show();
 
+        Log.d("Rachit", "cervice called");
+        Log.d("Rachitcurr", Boolean.toString(playing_));
+
         // Filter the intent and inform CPP if it was
         // a click from prev, play or pause
         String actionRcvd = intent.getAction();
@@ -66,6 +74,8 @@ public class DenkService extends QtService
                 sendToQt("((((Prev))))");
             } else if (actionRcvd.equals("com.denkplay.states.action.play")) {
                 sendToQt("((((Play))))");
+            } else if (actionRcvd.equals("com.denkplay.states.action.pause")) {
+            sendToQt("((((Pause))))");
             } else if (actionRcvd.equals("com.denkplay.states.action.next")) {
                 sendToQt("((((Next))))");
             }
@@ -89,6 +99,10 @@ public class DenkService extends QtService
         playIntent.setAction("com.denkplay.states.action.play");
         PendingIntent pplayIntent = PendingIntent.getForegroundService(this, 0, playIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
+        Intent pauseIntent = new Intent(this, DenkService.class);
+        pauseIntent.setAction("com.denkplay.states.action.pause");
+        PendingIntent ppauseIntent = PendingIntent.getForegroundService(this, 0, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
         Intent nextIntent = new Intent(this, DenkService.class);
         nextIntent.setAction("com.denkplay.states.action.next");
         PendingIntent pnextIntent = PendingIntent.getForegroundService(this, 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
@@ -96,14 +110,21 @@ public class DenkService extends QtService
         // Build the notification
         final String ChannelID = "DinkPlay";
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, ChannelID)
+                .setStyle(new MediaStyle()
+                               .setShowActionsInCompactView(0, 1, 2)
+                        )
                 .setSmallIcon(getApplicationInfo().icon)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), getApplicationInfo().icon))
                 .setContentTitle("")
                 .setContentText("")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingActIntent) // when I removed this, the app stopped dying on multi clicks
+                .setContentIntent(pendingActIntent)
                 .setOngoing(true)
                 .addAction(new NotificationCompat.Action(R.drawable.ic_media_previous, "Previous", ppreviousIntent))
-                .addAction(new NotificationCompat.Action(R.drawable.ic_media_play, "Toggle", pplayIntent))
+                .addAction(new NotificationCompat.Action(
+                        (playing_ ? R.drawable.ic_media_pause : R.drawable.ic_media_play),
+                        (playing_ ? "Pause" : "Play"),
+                        (playing_ ? ppauseIntent : pplayIntent)))
                 .addAction(new NotificationCompat.Action(R.drawable.ic_media_next, "Next", pnextIntent))
                 ;
 
@@ -113,9 +134,38 @@ public class DenkService extends QtService
             return ret;
     }
 
+    public void setPlayPauseIconInService(boolean playing) {
+        playing_ = playing;
+
+        /* We will manually execute a pendingIntent so that the onStartCommand will be called for our music player icons to be refreshed */
+        Intent refreshIconsIntent = new Intent(this, DenkService.class);
+        refreshIconsIntent.setAction("com.denkplay.states.action.refreshIcons");
+        PendingIntent prefreshIconsIntent = PendingIntent.getForegroundService(this, 0, refreshIconsIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        // Execute the operation associated with our pendingIntent as if it were clicked by a user
+        try {
+            prefreshIconsIntent.send();
+        } catch (PendingIntent.CanceledException e) {
+            // e.printStackTrace();
+        }
+    }
+
+    // Binder given to clients.
+    private final IBinder binder = new MyBinder();
+    /**
+     * Binder.getService() returns a service object.
+     * To make Binder.getService() return the instance of this service,
+     * we inherit from it, then we implement our custom MyBinder.getService()
+     */
+    public class MyBinder extends Binder {
+        DenkService getService() {
+            // Return this instance of DenkService so clients can call its public methods.
+            return DenkService.this;
+        }
+    }
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return binder;
     }
 
 
