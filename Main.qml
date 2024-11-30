@@ -66,7 +66,7 @@ Window {
             // set inactiveMouse to inactive every 3 seconds
             Timer {
                 id: timer
-                interval: 3000
+                interval: 7000
                 onTriggered: {
                     activityListener.inactiveMouse = true
                 }
