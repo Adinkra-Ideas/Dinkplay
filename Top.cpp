@@ -56,7 +56,12 @@ Top::Top(QObject * parent) :
     myInstance = this;
 }
 
-Top::~Top(){}
+Top::~Top(){
+    // qDebug() << "App is getting Killedffffffff";
+
+    // //
+    // checkForBackPress();
+}
 
 void Top::killAllThreads() {
     killIntervalThread();
@@ -73,6 +78,7 @@ void Top::checkForBackPress() {
     #endif
 }
 
+// will comment
 void Top::notifyJavaSeviceAboutPlaying(bool isplaying) {
     #ifdef Q_OS_ANDROID
     javaObject.callObjectMethod(

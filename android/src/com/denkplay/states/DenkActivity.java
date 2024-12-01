@@ -59,9 +59,22 @@ public class DenkActivity extends QtActivity {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         unbindService(connection);
         serviceBinded_ = false;
+
+        // This is a clean way to quickly exit the app onDestroy.
+        // if you depend on super.onDestroy, exiting can take over
+        // 20 seconds after app closes. Also, startedServices wont
+        // get their ondestroy called at all, orphaning them in the
+        // process. an
+        // Worse is if you attempt to relaunch the app, it will hang
+        // and crash.
+        // The only way to avoid all these problem is to cleanly exit
+        // using the below two calls.
+        finishAffinity();
+        System.exit(0);
+
+        super.onDestroy();
     }
 
     @Override
@@ -115,6 +128,11 @@ public class DenkActivity extends QtActivity {
             moveTaskToBack (true);
             super.onPause();
         } else {
+            // Instant and clean exit. All running services onDestroy()
+            // will be called as well to ensure startedServices also have
+            // the opportunity to close themselves gracefully.
+            // finishAffinity() kills app and frees memory.
+            // System.exit(0); forces android to take back freed memory.
             finishAffinity();
             System.exit(0);
         }
