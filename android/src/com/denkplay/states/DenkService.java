@@ -123,7 +123,9 @@ public class DenkService extends QtService
                 .addAction(new NotificationCompat.Action(R.drawable.ic_media_next, "Next", pnextIntent))
                 ;
 
-            startForeground(1002, builder.build(), 2); // 2 == FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+            // param3 of 2 == FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+            // as mandated by API >= 33
+            startForeground(1002, builder.build(), 2);
 
             int ret = super.onStartCommand(intent, flags, startId);
             return ret;

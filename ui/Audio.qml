@@ -27,7 +27,7 @@ Item {
                 text: modelData.slice(modelData.lastIndexOf('/') + 1)
                 // color: index % 2 ? "grey" : "yellow"
                 color: theListView.currentIndex === index ? "white" : "grey"
-                font.pointSize: 12
+                font.pointSize: 14
                 anchors.verticalCenter: parent.verticalCenter
                 // anchors.left: parent.left
                 // anchors.leftMargin: 5

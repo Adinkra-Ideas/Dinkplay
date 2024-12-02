@@ -2,13 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" android:installLocation="auto" android:versionCode="-- %%INSERT_VERSION_CODE%% --" android:versionName="-- %%INSERT_VERSION_NAME%% --">
     <!-- %%INSERT_PERMISSIONS -->
     <!-- %%INSERT_FEATURES -->
+
+    <!-- Mandatory foreground service declarations (for API 33 and above) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
+    <!-- Mandatory foreground service declarations (for API 33 and above) -->
 
     <!-- Display of notifications / foreground service notifications (for API 33 and above) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <!-- Display of notifications / foreground service notifications (for API 33 and above) -->
-
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
 
     <!-- Access Audio files (API 32 and below) -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
