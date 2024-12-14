@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Dialogs
+import QtCore
 // import QtMultimedia
 
 Rectangle {
@@ -134,7 +135,10 @@ Rectangle {
     // called when add is clicked
     FolderDialog {
         id: folderDialog
+        currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
 
+        // selectedFolder is the folder that the user just selected last.
+        // currentFolder is the folder that is first opened by FolderDialog.
         onAccepted: {
             folderDialog.currentFolder = folderDialog.selectedFolder
             Media.currDir = folderDialog.selectedFolder

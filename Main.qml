@@ -15,8 +15,10 @@ Window {
     title: qsTr("DinkPlay")
     // Let Activity determine whether to close or minimize
     onClosing: {
-        Media.checkForBackPress()
-        close.accepted = false
+        if (Qt.platform.os == "android" /*ios*/) {
+            Media.checkForBackPress()
+            close.accepted = false
+        }
     }
 
     Item {

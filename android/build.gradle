@@ -77,7 +77,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.adinkra.dinkplay" // Comment out during dev, else it wont run for debugging after installing to device
+        // applicationId "com.adinkra.dinkplay" // Comment out during dev, else it wont run for debugging after installing to device
         resConfig "en"
         minSdkVersion 28
         targetSdkVersion 34
