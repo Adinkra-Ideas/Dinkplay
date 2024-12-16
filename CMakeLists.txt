@@ -78,9 +78,11 @@ set_target_properties(appDinkplay PROPERTIES
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
+
 target_link_options(appDinkplay BEFORE PUBLIC
-    -L../../ma_lib
-    -L./ma_lib
+    # -L../../ma_lib  # custom directories to also search fir libraries added using target_link_libraries()
+    # -L./ma_lib      # custom directories to also search fir libraries added using target_link_libraries()
+    ./ma_lib/miniaudio.o
 )
 
 target_link_libraries(appDinkplay PRIVATE
@@ -121,6 +123,6 @@ endif()
 
 if (IOS)
     target_link_libraries(appDinkplay PRIVATE
-        miniaudio_arm64
+        # miniaudio_arm64
     )
 endif()
