@@ -78,7 +78,10 @@ set_target_properties(appDinkplay PROPERTIES
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
-target_link_options(appDinkplay BEFORE PUBLIC -L../../ma_lib)
+target_link_options(appDinkplay BEFORE PUBLIC
+    -L../../ma_lib
+    -L./ma_lib
+)
 
 target_link_libraries(appDinkplay PRIVATE
     Qt6::Quick
@@ -113,5 +116,11 @@ if (ANDROID)
         # miniaudio_x86
         # miniaudio_x86_64
         Qt6::CorePrivate
+    )
+endif()
+
+if (IOS)
+    target_link_libraries(appDinkplay PRIVATE
+        miniaudio_arm64
     )
 endif()
