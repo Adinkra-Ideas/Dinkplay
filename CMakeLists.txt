@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(UI ui)
 
-
 find_package(Qt6 6.5 REQUIRED COMPONENTS
     Quick
     Core
@@ -62,12 +61,7 @@ qt_add_qml_module(appDinkplay
         Interval.hpp Interval.cpp
         Player.hpp Player.cpp
         IntervalWorker.hpp IntervalWorker.cpp
-        #ma_lib/miniaudio.h ma_lib/miniaudio.c
-        #RESOURCES android/AndroidManifest.xml android/build.gradle android/res/values/libs.xml android/res/xml/qtprovider_paths.xml android/gradle/wrapper/gradle-wrapper.jar android/gradle/wrapper/gradle-wrapper.properties android/gradle.properties android/gradlew android/gradlew.bat
-        #RESOURCES android/src/com/denkplay/states/DenkService.java
-        #RESOURCES android/src/com/denkplay/states/DenkActivity.java
 )
-
 # qt_target_qml_sources() provides the ability to add more files to a QML module after qt_add_qml_module() has been called. Typically, you pass the set of .qml files and resources to qt_add_qml_module() directly, but in some cases, it may be desirable, or even necessary, to add files after qt_add_qml_module() has been called. For example, you may wish to add files conditionally based on an if statement expression, or from subdirectories that will only be added if certain criteria are met. You might want to add a set of files with different characteristics to the others, such as a different resource prefix, or with linting and bytecode compilation disabled. The qt_target_qml_sources() command enables these scenarios. https://felgo.com/doc/qt/qt-target-qml-sources/
 if (ANDROID)
 qt_target_qml_sources(appDinkplay
@@ -88,25 +82,26 @@ set_target_properties(appDinkplay PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-#target_link_options(appDinkplay BEFORE PUBLIC
-    # -L../../ma_lib  # custom directories to also search fir libraries added using target_link_libraries()
-    #-L./ma_lib      # custom directories to also search fir libraries added using target_link_libraries()
-    #./ma_lib/miniaudioMac.o
-    # -framework CoreFoundation
-#)
+
+#########################################
+#       ADD LINKING FLAGS               #
+#########################################
 
 # macos and my windows QtCreator finds ./ma_lib/ directory differently
 if (IOS)
     target_link_options(appDinkplay BEFORE PUBLIC
         -L./ma_lib      # custom directories to also search fir libraries added using target_link_libraries()
-        #./ma_lib/miniaudioMac.o
-        # -framework CoreFoundation
     )
 else()
     target_link_options(appDinkplay BEFORE PUBLIC
         -L../../ma_lib  #custom directories to also search fir libraries added using target_link_libraries()
     )
 endif()
+
+
+#########################################
+#       ADD LINKED LIBRARIES            #
+#########################################
 
 target_link_libraries(appDinkplay PRIVATE
     Qt6::Quick
@@ -115,21 +110,11 @@ target_link_libraries(appDinkplay PRIVATE
     Qt6::Qml
     Qt6::SpatialAudio
 )
-
-include(GNUInstallDirs)
-install(TARGETS appDinkplay
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
-
 if (WIN32)
     target_link_libraries(appDinkplay PRIVATE
         miniaudio_win32
     )
-endif()
-
-if (ANDROID)
+elseif (ANDROID)
     include(C:/Users/user/AppData/Local/Android/Sdk/android_openssl/CMakeLists.txt)
     set_target_properties(appDinkplay PROPERTIES
        QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/android
@@ -142,10 +127,16 @@ if (ANDROID)
         # miniaudio_x86_64
         Qt6::CorePrivate
     )
-endif()
-
-if (IOS)
+elseif (IOS)
     target_link_libraries(appDinkplay PRIVATE
         miniaudio_iOS
     )
 endif()
+
+
+include(GNUInstallDirs)
+install(TARGETS appDinkplay
+    BUNDLE DESTINATION .
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
