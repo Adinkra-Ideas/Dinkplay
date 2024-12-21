@@ -113,7 +113,7 @@ target_link_libraries(appDinkplay PRIVATE
     Qt6::Core
     Qt6::QuickControls2
     Qt6::Qml
-    Qt6::SpatialAudio
+    #Qt6::SpatialAudio this needed to be commented out before app could be built for iOS but I dont know how it got here in first place for android build. Was it a remnant I had forgotten to remove during my time of frustration post qmediaplayer?
 )
 
 include(GNUInstallDirs)
