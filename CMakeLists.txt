@@ -32,6 +32,7 @@ qt_add_qml_module(appDinkplay
         QML_FILES ${UI}/Settings.qml
         QML_FILES ${UI}/MediaControls.qml
     RESOURCES
+        ${UI}/images/db.mp3
         ${UI}/images/musicSpin.gif
         ${UI}/images/musicIco/artist.png
         ${UI}/images/musicIco/playing.png
@@ -75,10 +76,10 @@ endif()
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
 set_target_properties(appDinkplay PROPERTIES
-#    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appDinkplay
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE TRUE
+##    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appDinkplay
+#    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+#    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+#    MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
 
@@ -115,6 +116,7 @@ if (WIN32)
         miniaudio_win32
     )
 elseif (ANDROID)
+    # This filepath is based on default Qt AppData path for windows. Change if on different OS
     include(C:/Users/user/AppData/Local/Android/Sdk/android_openssl/CMakeLists.txt)
     set_target_properties(appDinkplay PROPERTIES
        QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/android
@@ -128,6 +130,10 @@ elseif (ANDROID)
         Qt6::CorePrivate
     )
 elseif (IOS)
+    set_target_properties(appDinkplay PROPERTIES
+        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/iOS/Info.plist.in
+    )
+
     target_link_libraries(appDinkplay PRIVATE
         miniaudio_iOS
     )

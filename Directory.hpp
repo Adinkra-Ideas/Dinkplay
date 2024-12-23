@@ -14,6 +14,7 @@
 #include <QDir>
 #include <QStringList>
 #include <QSettings>
+#include <QStandardPaths>
 
 #include "Media.hpp"
 

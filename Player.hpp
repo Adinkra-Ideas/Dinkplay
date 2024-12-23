@@ -3,6 +3,7 @@
 #define PLAYER_HPP
 
 #include <QObject>
+#include <QDebug>
 
 #include "Media.hpp"
 

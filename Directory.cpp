@@ -141,9 +141,26 @@ void    Directory::addDir(QUrl path) {
     path = QUrl::fromLocalFile(path.toString());
     #endif
 
-    // we dont even know if the right path is what we're using
+    // how do we know a path that requires permission outside our sandbox?
+    // I believe this homelocation will change output if we have permission.
 
-    currDir_ = path.toString();
+
+    //////
+    /// // /private/var/mobile/Containers/Data/Application/C2103CFC-BECD-4184-8BA5-55D41E7E8C99/dab.mp3
+    //currDir_ = "file:///private/var/mobile/Containers/Data/Application/";
+    //qDebug() << "recvd path " << path;
+    currDir_ = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/";
+    currDir_.prepend("file//");
+    qDebug() << "the curr" << currDir_;
+    qDebug() << "test " << QDir(QUrl(currDir_).toLocalFile()).exists();
+    //////
+    QDir dir(QUrl(currDir_).toLocalFile());
+    QStringList all = dir.entryList();
+    for (QString &one: all) {
+        qDebug() << "checking:" << one;
+    }
+
+    // currDir_ = path.toString();
     if (! currDir_.endsWith('/')) {
         currDir_.append('/');
     }
@@ -157,6 +174,10 @@ QStringList Directory::getAudioPaths() {
 }
 
 void Directory::doAddDir() {
+    //////
+    audioPaths_.push_back(currDir_ + "dab.mp3");
+    soundsHash_[currDir_ + "dab.mp3"] = nullptr;
+
     QDir dir(QUrl(currDir_).toLocalFile());
 
     // remove the file:/// from the beginning of file name
@@ -168,10 +189,6 @@ void Directory::doAddDir() {
 
     // Fetch all filepaths that ends with .mp3 from the directory
     QStringList mp3 = dir.entryList(QStringList() << "*.mp3", QDir::Files);
-
-    //////
-    //audioPaths_.push_back("/private/var/mobile/Library/Mobile Documents/com~apple~CloudDocs/Downloads/dab.mp3");
-    //soundsHash_["/private/var/mobile/Library/Mobile Documents/com~apple~CloudDocs/Downloads/dab.mp3"] = nullptr;
 
     for (QString &aMp3: mp3) {
         qDebug() << "here means access to files were granted" << aMp3 ;
@@ -191,6 +208,9 @@ void Directory::doAddDir() {
     backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));
 
     preparePathsForPlay();
+
+    //////
+    play();
 }
 
 /**
