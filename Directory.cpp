@@ -141,7 +141,13 @@ void    Directory::addDir(QUrl path) {
     path = QUrl::fromLocalFile(path.toString());
     #endif
 
-    currDir_ = path.toString() + '/';
+    // we dont even know if the right path is what we're using
+
+    currDir_ = path.toString();
+    if (! currDir_.endsWith('/')) {
+        currDir_.append('/');
+    }
+
     doAddDir();
     // emit dirChanged();
 }
@@ -153,7 +159,7 @@ QStringList Directory::getAudioPaths() {
 void Directory::doAddDir() {
     QDir dir(QUrl(currDir_).toLocalFile());
 
-    // remove the file:/// from the beginnig of file name
+    // remove the file:/// from the beginning of file name
     // This problem exist coz we were initially building
     // for qmediaplayer
     if (QUrl(currDir_).isLocalFile()) {
@@ -162,7 +168,13 @@ void Directory::doAddDir() {
 
     // Fetch all filepaths that ends with .mp3 from the directory
     QStringList mp3 = dir.entryList(QStringList() << "*.mp3", QDir::Files);
+
+    //////
+    //audioPaths_.push_back("/private/var/mobile/Library/Mobile Documents/com~apple~CloudDocs/Downloads/dab.mp3");
+    //soundsHash_["/private/var/mobile/Library/Mobile Documents/com~apple~CloudDocs/Downloads/dab.mp3"] = nullptr;
+
     for (QString &aMp3: mp3) {
+        qDebug() << "here means access to files were granted" << aMp3 ;
         if (! audioPaths_.contains(currDir_ + aMp3)) {  // no repeat
             // Add the new path to our sound stringlist
             audioPaths_.push_back(currDir_ + aMp3);
