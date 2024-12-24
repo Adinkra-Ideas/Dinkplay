@@ -50,5 +50,32 @@
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
+
+    <key>NSDocumentsFolderUsageDescription</key>
+    <string>App wants to access your documents folder</string>
+
+    <key>NSDownloadsFolderUsageDescription</key>
+    <string>App wants to access your downloads folder</string>
+
+    <key>NSNetworkVolumesUsageDescription</key>
+    <string>App wants to access your documents folder</string>
+
+    <key>NSRemovableVolumesUsageDescription</key>
+    <string>App wants to access your downloads folder</string>
+
+    <key>NSFileProviderDomainUsageDescription</key>
+    <string>App wants to access your documents folder</string>
+
+    <key>NSDesktopFolderUsageDescription</key>
+    <string>App wants to access your downloads folder</string>
+
+    <key>com.apple.security.files.user-selected.read-only</key>
+    <true/>
+
+    <key>com.apple.security.files.downloads.read-only</key>
+    <true/>
+
+    <key>NSAppDataUsageDescription</key>
+    <string>App Whyyy to access your downloads folder</string>
 </dict>
 </plist>
