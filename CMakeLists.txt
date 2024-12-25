@@ -32,7 +32,7 @@ qt_add_qml_module(appDinkplay
         QML_FILES ${UI}/Settings.qml
         QML_FILES ${UI}/MediaControls.qml
     RESOURCES
-        ${UI}/images/db.mp3
+        #${UI}/images/db.mp3
         ${UI}/images/musicSpin.gif
         ${UI}/images/musicIco/artist.png
         ${UI}/images/musicIco/playing.png
@@ -130,6 +130,13 @@ elseif (ANDROID)
         Qt6::CorePrivate
     )
 elseif (IOS)
+    file(GLOB_RECURSE myAudios CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/ui/images/*.mp3)
+    target_sources(appDinkplay PRIVATE ${myAudios})
+    set_source_files_properties(
+        ${myAudios}
+        PROPERTIES MACOSX_PACKAGE_LOCATION Resources/audios
+    )
+
     set_target_properties(appDinkplay PROPERTIES
         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/iOS/Info.plist.in
     )
