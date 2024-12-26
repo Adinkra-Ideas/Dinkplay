@@ -91,10 +91,8 @@ set_target_properties(appDinkplay PROPERTIES
 # macos and my windows QtCreator finds ./ma_lib/ directory differently
 if (IOS)
     target_link_options(appDinkplay BEFORE PUBLIC
-        #-L./ma_lib      # custom directories to also search fir libraries added using target_link_libraries()
-        ./ma_lib/miniaudioMac.o
-        -framework CoreAudio
-        #-framework CoreFoundation  # # -framework AudioUnit # Since these two are already auto added by xcode, adding them again will lead to error that you wont understand
+        -L./ma_lib      # custom directories to also search fir libraries added using target_link_libraries()
+        -framework AVFoundation
     )
 else()
     target_link_options(appDinkplay BEFORE PUBLIC
@@ -147,8 +145,11 @@ elseif (IOS)
         #XCODE_ATTRIBUTE_LIBRARY_LOAD_CONSTRAINT ${CMAKE_SOURCE_DIR}/iOS/Entitlements.plist.iOS
         #XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS ${CMAKE_SOURCE_DIR}/iOS/Entitlements.plist.iOS
 
+        # ADD CUSTOM ENTITLEMENTS FOR ADDING ENTITLEMENTS THAT ARE POSSIBLE TO BE ADDED IN CUSTOM .entitlements file
         XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS ${CMAKE_SOURCE_DIR}/iOS/appDinkplay.entitlements
         XCODE_ATTRIBUTE_DEVELOPMENT_TEAM 9252ZRKKG6 #big improvement to prevent the manual sign sign sign
+
+        # APPSTORE DEPLOYMENT SETTINGS TO PREVENT REJECTION
         #XCODE_ATTRIBUTE_ENABLE_APP_SANDBOX "YES"
         #XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME "YES"
         #XCODE_ATTRIBUTE_ENABLE_USER_SELECTED_FILES "readonly"
@@ -158,7 +159,7 @@ elseif (IOS)
 
 
     target_link_libraries(appDinkplay PRIVATE
-        #miniaudio_iOS
+        miniaudio_iOS
     )
 endif()
 

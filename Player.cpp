@@ -27,6 +27,8 @@ Player::Player(QObject *parent) :
     Media{parent},
     engineInit_{false},
     state_{0} {
+
+
     // initialize the mini audio engine object.
     // will be destroyed in destructor
     result_ = ma_engine_init(NULL, &engine_);

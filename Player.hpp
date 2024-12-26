@@ -34,9 +34,10 @@ public:
     void    stop();
 
 protected:
-    ma_sound    sound_;
-    ma_result   result_;
-    ma_engine   engine_;
+    ma_sound            sound_;
+    ma_result           result_;
+    ma_engine           engine_;
+    ma_device_config    config_;
 
     bool        engineInit_;    // True if mini audio engine was successfully init-ed, else false
     quint8      state_;         // Holds the current media playback state at any given time. 0 == stopped, 1 == playing, 2 == paused
