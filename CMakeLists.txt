@@ -91,7 +91,10 @@ set_target_properties(appDinkplay PROPERTIES
 # macos and my windows QtCreator finds ./ma_lib/ directory differently
 if (IOS)
     target_link_options(appDinkplay BEFORE PUBLIC
-        -L./ma_lib      # custom directories to also search fir libraries added using target_link_libraries()
+        #-L./ma_lib      # custom directories to also search fir libraries added using target_link_libraries()
+        ./ma_lib/miniaudioMac.o
+        -framework CoreAudio
+        #-framework CoreFoundation  # # -framework AudioUnit # Since these two are already auto added by xcode, adding them again will lead to error that you wont understand
     )
 else()
     target_link_options(appDinkplay BEFORE PUBLIC
@@ -133,16 +136,29 @@ elseif (IOS)
     file(GLOB_RECURSE myAudios CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/ui/images/*.mp3)
     target_sources(appDinkplay PRIVATE ${myAudios})
     set_source_files_properties(
-        ${myAudios}
-        PROPERTIES MACOSX_PACKAGE_LOCATION Resources/audios
+        ${myAudios} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/audios
     )
 
     set_target_properties(appDinkplay PROPERTIES
-        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/iOS/Info.plist.in
+        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/iOS/Info.plist
+
+        #XCODE_ATTRIBUTE_LAUNCH_CONSTRAINT_SELF ${CMAKE_SOURCE_DIR}/iOS/Entitlements.plist.iOS
+        #XCODE_ATTRIBUTE_LAUNCH_CONSTRAINT_RESPONSIBLE ${CMAKE_SOURCE_DIR}/iOS/Entitlements.plist.iOS
+        #XCODE_ATTRIBUTE_LIBRARY_LOAD_CONSTRAINT ${CMAKE_SOURCE_DIR}/iOS/Entitlements.plist.iOS
+        #XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS ${CMAKE_SOURCE_DIR}/iOS/Entitlements.plist.iOS
+
+        XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS ${CMAKE_SOURCE_DIR}/iOS/appDinkplay.entitlements
+        XCODE_ATTRIBUTE_DEVELOPMENT_TEAM 9252ZRKKG6 #big improvement to prevent the manual sign sign sign
+        #XCODE_ATTRIBUTE_ENABLE_APP_SANDBOX "YES"
+        #XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME "YES"
+        #XCODE_ATTRIBUTE_ENABLE_USER_SELECTED_FILES "readonly"
+        #XCODE_ATTRIBUTE_ALLOW_DYLD_ENVIRONMENT_VARIABLES "YES"
+        #/Users/daniel/Documents/Dinkplay/iOS/appDinkplay.entitlements
     )
 
+
     target_link_libraries(appDinkplay PRIVATE
-        miniaudio_iOS
+        #miniaudio_iOS
     )
 endif()
 

@@ -146,20 +146,17 @@ void    Directory::addDir(QUrl path) {
 
 
     //////
-    /// // /private/var/mobile/Containers/Data/Application/C2103CFC-BECD-4184-8BA5-55D41E7E8C99/dab.mp3
     //currDir_ = "file:///private/var/mobile/Containers/Data/Application/";
-    //qDebug() << "recvd path " << path;
-    QString thisAppID = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/";
-    thisAppID = thisAppID.mid(47);
-    qDebug() << "the home" << thisAppID;
-    //currDir_ = "/var/mobile/Containers/Data/Application" + thisAppID;
 
-    //currDir_ = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/";
-    //currDir_.prepend("file://");
-    //currDir_.chop(22);
-    currDir_ = "./audios";
+    // Extracting the unique App_ID of this app
+    QString thisAppID = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/";
+    //thisAppID = thisAppID.mid(47);
+    //thisAppID = "/6935D002-44A6-4328-86A2-1CEAC71DC409/";
+    //qDebug() << "the home" << thisAppID;
+    //currDir_ = "file:///private/var/mobile/Containers/Data/Application" + thisAppID;
+    //currDir_ = "file:///private/var/mobile/Containers/Shared/AppGroup" + thisAppID;
+    currDir_ = ".";
     qDebug() << "the curr" << currDir_;
-    //qDebug() << "test " << QDir(QUrl(currDir_).toLocalFile()).exists();
     //////
     //QDir dir(QUrl(currDir_).toLocalFile());
     QDir dir(currDir_);
@@ -184,8 +181,9 @@ QStringList Directory::getAudioPaths() {
 
 void Directory::doAddDir() {
     //////
-    audioPaths_.push_back(currDir_ + "db.mp3");
-    soundsHash_[currDir_ + "db.mp3"] = nullptr;
+    /// // just adding a bundled song for testing whether audio plays out
+    audioPaths_.push_back("audios/db.mp3");
+    soundsHash_["audios/db.mp3"] = nullptr;
 
     QDir dir(QUrl(currDir_).toLocalFile());
 
