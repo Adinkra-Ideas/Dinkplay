@@ -103,6 +103,8 @@ void    Directory::addDir(QUrl path) {
     checkPermission();
     #endif
 
+    qDebug() << "the things: " << path.toString();
+
     // if there is an active, we stop the ma_sound.
     // THIS MUST BE DONE BEFORE TAMPERING WITH
     // audIt_ or *audIt_ or audioPaths_
@@ -120,6 +122,7 @@ void    Directory::addDir(QUrl path) {
         path = QUrl::fromLocalFile(path.toString());
     }
 
+    // Arranging directory path according to android uncertainties and specifications
     #ifdef Q_OS_ANDROID
     // decode twice from %253A to %3A then to :
     path.setUrl(QUrl::fromPercentEncoding(path.toString().toLatin1()));
@@ -139,6 +142,21 @@ void    Directory::addDir(QUrl path) {
     else
         path.setUrl(QString(path.toString()).sliced(pos + 6, subPathPos - (pos + 6)).prepend("/storage/").append(subPath)); // 6 == len("/tree/"), 9 == len("xxxx-xxxx")
     path = QUrl::fromLocalFile(path.toString());
+    #endif
+
+    // If IOS, it means we received a big string with each selected filepath separated by a comma.
+    // here we break the string and assign them directly.
+    #ifdef Q_OS_IOS
+    QStringList allPaths = path.toString().split(',', Qt::SkipEmptyParts);
+    for (QString &onePath: allPaths) {
+        // If path begins with "file:///", we have to change it to "/"
+        // before assigning to audioPaths_
+        if (QUrl(onePath).isLocalFile()) {
+            audioPaths_.push_back(QUrl(onePath).toLocalFile());
+        } else {
+           audioPaths_.push_back(onePath);
+        }
+    }
     #endif
 
     //////
@@ -170,7 +188,6 @@ void    Directory::addDir(QUrl path) {
 
 
     doAddDir();
-    // emit dirChanged();
 }
 
 QStringList Directory::getAudioPaths() {
@@ -182,6 +199,15 @@ void Directory::doAddDir() {
     /// // just adding a bundled song for testing whether audio plays out
     //audioPaths_.push_back("audios/db.mp3");
     //soundsHash_["audios/db.mp3"] = nullptr;
+
+    // Since IOS selectedfiles paths have already been assigned to audioPaths_,
+    // no need to repeat.
+    #ifndef Q_OS_IOS
+    // // we can clean this below code to if we can test with android to know there is no problem
+    // if (QUrl(currDir_).isLocalFile()) {
+    //     currDir_ = QUrl(currDir_).toLocalFile();
+    // }
+    // QDir dir(currDir_);
 
     QDir dir(QUrl(currDir_).toLocalFile());
 
@@ -207,6 +233,7 @@ void Directory::doAddDir() {
     // for (QString &aMp4: mp4) {
     //     videoPaths_.push_back(currDir_ + aMp4);
     // }
+    #endif
 
     // preparing for store to localStorage onExit
     backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));
