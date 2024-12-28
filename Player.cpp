@@ -88,8 +88,6 @@ void Player::setSource(const char * path) {
     // set the current playing audio path to currentPlayingPath_
     currentPlayingPath_ = path;
 
-    qDebug() << "trying to init audio from path " << path;
-
     // The idea is: although the soundsHash_ contains
     // all the mp3 files indexed from addDirectory(),
     // the ma_sound associated with a mp3 file will only
@@ -101,12 +99,10 @@ void Player::setSource(const char * path) {
         soundsHash_[QString(path)] = new ma_sound;
         result_ = ma_sound_init_from_file(&engine_, path, 0, NULL, NULL, soundsHash_[QString(path)]);
         if (result_ == MA_SUCCESS) {
-            qDebug() << "audio initted " ;
             // calls itself again this time with a sound to play
             setSource(path);
             return ;
         } else {
-            qDebug() << "audio init failed " ;
             delete soundsHash_[QString(path)];
             soundsHash_[QString(path)] = nullptr;
             return ;

@@ -101,6 +101,7 @@ Rectangle {
                 anchors.fill: parent
                 onClicked: {
                     folderDialog.open()
+                    //fileDialog.open()
                 }
             }
         }
@@ -148,4 +149,17 @@ Rectangle {
         // currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
         // selectedFolder: viewer.folder
     }
+    FileDialog {
+        id: fileDialog
+        currentFolder: StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
+
+        // selectedFile is the file that the user just selected last.
+        // currentFolder is the folder that is first opened by FileDialog.
+        onAccepted: {
+            fileDialog.currentFile = fileDialog.selectedFile
+            Media.currDir = fileDialog.selectedFile
+            print("trrrrrr: ", fileDialog.selectedFile)
+        }
+    }
+
 }

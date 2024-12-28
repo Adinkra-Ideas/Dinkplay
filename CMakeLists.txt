@@ -62,6 +62,7 @@ qt_add_qml_module(appDinkplay
         Interval.hpp Interval.cpp
         Player.hpp Player.cpp
         IntervalWorker.hpp IntervalWorker.cpp
+        ma_lib/miniaudio.m # added for simulator
 )
 # qt_target_qml_sources() provides the ability to add more files to a QML module after qt_add_qml_module() has been called. Typically, you pass the set of .qml files and resources to qt_add_qml_module() directly, but in some cases, it may be desirable, or even necessary, to add files after qt_add_qml_module() has been called. For example, you may wish to add files conditionally based on an if statement expression, or from subdirectories that will only be added if certain criteria are met. You might want to add a set of files with different characteristics to the others, such as a different resource prefix, or with linting and bytecode compilation disabled. The qt_target_qml_sources() command enables these scenarios. https://felgo.com/doc/qt/qt-target-qml-sources/
 if (ANDROID)
@@ -147,6 +148,8 @@ elseif (IOS)
 
         # ADD CUSTOM ENTITLEMENTS FOR ADDING ENTITLEMENTS THAT ARE POSSIBLE TO BE ADDED IN CUSTOM .entitlements file
         XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS ${CMAKE_SOURCE_DIR}/iOS/appDinkplay.entitlements
+
+        # ADD XCODE SIGNING FROM CMAKE (THESE CAN BE MANUALLY ENTERED IN XCODE DIRECTLY)
         XCODE_ATTRIBUTE_DEVELOPMENT_TEAM 9252ZRKKG6 #big improvement to prevent the manual sign sign sign
 
         # APPSTORE DEPLOYMENT SETTINGS TO PREVENT REJECTION
@@ -154,12 +157,11 @@ elseif (IOS)
         #XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME "YES"
         #XCODE_ATTRIBUTE_ENABLE_USER_SELECTED_FILES "readonly"
         #XCODE_ATTRIBUTE_ALLOW_DYLD_ENVIRONMENT_VARIABLES "YES"
-        #/Users/daniel/Documents/Dinkplay/iOS/appDinkplay.entitlements
     )
 
 
     target_link_libraries(appDinkplay PRIVATE
-        miniaudio_iOS
+        #miniaudio_iOS # removed for simulator
     )
 endif()
 

@@ -4,23 +4,13 @@
 <dict>
 	<key>application-identifier</key>
 	<string>9252ZRKKG6.com.adinkra.appDinkplay</string>
-	<key>com.apple.developer.healthkit.access</key>
-	<array/>
 	<key>com.apple.developer.team-identifier</key>
 	<string>9252ZRKKG6</string>
-	<key>com.apple.security.cs.allow-dyld-environment-variables</key>
-	<true/>
-	<key>com.apple.security.cs.allow-unsigned-executable-memory</key>
-	<true/>
-	<key>com.apple.security.device.audio-input</key>
-	<true/>
-	<key>com.apple.security.device.camera</key>
-	<true/>
-	<key>com.apple.security.device.microphone</key>
-	<true/>
-	<key>com.apple.security.device.usb</key>
-	<true/>
-	<key>com.apple.security.files.user-selected.read-only</key>
-	<true/>
+        <!--
+        <key>get-task-allow</key>
+        <false/>
+        <key>com.apple.security.app-sandbox</key>
+        <false/>
+        -->
 </dict>
 </plist>

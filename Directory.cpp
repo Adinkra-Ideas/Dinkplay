@@ -141,35 +141,33 @@ void    Directory::addDir(QUrl path) {
     path = QUrl::fromLocalFile(path.toString());
     #endif
 
-    // how do we know a path that requires permission outside our sandbox?
-    // I believe this homelocation will change output if we have permission.
-
-
     //////
-    //currDir_ = "file:///private/var/mobile/Containers/Data/Application/";
-
     // Extracting the unique App_ID of this app
-    QString thisAppID = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/";
-    //thisAppID = thisAppID.mid(47);
-    //thisAppID = "/6935D002-44A6-4328-86A2-1CEAC71DC409/";
-    //qDebug() << "the home" << thisAppID;
-    //currDir_ = "file:///private/var/mobile/Containers/Data/Application" + thisAppID;
-    //currDir_ = "file:///private/var/mobile/Containers/Shared/AppGroup" + thisAppID;
-    currDir_ = ".";
-    qDebug() << "the curr" << currDir_;
-    //////
-    //QDir dir(QUrl(currDir_).toLocalFile());
-    QDir dir(currDir_);
-    qDebug() << "the dir" << dir;
-    QStringList all = dir.entryList(QStringList()/*, QDir::Dirs*/);
-    for (QString &one: all) {
-        qDebug() << "checking:" << one;
-    }
+    //QString thisAppID = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+    //qsizetype pos = thisAppID.lastIndexOf("/");
+    //currDir_ = thisAppID.sliced(0, pos + 1);
+    //thisAppID = thisAppID.sliced(pos + 1);
+    //currDir_.append(thisAppID + "/");
+    // now you can use dir.entryList to print out sandox content of *this app
 
-    // currDir_ = path.toString();
+
+    currDir_ = path.toString();
     if (! currDir_.endsWith('/')) {
         currDir_.append('/');
     }
+
+
+    // ///
+    // // FOR iOS TESTING WHETHER READ PERMISSION EXISTS ON THIS SELECTED DIRECTORY
+    // QDir dir(QUrl(currDir_).toLocalFile());
+    // //QDir dir(currDir_);
+    // qDebug() << "the dir" << dir;
+    // QStringList all = dir.entryList(QStringList()/*, QDir::Dirs*/);
+    // for (QString &one: all) {
+    //     qDebug() << "checking: " << one;
+    // }
+    // qDebug() << "IF NO LINE BEGINS WITH 'checking:' AT THIS POINT, IT MEANS NO PERMISSION FOR THIS DIRECTORY";
+
 
     doAddDir();
     // emit dirChanged();
@@ -182,8 +180,8 @@ QStringList Directory::getAudioPaths() {
 void Directory::doAddDir() {
     //////
     /// // just adding a bundled song for testing whether audio plays out
-    audioPaths_.push_back("audios/db.mp3");
-    soundsHash_["audios/db.mp3"] = nullptr;
+    //audioPaths_.push_back("audios/db.mp3");
+    //soundsHash_["audios/db.mp3"] = nullptr;
 
     QDir dir(QUrl(currDir_).toLocalFile());
 
@@ -198,7 +196,6 @@ void Directory::doAddDir() {
     QStringList mp3 = dir.entryList(QStringList() << "*.mp3", QDir::Files);
 
     for (QString &aMp3: mp3) {
-        qDebug() << "here means access to files were granted" << aMp3 ;
         if (! audioPaths_.contains(currDir_ + aMp3)) {  // no repeat
             // Add the new path to our sound stringlist
             audioPaths_.push_back(currDir_ + aMp3);
@@ -217,7 +214,8 @@ void Directory::doAddDir() {
     preparePathsForPlay();
 
     //////
-    play();
+    /// // just auto-playing the index song for testing
+    //play();
 }
 
 /**
@@ -250,3 +248,17 @@ void Directory::preparePathsForPlay() {
     // After update, now refresh the qml view displaying audioPaths_ as list
     emit audioPathsChanged();
 }
+
+//qDebug() << "path: " << path.toString();
+//qsizetype pos = path.toString().lastIndexOf("/");
+//currDir_ = path.toString();
+// currDir_.truncate(pos + 1);
+// path = path.toString().sliced(pos + 1);
+// qDebug() << "currDir: " << currDir_ << "pos: " << pos;
+// qDebug() << "path: " << path.toString();
+// audioPaths_.push_back(currDir_ + path.toString());
+// soundsHash_[currDir_ + path.toString()] = nullptr;
+
+
+// home dir in simulation == /data/Containers/Data/Application/FC24ED6A-E8AA-44FC-B38C-55B7993BE416/
+// file explorere         == /data/Containers/Shared/AppGroup/FC24ED6A-E8AA-44FC-B38C-55B7993BE416/File Provider Storage/
