@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 
     // Calling the method to load the persisted
     // filepaths (if any) on startup.
-    // media.loadSavedPaths(); // UNCOMMENT THIS. ONLY COMMENTED BECAUSE OF IOS TESTING
+    media.loadSavedPaths(); // UNCOMMENT THIS. ONLY COMMENTED BECAUSE OF IOS TESTING
 
     #ifdef Q_OS_ANDROID
     QNativeInterface::QAndroidApplication::hideSplashScreen();

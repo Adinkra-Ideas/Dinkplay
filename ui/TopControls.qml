@@ -141,6 +141,7 @@ Rectangle {
     // called when add is clicked
     FolderDialog {
         id: folderDialog
+        options: FolderDialog.ReadOnly
         currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
 
         // selectedFolder is the folder that the user just selected last.

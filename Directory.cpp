@@ -99,11 +99,10 @@ void Directory::loadSavedPaths() {
 
 
 void    Directory::addDir(QUrl path) {
+    // Permission request for android users
     #ifdef Q_OS_ANDROID
     checkPermission();
     #endif
-
-    qDebug() << "the things: " << path.toString();
 
     // if there is an active, we stop the ma_sound.
     // THIS MUST BE DONE BEFORE TAMPERING WITH
@@ -116,7 +115,7 @@ void    Directory::addDir(QUrl path) {
     while (path.isLocalFile()) {
         path = QUrl(path).toLocalFile();
     }
-    // Now change path to a schemed path in times
+    // Now change path to a schemed path AKA file:///
     if (! path.isLocalFile()) {
         path.setScheme(QString());
         path = QUrl::fromLocalFile(path.toString());
@@ -168,12 +167,10 @@ void    Directory::addDir(QUrl path) {
     //currDir_.append(thisAppID + "/");
     // now you can use dir.entryList to print out sandox content of *this app
 
-
     currDir_ = path.toString();
     if (! currDir_.endsWith('/')) {
         currDir_.append('/');
     }
-
 
     // ///
     // // FOR iOS TESTING WHETHER READ PERMISSION EXISTS ON THIS SELECTED DIRECTORY
@@ -185,7 +182,6 @@ void    Directory::addDir(QUrl path) {
     //     qDebug() << "checking: " << one;
     // }
     // qDebug() << "IF NO LINE BEGINS WITH 'checking:' AT THIS POINT, IT MEANS NO PERMISSION FOR THIS DIRECTORY";
-
 
     doAddDir();
 }
@@ -201,22 +197,22 @@ void Directory::doAddDir() {
     //soundsHash_["audios/db.mp3"] = nullptr;
 
     // Since IOS selectedfiles paths have already been assigned to audioPaths_,
-    // no need to repeat.
+    // no need to repeat this block for iOS users.
     #ifndef Q_OS_IOS
     // // we can clean this below code to if we can test with android to know there is no problem
-    // if (QUrl(currDir_).isLocalFile()) {
-    //     currDir_ = QUrl(currDir_).toLocalFile();
-    // }
-    // QDir dir(currDir_);
-
-    QDir dir(QUrl(currDir_).toLocalFile());
-
-    // remove the file:/// from the beginning of file name
-    // This problem exist coz we were initially building
-    // for qmediaplayer
     if (QUrl(currDir_).isLocalFile()) {
         currDir_ = QUrl(currDir_).toLocalFile();
     }
+    QDir dir(currDir_);
+
+    // QDir dir(QUrl(currDir_).toLocalFile());
+
+    // // remove the file:/// from the beginning of file name
+    // // This problem exist coz we were initially building
+    // // for qmediaplayer
+    // if (QUrl(currDir_).isLocalFile()) {
+    //     currDir_ = QUrl(currDir_).toLocalFile();
+    // }
 
     // Fetch all filepaths that ends with .mp3 from the directory
     QStringList mp3 = dir.entryList(QStringList() << "*.mp3", QDir::Files);
@@ -229,13 +225,9 @@ void Directory::doAddDir() {
             soundsHash_[currDir_ + aMp3] = nullptr;
         }
     }
-    // QStringList mp4 = dir.entryList(QStringList() << "*.mp4", QDir::Files);
-    // for (QString &aMp4: mp4) {
-    //     videoPaths_.push_back(currDir_ + aMp4);
-    // }
     #endif
 
-    // preparing for store to localStorage onExit
+    // preparing for backup to localStorage onExit
     backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));
 
     preparePathsForPlay();
