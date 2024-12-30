@@ -12,8 +12,7 @@
 #endif
 
 #ifdef Q_OS_IOS
-// #include "iOS/src/MPRemoteCommandCenter_Interfacer.h"
-#include "iOS/src/MPRemoteCommandCenter.h"
+#include "iOS/src/MyMPRemoteCC.h"
 #endif
 
 #include "Directory.hpp"

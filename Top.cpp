@@ -53,16 +53,22 @@ Top::Top(QObject * parent) :
     javaObject.swap(activity);
     #endif
 
-    // testing objective-c++
+    // initialize objective-c++ object
     #ifdef Q_OS_IOS
-    helloim();
-    // qDebug() << "jombolo" << localizedHostName();
+    initMyMPRemoteCC();
+    incrementMyMPRemoteCC();
+    printMyMPRemoteCC();
     #endif
 
     myInstance = this;
 }
 
 Top::~Top(){
+    // Cleanup objective-c if iOS
+    #ifdef Q_OS_IOS
+    destroyMyMPRemoteCC();
+    #endif
+
     // qDebug() << "App is getting Killedffffffff";
 
     // //
@@ -86,6 +92,14 @@ void Top::checkForBackPress() {
 
 // will comment
 void Top::notifyJavaSeviceAboutPlaying(bool isplaying) {
+    #ifdef Q_OS_IOS
+    // qDebug() << "stated playing? " << isplaying;
+    if (isplaying) {
+        turnonMPRemoteCC();
+    }
+    #endif
+
+
     #ifdef Q_OS_ANDROID
     javaObject.callObjectMethod(
         "setPlayPauseIconInActivity",
