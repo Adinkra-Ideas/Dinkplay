@@ -12,7 +12,7 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS
     Core
     QuickControls2
     Qml
-    SpatialAudio
+    #SpatialAudio
 )
 
 qt_standard_project_setup(REQUIRES 6.5)
@@ -167,7 +167,7 @@ elseif (IOS)
 
 
     target_link_libraries(appDinkplay PRIVATE
-        #miniaudio_iOS # removed for simulator
+        #miniaudio_iOS #removed for simulator
     )
 endif()
 
