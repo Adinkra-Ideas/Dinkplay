@@ -11,6 +11,10 @@
 #include <QtCore/private/qandroidextras_p.h>
 #endif
 
+#ifdef Q_OS_IOS
+// #include "iOS/src/MPRemoteCommandCenter_Interfacer.h"
+#include "iOS/src/MPRemoteCommandCenter.h"
+#endif
 
 #include "Directory.hpp"
 #include "ChangePlay.hpp"

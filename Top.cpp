@@ -53,6 +53,12 @@ Top::Top(QObject * parent) :
     javaObject.swap(activity);
     #endif
 
+    // testing objective-c++
+    #ifdef Q_OS_IOS
+    helloim();
+    // qDebug() << "jombolo" << localizedHostName();
+    #endif
+
     myInstance = this;
 }
 
