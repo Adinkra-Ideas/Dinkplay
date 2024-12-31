@@ -184,17 +184,17 @@ void Player::pause() {
   * because Frontend needs to know.
   * @returns void
   */
-// void Player::playOrPause() {
-//     if (!engineInit_ || audioPaths_.isEmpty()) {
-//         return ;
-//     }
+void Player::playOrPause() {
+    if (!engineInit_ || audioPaths_.isEmpty()) {
+        return ;
+    }
 
-//     if (ma_sound_is_playing(soundsHash_[QString(*audIt_)])) {
-//         pause();
-//     } else {
-//         play();
-//     }
-// }
+    if (ma_sound_is_playing(soundsHash_[QString(*audIt_)])) {
+        pause();
+    } else {
+        play();
+    }
+}
 
 /**
   * Simply providing a medium through

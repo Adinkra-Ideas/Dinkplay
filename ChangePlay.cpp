@@ -10,9 +10,6 @@ void ChangePlay::changePlay(bool move) {
     // if there is an active, we stop it first
     stopAnyCurrentPlaying();
 
-    // didnt use audIt_ != audItRealBegin_ coz
-    // Qlist begin() is never the same
-
     // if last, stop
     // if not last, next
     if (move && audioPaths_.size()) { // fwd

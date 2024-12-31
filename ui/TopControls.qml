@@ -149,7 +149,6 @@ Rectangle {
         onAccepted: {
             folderDialog.currentFolder = folderDialog.selectedFolder
             Media.currDir = folderDialog.selectedFolder
-            print("trrrrrr: ", folderDialog.selectedFolder)
         }
 
         // currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]

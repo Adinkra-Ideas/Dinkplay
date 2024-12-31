@@ -55,9 +55,7 @@ Top::Top(QObject * parent) :
 
     // initialize objective-c++ object
     #ifdef Q_OS_IOS
-    initMyMPRemoteCC();
-    incrementMyMPRemoteCC();
-    printMyMPRemoteCC();
+    initMyMPRemoteCC(this);
     #endif
 
     myInstance = this;

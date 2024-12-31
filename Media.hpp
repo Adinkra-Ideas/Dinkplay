@@ -66,7 +66,7 @@ public:
     virtual void    stopAnyCurrentPlaying() = 0;
     virtual void    play() = 0;
     virtual void    pause() = 0;
-    // virtual void    playOrPause() = 0;
+    virtual void    playOrPause() = 0;
     virtual QString getTitle() = 0;
     /*************************************************/
 
