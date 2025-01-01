@@ -29,6 +29,8 @@ public:
 
     void    play() override;
     void    pause() override;
+    void    suspendAudio() override;
+    void    unsuspendAudio() override;
     void    playOrPause() override;
     void    stop();
 
@@ -36,6 +38,7 @@ protected:
     ma_sound            sound_;
     ma_result           result_;
     ma_engine           engine_;
+    ma_device         * device_;  // After the ma_engine_init() ints our engine, we backup the device it created for us here so we can use it when necessary
     ma_device_config    config_;
 
     bool        engineInit_;    // True if mini audio engine was successfully init-ed, else false

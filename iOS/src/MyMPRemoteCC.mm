@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <MediaPlayer/MediaPlayer.h>
+#import <UIKit/UIKit.h>
 #include <stdio.h> // because nslog aint printing to qt debug
 
 #import "MyMPRemoteCC.h"
@@ -24,7 +25,7 @@ Top *cppObject;
 
 @public
 }
-
+- (void)listenForInterruptions;
 - (void)setupMPRemoteCommandCenter;
 - (MPRemoteCommandHandlerStatus)previousAudio: (MPRemoteCommandHandlerStatus *)event;
 - (MPRemoteCommandHandlerStatus)nextAudio: (MPRemoteCommandHandlerStatus *)event;
@@ -46,11 +47,82 @@ Top *cppObject;
   [super dealloc];  // call the destructor of NSObject AKA parent that we inherited from
 }
 
+
+// will comment this
+- (void)listenForInterruptions {
+  @try {
+    printf("%s", "enterrrrr\n");
+    // Had to comment this part out coz it messes up the whole audio playback in media control center
+    // AVAudioSession *session = [AVAudioSession sharedInstance];
+    // [session setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionDuckOthers error:nil];
+    // [session setActive:YES error:nil];
+
+    // Listen for system interrupts AKA phone call et al, and suspend/unsuspend accordingly
+    NSNotificationCenter *notifCenter = [NSNotificationCenter defaultCenter];
+    [notifCenter  addObserver:
+                  self
+                  selector:@selector(onAudioSessionInterrupted:) //wow! if the callback method takes an arg and you fail to add the appending ":" to its name, app will crash at runtime when it gets here
+                  name:AVAudioSessionInterruptionNotification
+                  object:[AVAudioSession sharedInstance]];
+  }
+  @catch (NSException *exception) {
+    // NSLog(@"%@", exception);
+  }
+}
+
+
+// will also comment this
+- (void) onAudioSessionInterrupted: (NSNotification *) notification
+{
+    //Check the type of notification, especially if you are sending multiple AVAudioSession events here
+    printf("%s", "Interruption start\n");
+
+    if ([notification.name isEqualToString:AVAudioSessionInterruptionNotification]) {
+        printf("%s", "Interruption try\n");
+
+        //Check to see if it was a Begin interruption
+        if ([[notification.userInfo valueForKey:AVAudioSessionInterruptionTypeKey] isEqualToNumber:[NSNumber numberWithInt:AVAudioSessionInterruptionTypeBegan]]) {
+            printf("%s", "Interruption enterrrrr\n");
+            //Suspend your audio
+            cppObject->suspendAudio();
+
+        } else if([[notification.userInfo valueForKey:AVAudioSessionInterruptionTypeKey] isEqualToNumber:[NSNumber numberWithInt:AVAudioSessionInterruptionTypeEnded]]){
+            printf("%s", "Interruption end\n");
+            //Resume your audio
+            cppObject->unsuspendAudio();
+
+        }
+    }
+}
+// - (void)onAudioSessionInterrupted: (NSNotification *)notif {
+//   NSDictionary *userInfo = [notif userInfo];
+//   NSNumber *typeValue = [userInfo valueForKey:AVAudioSessionInterruptionTypeKey];
+
+//   AVAudioSessionInterruptionType type = (AVAudioSessionInterruptionType)[typeValue unsignedIntegerValue];
+
+// //Check the type of notification
+//   if ([notif.name isEqualToString:AVAudioSessionInterruptionNotification]) {
+//       NSLog(@"Interruption notification received!");
+
+//       //Check to see if it was a Begin interruption
+//       if ([[notif.userInfo valueForKey:AVAudioSessionInterruptionTypeKey] isEqualToNumber:[NSNumber numberWithInt:AVAudioSessionInterruptionTypeBegan]]) {
+//           NSLog(@"Interruption began!");
+//           printf("%s", "Interruption enterrrrr\n");
+
+//       } else {
+//           NSLog(@"Interruption ended!");
+//           printf("%s", "Interruption end\n");
+//           //Resume your audio
+//       }
+//   }
+// }
+
 - (void)setupMPRemoteCommandCenter {
   // This line was used with the old ApI.
   // Will leave it here though, in case I need it for future learnings.
   // [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
 
+  // MPRemoteCommandCenter.sharedCommandCenter returns a pointer to the running instance.
   // This by itself wont turn on the lockscreen media control board.
   // At least one command must be setEnabled:YES and having a valid action:@selector
   // What it does is it seizes control of the lockscreen media control board for your app.
@@ -149,6 +221,8 @@ MyMPRemoteCC *mpRmObject;
 void initMyMPRemoteCC(Top *cppObj) {
   mpRmObject = [MyMPRemoteCC new];
   cppObject = cppObj;
+
+  [mpRmObject listenForInterruptions];
 }
 
 void destroyMyMPRemoteCC() {

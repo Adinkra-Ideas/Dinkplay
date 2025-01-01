@@ -36,6 +36,11 @@ Player::Player(QObject *parent) :
         return ;
     }
     engineInit_ = true;
+
+    // It is necessary to back this created device
+    // up so we can use ma_device_start() and
+    // ma_device_stop() when necessary.
+    device_ = ma_engine_get_device(&engine_);
 }
 
 Player::~Player() {
@@ -175,6 +180,47 @@ void Player::pause() {
         emit playbackStateChanged(currentPlayingPath_);
         //
         notifyJavaSeviceAboutPlaying(false);
+    }
+}
+
+/**
+  * simply sets the suspended_ variable
+  * to true after calling pause().
+  * Setting the suspended_ variable to
+  * true means if unsuspendAudio() is
+  * called afterwards, the audio will
+  * resume playing.
+  * @returns void
+  */
+void Player::suspendAudio() {
+    if (ma_sound_is_playing(soundsHash_[QString(*audIt_)])) {
+        pause();
+        suspended_ = true;
+    }
+
+    // This is necessary so mini audio dont lose audio
+    // when iOS is returning from an interruption
+    ma_device_stop(device_);
+}
+
+/**
+  * Only calls play() if suspended_ is true.
+  * This is because if suspended_ == true, it
+  * means the currently playing was suspended
+  * temporarily waiting to be resumed maybe due
+  * to an audio interruption or ducking,
+  * TIP: we wont want to resume if it was an
+  * audio ducking though. Learn from VLC
+  * @returns void
+  */
+void Player::unsuspendAudio() {
+    // This is necessary so mini audio dont lose audio
+    // when iOS is returning from an interruption
+    ma_device_start(device_);
+
+    if (suspended_) {
+        play();
+        suspended_ = false;
     }
 }
 
@@ -321,4 +367,6 @@ QString Player::getTitle() {
         return "";
     }
 }
+
+
 

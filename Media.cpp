@@ -2,7 +2,8 @@
 
 Media::Media(QObject *parent) :
     QObject{parent},
-    repeat_{2} {
+    repeat_{2},
+    suspended_{false} {
     // set iterator accordingly
     audIt_ = audioPaths_.begin();
     // vpIt_ = videoPaths_.begin();

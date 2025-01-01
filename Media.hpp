@@ -66,6 +66,8 @@ public:
     virtual void    stopAnyCurrentPlaying() = 0;
     virtual void    play() = 0;
     virtual void    pause() = 0;
+    virtual void    suspendAudio() = 0;
+    virtual void    unsuspendAudio() = 0;
     virtual void    playOrPause() = 0;
     virtual QString getTitle() = 0;
     /*************************************************/
@@ -124,6 +126,7 @@ protected:
     QStringList::iterator      audIt_;  // iterator to audioPaths_
     QString       currentPlayingPath_;  // stores the filepath of currently active audio
     std::unordered_map<QString, ma_sound *> soundsHash_; // used as a storage for Holding audioPaths_ keys and their associated values == their decoded ma_sound.
+    bool                    suspended_; // if true, it means the current nowPlaying audio is suspended. In this case, calling unsuspendAudio() will play it. If false, calling unsuspendAudio will do nothing.
 };
 
 #endif // MEDIA_HPP
