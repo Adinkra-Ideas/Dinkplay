@@ -48,16 +48,30 @@ Top *cppObject;
 }
 
 
-// will comment this
+/**
+  * This method is called when app launches on iOS.
+  * It is called from initMyMPRemoteCC() at the time
+  * when the app is instantiating the objective-c
+  * part of the app.
+  * It simply sets up a listener to listen for:
+  * (1) interrupts AKA phone calls, alarms or any
+  * other system sound that will cause this app to
+  * relinquish audiosession,
+  * (2) Duckings AKA when another audio player takes
+  * control of audiosession.
+  * NOTES:
+  * (1) This listener will pick up notifications about
+  * System interruptions even if the app is not playing
+  * a song.
+  * (2) But this listener can only pick up notifications
+  * about Duckings only if the app was playing an audio at the
+  * time the other audio player takes control of audiosession.
+  * @param none
+  * @returns void
+  */
 - (void)listenForInterruptions {
   @try {
-    printf("%s", "enterrrrr\n");
-    // Had to comment this part out coz it messes up the whole audio playback in media control center
-    // AVAudioSession *session = [AVAudioSession sharedInstance];
-    // [session setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionDuckOthers error:nil];
-    // [session setActive:YES error:nil];
-
-    // Listen for system interrupts AKA phone call et al, and suspend/unsuspend accordingly
+    // Listen for system interrupts and duckings and suspend/unsuspend play accordingly
     NSNotificationCenter *notifCenter = [NSNotificationCenter defaultCenter];
     [notifCenter  addObserver:
                   self
@@ -70,52 +84,37 @@ Top *cppObject;
   }
 }
 
-
-// will also comment this
+/**
+  * This method is callback passed to
+  * listenForInterruptions() above.
+  * It reads the notification to see whether
+  * it is begin or end of notification, then
+  * decides whether audio should be
+  * suspended or unsuspended.
+  * @param none
+  * @returns void
+  */
 - (void) onAudioSessionInterrupted: (NSNotification *) notification
 {
     //Check the type of notification, especially if you are sending multiple AVAudioSession events here
-    printf("%s", "Interruption start\n");
+    printf("%s", "Interruption RECEIVED!!!\n");
 
     if ([notification.name isEqualToString:AVAudioSessionInterruptionNotification]) {
-        printf("%s", "Interruption try\n");
+        printf("%s", "Interruption confirmed\n");
 
         //Check to see if it was a Begin interruption
         if ([[notification.userInfo valueForKey:AVAudioSessionInterruptionTypeKey] isEqualToNumber:[NSNumber numberWithInt:AVAudioSessionInterruptionTypeBegan]]) {
-            printf("%s", "Interruption enterrrrr\n");
+            printf("%s", "Interruption begin\n");
             //Suspend your audio
             cppObject->suspendAudio();
 
         } else if([[notification.userInfo valueForKey:AVAudioSessionInterruptionTypeKey] isEqualToNumber:[NSNumber numberWithInt:AVAudioSessionInterruptionTypeEnded]]){
             printf("%s", "Interruption end\n");
-            //Resume your audio
             cppObject->unsuspendAudio();
 
         }
     }
 }
-// - (void)onAudioSessionInterrupted: (NSNotification *)notif {
-//   NSDictionary *userInfo = [notif userInfo];
-//   NSNumber *typeValue = [userInfo valueForKey:AVAudioSessionInterruptionTypeKey];
-
-//   AVAudioSessionInterruptionType type = (AVAudioSessionInterruptionType)[typeValue unsignedIntegerValue];
-
-// //Check the type of notification
-//   if ([notif.name isEqualToString:AVAudioSessionInterruptionNotification]) {
-//       NSLog(@"Interruption notification received!");
-
-//       //Check to see if it was a Begin interruption
-//       if ([[notif.userInfo valueForKey:AVAudioSessionInterruptionTypeKey] isEqualToNumber:[NSNumber numberWithInt:AVAudioSessionInterruptionTypeBegan]]) {
-//           NSLog(@"Interruption began!");
-//           printf("%s", "Interruption enterrrrr\n");
-
-//       } else {
-//           NSLog(@"Interruption ended!");
-//           printf("%s", "Interruption end\n");
-//           //Resume your audio
-//       }
-//   }
-// }
 
 - (void)setupMPRemoteCommandCenter {
   // This line was used with the old ApI.

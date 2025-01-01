@@ -150,6 +150,11 @@ void Player::play() {
     if (!engineInit_ || audioPaths_.isEmpty()) {
         return ;
     }
+
+    // This is necessary so mini audio dont lose audio
+    // when iOS is returning from an interruption
+    ma_device_start(device_);
+
     // play the sound
     ma_sound_start(soundsHash_[QString(*audIt_)]);
     // emit playing only if sounds started playing
@@ -181,6 +186,11 @@ void Player::pause() {
         //
         notifyJavaSeviceAboutPlaying(false);
     }
+
+    // This is necessary so mini audio dont lose audio
+    // when iOS is returning from an interruption.
+    // But we leave it outside if_ios incase android needs it too.
+    ma_device_stop(device_);
 }
 
 /**
@@ -197,10 +207,6 @@ void Player::suspendAudio() {
         pause();
         suspended_ = true;
     }
-
-    // This is necessary so mini audio dont lose audio
-    // when iOS is returning from an interruption
-    ma_device_stop(device_);
 }
 
 /**
@@ -214,10 +220,6 @@ void Player::suspendAudio() {
   * @returns void
   */
 void Player::unsuspendAudio() {
-    // This is necessary so mini audio dont lose audio
-    // when iOS is returning from an interruption
-    ma_device_start(device_);
-
     if (suspended_) {
         play();
         suspended_ = false;
