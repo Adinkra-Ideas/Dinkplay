@@ -48,6 +48,7 @@
         <key>UIBackgroundModes</key>
         <array>
             <string>audio</string>
+            <string>bluetooth-central</string>
         </array>
         <!-- For declaring Usages that needs to be run in background ENDS -->
 </dict>
