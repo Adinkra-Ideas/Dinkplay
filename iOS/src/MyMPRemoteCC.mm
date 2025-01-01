@@ -46,16 +46,6 @@ Top *cppObject;
     return nil;
   }
 
-  // printf("%s", "bbbbbbbbbbbbbbbbb!!!\n");
-  // // Adding observers AKA listeners for audio state-changes.
-  // // Listen for and call method specified in "selector"
-  // notifCenter = [NSNotificationCenter defaultCenter];
-  // [notifCenter  addObserver:
-  //               self
-  //               selector:@selector(onAudioSessionInterrupted:) //wow! if the callback method takes an arg and you fail to add the appending ":" to its name, app will crash at runtime when it gets here
-  //               name:AVAudioSessionInterruptionNotification
-  //               object:[AVAudioSession sharedInstance]];
-
   return self;
 }
 
