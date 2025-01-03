@@ -96,7 +96,6 @@ set_target_properties(appDinkplay PROPERTIES
 if (IOS)
     target_link_options(appDinkplay BEFORE PUBLIC
         -L./ma_lib      # custom directories to also search fir libraries added using target_link_libraries()
-        -framework AVFoundation
     )
 else()
     target_link_options(appDinkplay BEFORE PUBLIC
@@ -136,25 +135,34 @@ elseif (ANDROID)
     )
 elseif (IOS)
     file(GLOB_RECURSE myAudios CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/ui/images/*.mp3)
+    set(default_artist_icon "${UI}/images/musicIco/artist.png")
+    set(asset_catalog_path "iOS/Assets.xcassets") #naming the folder ".whatever" makes it pickable as a single file into bundle I believe
     target_sources(appDinkplay PRIVATE
         ${myAudios}
-        "${UI}/images/musicIco/artist.png"
+        ${default_artist_icon}
+        ${asset_catalog_path}
         iOS/src/MyMPRemoteCC.h iOS/src/MyMPRemoteCC.mm
     )
     set_source_files_properties(
         ${myAudios} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/audios
     )
     set_source_files_properties(
-        "${UI}/images/musicIco/artist.png" PROPERTIES MACOSX_PACKAGE_LOCATION Resources/images
+        ${default_artist_icon} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/images
+    )
+    set_source_files_properties(
+        ${asset_catalog_path} PROPERTIES MACOSX_PACKAGE_LOCATION Resources
     )
 
+
     set_target_properties(appDinkplay PROPERTIES
+        # Replaye Qt's default white splashscreen
+        QT_IOS_LAUNCH_SCREEN "${CMAKE_SOURCE_DIR}/iOS/LaunchScr.storyboard"
+
+        MACOSX_BUNDLE TRUE #####
+
         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/iOS/Info.plist
 
-        #XCODE_ATTRIBUTE_LAUNCH_CONSTRAINT_SELF ${CMAKE_SOURCE_DIR}/iOS/Entitlements.plist.iOS
-        #XCODE_ATTRIBUTE_LAUNCH_CONSTRAINT_RESPONSIBLE ${CMAKE_SOURCE_DIR}/iOS/Entitlements.plist.iOS
-        #XCODE_ATTRIBUTE_LIBRARY_LOAD_CONSTRAINT ${CMAKE_SOURCE_DIR}/iOS/Entitlements.plist.iOS
-        #XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS ${CMAKE_SOURCE_DIR}/iOS/Entitlements.plist.iOS
+        XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME AppIcon
 
         # ADD CUSTOM ENTITLEMENTS FOR ADDING ENTITLEMENTS THAT ARE POSSIBLE TO BE ADDED IN CUSTOM .entitlements file
         XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS ${CMAKE_SOURCE_DIR}/iOS/appDinkplay.entitlements
@@ -172,6 +180,8 @@ elseif (IOS)
 
     target_link_libraries(appDinkplay PRIVATE
         #miniaudio_iOS #removed for simulator
+        "-framework MediaPlayer"
+        "-framework AVFoundation"
     )
 endif()
 
