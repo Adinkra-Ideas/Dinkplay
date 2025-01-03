@@ -32,6 +32,7 @@ public:
     void killAllThreads() override;
     void checkForBackPress() override;
     void notifyJavaSeviceAboutPlaying(bool isplaying) override;
+    void updateAllAudioDetailsDisplayers() override;
 
     static Top * myInstance;
 

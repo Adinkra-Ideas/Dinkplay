@@ -138,10 +138,14 @@ elseif (IOS)
     file(GLOB_RECURSE myAudios CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/ui/images/*.mp3)
     target_sources(appDinkplay PRIVATE
         ${myAudios}
+        "${UI}/images/musicIco/artist.png"
         iOS/src/MyMPRemoteCC.h iOS/src/MyMPRemoteCC.mm
     )
     set_source_files_properties(
         ${myAudios} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/audios
+    )
+    set_source_files_properties(
+        "${UI}/images/musicIco/artist.png" PROPERTIES MACOSX_PACKAGE_LOCATION Resources/images
     )
 
     set_target_properties(appDinkplay PROPERTIES

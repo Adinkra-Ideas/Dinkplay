@@ -7,7 +7,9 @@ class Top;          // Forward-declaring the cpp class is mandatory in order for
 void initMyMPRemoteCC(Top * cppObj);
 void destroyMyMPRemoteCC();
 
-void turnonMPRemoteCC();
+void seizeControlOfInfoCenter();
+void updateInfoCenter(const char * title,
+                      const char * artist);
 
 #endif
 

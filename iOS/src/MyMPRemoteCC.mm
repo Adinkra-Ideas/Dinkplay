@@ -2,7 +2,6 @@
 #import <MediaPlayer/MediaPlayer.h>
 #import <UIKit/UIKit.h>
 #include <stdio.h> // because nslog aint printing to qt debug
-#import <unistd.h>
 #import "MyMPRemoteCC.h"
 
 // Un-initialized pointer to cpp class.
@@ -22,7 +21,6 @@ Top *cppObject;
 {
   NSNotificationCenter *notifCenter;        // for adding and removing observers AKA notification for audio state-change listeners
   MPRemoteCommandCenter *myCommandCenter;   // For holding the control center instance
-  MPNowPlayingInfoCenter *myPlayingCenter;
 
 @public
 }
@@ -30,9 +28,8 @@ Top *cppObject;
 - (void)setupMPRemoteCommandCenter;
 - (MPRemoteCommandHandlerStatus)previousAudio: (MPRemoteCommandHandlerStatus *)event;
 - (MPRemoteCommandHandlerStatus)nextAudio: (MPRemoteCommandHandlerStatus *)event;
-- (MPRemoteCommandHandlerStatus)playAudio: (MPRemoteCommandHandlerStatus *)event;
-- (MPRemoteCommandHandlerStatus)pauseAudio: (MPRemoteCommandHandlerStatus *)event;
-- (MPRemoteCommandHandlerStatus)playPauseAudio: (MPRemoteCommandHandlerStatus *)even;
+- (MPRemoteCommandHandlerStatus)playPauseAudio: (MPRemoteCommandHandlerStatus *)event;
+- (void)passAudioDetailsToInfoCenter: (NSString *)title :(NSString *)artist;
 
 @end
 @implementation MyMPRemoteCC
@@ -41,10 +38,10 @@ Top *cppObject;
 {
   // Initialize base class before this AKA self
   // IF PROBLEM, SIMPLY COMMENT OUT COZ APP WORKED FINE WITHOUT IT.
-  self = [super init];
-  if (!self) {
-    return nil;
-  }
+  // self = [super init];
+  // if (!self) {
+  //   return nil;
+  // }
 
   return self;
 }
@@ -52,8 +49,14 @@ Top *cppObject;
 // class destructor
 -(void)dealloc
 {
-  // unplug the listeners.  we will comment this
+  // unplug the listeners.
+  // removeObserver:self will remove all observers
+  // observing self even if they are one million
   [notifCenter removeObserver:self];
+
+  // removing any previous hold of this app on control center
+  [myCommandCenter.togglePlayPauseCommand removeTarget:self];
+  [myCommandCenter.togglePlayPauseCommand setEnabled:NO];
 
   [super dealloc];  // call the destructor of NSObject AKA parent that we inherited from
 }
@@ -109,7 +112,6 @@ Top *cppObject;
     // NSLog(@"%@", exception);
   }
 }
-
 /**
   * This method is callback passed to
   * listenForInterruptions() above.
@@ -171,20 +173,13 @@ Top *cppObject;
 }
 
 
+//
 - (void)setupMPRemoteCommandCenter {
-  // This line was used with the old ApI.
-  // Will leave it here though, in case I need it for future learnings.
-  // [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
-
   // MPRemoteCommandCenter.sharedCommandCenter returns a pointer to the running instance.
   // This by itself wont turn on the lockscreen media control board.
   // At least one command must be setEnabled:YES and having a valid action:@selector
   // What it does is it seizes control of the lockscreen media control board for your app.
   myCommandCenter = [MPRemoteCommandCenter sharedCommandCenter];
-
-  // resetting any previous hold of this app on control center
-  [myCommandCenter.playCommand removeTarget:self];
-  [myCommandCenter.pauseCommand removeTarget:self];
 
   // Add handler for Commands we intend to support
   [myCommandCenter.previousTrackCommand setEnabled:YES];
@@ -193,11 +188,6 @@ Top *cppObject;
   [myCommandCenter.nextTrackCommand setEnabled:YES];
   [myCommandCenter.nextTrackCommand addTarget:self action:@selector(nextAudio:)];
   //
-  [myCommandCenter.playCommand setEnabled:YES];
-  [myCommandCenter.playCommand addTarget:self action:@selector(playPauseAudio:)];
-  //
-  [myCommandCenter.pauseCommand setEnabled:YES];
-  [myCommandCenter.pauseCommand addTarget:self action:@selector(pauseAudio:)];
   // Play and pause buttons (bluetooth earphone control)
   [myCommandCenter.togglePlayPauseCommand setEnabled:YES];
   [myCommandCenter.togglePlayPauseCommand addTarget:self action:@selector(playPauseAudio:)];
@@ -218,15 +208,6 @@ Top *cppObject;
   // }
 }
 
-// Not yet implemented
-- (void)setupLockScreenMediaInfo {
-  // just Pass empty information to MPNowPlayingInfoCenter for now
-  myPlayingCenter = [MPNowPlayingInfoCenter defaultCenter];
-  NSMutableDictionary *playingInfo = [NSMutableDictionary new];
-  [myPlayingCenter setNowPlayingInfo:playingInfo];
-  [playingInfo release];
-}
-
 - (MPRemoteCommandHandlerStatus)previousAudio: (MPRemoteCommandHandlerStatus *)event {
   cppObject->changePlay(false);
   return MPRemoteCommandHandlerStatusSuccess;
@@ -237,20 +218,39 @@ Top *cppObject;
   return MPRemoteCommandHandlerStatusSuccess;
 }
 
-- (MPRemoteCommandHandlerStatus)playAudio: (MPRemoteCommandHandlerStatus *)event {
-  cppObject->play();
-  return MPRemoteCommandHandlerStatusSuccess;
-}
-
-- (MPRemoteCommandHandlerStatus)pauseAudio: (MPRemoteCommandHandlerStatus *)event {
-  cppObject->pause();
-  return MPRemoteCommandHandlerStatusSuccess;
-}
-
 - (MPRemoteCommandHandlerStatus)playPauseAudio: (MPRemoteCommandHandlerStatus *)event {
   cppObject->playOrPause();
   return MPRemoteCommandHandlerStatusSuccess;
 }
+
+// Not yet implemented
+// THIS METHOD SHOULD BE CALLED ONLY AT THE VERY BEGINNING OF AN AUDIO PLAY. AKA WHEN NEXT IS CLICKED OR WHEN TRACK AUTO MOVED TO NEXT
+// CALLING IT FROM EACH PLAY SIGNAL MEANS THE SEEKER WILL BEGIN FROM BEGINNING AFTER EACH PAUSE/PLAY
+- (void)passAudioDetailsToInfoCenter: (NSString *)title
+                                      :(NSString *)artist {
+  // Retrieve the instance of MPNowPlayingInfoCenter
+  MPNowPlayingInfoCenter *nowPlayingInfoCenter = [MPNowPlayingInfoCenter defaultCenter];
+
+  // get the image from func parameter
+  UIImage *artworkImage = [UIImage imageNamed:@"images/artist2.png"];
+  // if no image received as func arg, use default from bundle
+  artworkImage = (artworkImage) ? artworkImage : [UIImage imageNamed:@"images/artist.png"];
+  // convert the UIImage into format that InfoCenter can display
+  MPMediaItemArtwork *albumArt = [[MPMediaItemArtwork alloc] initWithBoundsSize:artworkImage.size requestHandler:^UIImage *(CGSize size) {
+                  return artworkImage;
+                }];
+  // just pass an array/object directly to nowPlayingInfoCenter.nowPlayingInfo.
+  // Assigning to nowPlayingInfoCenter.nowPlayingInfo will auto-update the Info Center
+  nowPlayingInfoCenter.nowPlayingInfo = @{
+      MPMediaItemPropertyTitle: title,
+      MPMediaItemPropertyArtist: artist,
+      MPMediaItemPropertyPlaybackDuration: @(120.0),
+      MPMediaItemPropertyArtwork: albumArt // working
+    };
+
+  [albumArt release];
+}
+
 
 @end
 
@@ -283,12 +283,19 @@ void destroyMyMPRemoteCC() {
   [mpRmObject release];
 }
 
-
-void turnonMPRemoteCC() {
+void seizeControlOfInfoCenter() {
   [mpRmObject setupMPRemoteCommandCenter];
 }
 
+void updateInfoCenter(const char * title,
+                      const char * artist) {
+  [mpRmObject passAudioDetailsToInfoCenter:
+                    [NSString stringWithCString:title encoding:NSUTF8StringEncoding]
+                    :[NSString stringWithCString:artist encoding:NSUTF8StringEncoding]
+                  ];
+}
 
 
+// [UIImage imageNamed:@"Apple.png"] so it can use the build in features to detect whether it should display either Apple.png or Apple@2x.png.
 
 

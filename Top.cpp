@@ -53,7 +53,7 @@ Top::Top(QObject * parent) :
     javaObject.swap(activity);
     #endif
 
-    // initialize objective-c++ object
+    // initialize objective-c objects
     #ifdef Q_OS_IOS
     initMyMPRemoteCC(this);
     #endif
@@ -89,19 +89,21 @@ void Top::checkForBackPress() {
 }
 
 // will comment
+// will also rename to notifyAllPlatformsAboutPlaying
 void Top::notifyJavaSeviceAboutPlaying(bool isplaying) {
-    #ifdef Q_OS_IOS
-    // qDebug() << "stated playing? " << isplaying;
-    if (isplaying) {
-        turnonMPRemoteCC();
-    }
-    #endif
-
-
     #ifdef Q_OS_ANDROID
     javaObject.callObjectMethod(
         "setPlayPauseIconInActivity",
         "(Z)V",
         isplaying );
+    #endif
+}
+
+// will comment
+void Top::updateAllAudioDetailsDisplayers() {
+    #ifdef Q_OS_IOS
+    seizeControlOfInfoCenter();
+    updateInfoCenter(currentPlayingTitle_.toLocal8Bit().constData(),
+                     currentPlayingArtist_.toLocal8Bit().constData());
     #endif
 }

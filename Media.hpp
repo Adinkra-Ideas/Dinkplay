@@ -86,6 +86,7 @@ public:
     /******* Implemented in Top.cpp ***************/
     virtual void killAllThreads() = 0;
     virtual void notifyJavaSeviceAboutPlaying(bool isplaying) = 0;
+    virtual void updateAllAudioDetailsDisplayers() = 0;
     /**********************************************/
 
 public slots:
@@ -125,6 +126,8 @@ protected:
     QStringList           audioPaths_;  // holds all the mp3 files found in directory selected by the user for media search
     QStringList::iterator      audIt_;  // iterator to audioPaths_
     QString       currentPlayingPath_;  // stores the filepath of currently active audio
+    QString      currentPlayingTitle_;  // stores the title of currently active audio
+    QString     currentPlayingArtist_;  // stores the Artist of currently active audio
     std::unordered_map<QString, ma_sound *> soundsHash_; // used as a storage for Holding audioPaths_ keys and their associated values == their decoded ma_sound.
     bool                    suspended_; // if true, it means the current nowPlaying audio is suspended. In this case, calling unsuspendAudio() will play it. If false, calling unsuspendAudio will do nothing.
 };

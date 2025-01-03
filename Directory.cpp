@@ -72,7 +72,15 @@ bool checkPermission() {
 Directory::Directory(QObject *parent) :
     Media{parent},
     backups_{"Adinkra-Ideas", "Dinkplay"}
-{}
+{
+    //testing
+    QString currDir_ = "./images";
+    QDir dir(currDir_);
+    QStringList all = dir.entryList(QStringList()/*, QDir::Dirs*/);
+    for (QString &one: all) {
+        qDebug() << "checking:" << one;
+    }
+}
 
 Directory::~Directory(){}
 
@@ -160,11 +168,11 @@ void    Directory::addDir(QUrl path) {
 
     //////
     // Extracting the unique App_ID of this app
-    //QString thisAppID = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
-    //qsizetype pos = thisAppID.lastIndexOf("/");
-    //currDir_ = thisAppID.sliced(0, pos + 1);
-    //thisAppID = thisAppID.sliced(pos + 1);
-    //currDir_.append(thisAppID + "/");
+    // QString thisAppID = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+    // qsizetype pos = thisAppID.lastIndexOf("/");
+    // currDir_ = thisAppID.sliced(0, pos + 1);
+    // thisAppID = thisAppID.sliced(pos + 1);
+    // currDir_.append(thisAppID + "/");
     // now you can use dir.entryList to print out sandox content of *this app
 
     currDir_ = path.toString();

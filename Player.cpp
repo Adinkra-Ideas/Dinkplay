@@ -17,7 +17,7 @@ static void my_end_callback(void* pUserData, ma_sound* pSound)
         return;
     }
 
-    playee->stop();
+    playee->endOfCurrentAudio();
 }
 
 // **************************************
@@ -114,12 +114,13 @@ void Player::setSource(const char * path) {
         }
     }
 
+    readyAudioForNewPlay(); /////
     // set cursor to beginning
-    ma_sound_seek_to_pcm_frame(soundsHash_[QString(path)], 0);
+    /////ma_sound_seek_to_pcm_frame(soundsHash_[QString(path)], 0);
     // connect end call back
     ma_sound_set_end_callback(soundsHash_[QString(path)], my_end_callback, this);
     // set current playing state to "stopped"
-    state_ = 0;
+    /////state_ = 0;
     // refresh the UI
     emit playbackStateChanged(currentPlayingPath_);
     //
@@ -256,10 +257,9 @@ void Player::setPlaybackState(quint8 state) {
     }
 
     if (state == 0) {
-        // this will tells stop() to stop()
-        // the active sound regardless of anything.
-        state_ = 0;
-        stop();
+        // this will tell endOfCurrentAudio() to stop completely
+        // state_ = 0;  // 1 GREAT CHANGE CHNAGED THIS TO COMMENTED OUT
+        endOfCurrentAudio(true);     // 2 GREAT CHANGE CHNAGED THIS TO HAVING AN ARG
     } else if (state == 1) {
         play();
     } else if (state == 2) {
@@ -288,14 +288,15 @@ void    Player::stopAnyCurrentPlaying() {
 }
 
 /**
-  * Stops the sound BUT only if there
-  * is no repeat_one or repeat_all set.
-  * If you want the sound to be stopped
-  * regardless of the above, then you
-  * have to call setPlaybackState(0)
-  * instead.
-  * If stopped, it emits isStopped
-  * because the frontend needs to
+  * This method is auto called whenever
+  * current audio is changing to the next
+  * or prev, and also whenever there is no
+  * repeat set and current audio has to
+  * stop completely. In the latter, then
+  * this method must be called with
+  * endOfCurrentAudio(true).
+  * If stopped completely, it emits
+  * isStopped because the frontend needs to
   * know. Else it either sets the
   * cursor to beginning and call
   * play() if repeat 1, or it calls
@@ -303,40 +304,43 @@ void    Player::stopAnyCurrentPlaying() {
   * repeat all.
   * @returns void
   */
-void Player::stop() {
+void Player::endOfCurrentAudio(bool shouldStopCompletely) { // 4 GREAT CHANGE CHNAGED THIS TO having a param
     if (!engineInit_ || audioPaths_.isEmpty()) {
         return ;
     }
 
-    if (state_ == 0) {
-        // Here means a direct instruction was sent from
-        // setPlaybackState() to set the player to stop.
-        // THIS CONDITION MUST BE AT THE TOP!
-
-        // Shift pcm to beginning to signal stop
-        // Shift pcm to beginning to signal stop
-        ma_sound_seek_to_pcm_frame(soundsHash_[QString(*audIt_)], 0);
-        // pause the sound at beginning
-        ma_sound_stop(soundsHash_[QString(*audIt_)]);
+    // THIS STOP LOGIC DOESNT MAKE SENSE
+    // BUT FOR NOW WE AR ELOOKING FOR HOW TO CALL UPDATE CC FROM PLAY WHEN PLAY IS BEGINNING OF SOUND
+    if (! shouldStopCompletely && repeat_) {
+        // verify that there is no next or repeat to do
+        if (repeat_ == 1) {
+            readyAudioForNewPlay(); /////
+            // set cursor to beginning
+            /////ma_sound_seek_to_pcm_frame(soundsHash_[QString(*audIt_)], 0);
+            // pause the sound at beginning
+            /////ma_sound_stop(soundsHash_[QString(*audIt_)]);
+            // call play()
+            play();
+        } else if (repeat_ == 2) {
+            changePlay(true);
+        }
     }
-    // verify that there is no next or repeat to do
-    else if (repeat_ == 1) {
-        // set cursor to beginning
-        ma_sound_seek_to_pcm_frame(soundsHash_[QString(*audIt_)], 0);
-        // pause the sound at beginning
-        ma_sound_stop(soundsHash_[QString(*audIt_)]);
-        // call play()
-        play();
-    } else if (repeat_ == 2) {
-        changePlay(true);
-    } else {
-        // Here means it reached a final stop.
+    else {
+        // Here means either endOfCurrentAudio() was called with its shouldStopCompletely
+        // parameter set to true OR or current audio reached its end and repeat_ had a
+        // value of 0 when the audio ended AKA dont repeat anything.
+
+        readyAudioForNewPlay(); /////
         // Shift pcm to beginning to signal stop
-        ma_sound_seek_to_pcm_frame(soundsHash_[QString(*audIt_)], 0);
-        // pause the sound at beginning
-        ma_sound_stop(soundsHash_[QString(*audIt_)]);
-        // set state to "stopped"
-        state_ = 0;
+        /////ma_sound_seek_to_pcm_frame(soundsHash_[QString(*audIt_)], 0);
+        // pause the sound at beginning. Since pause() calls ma_stop,
+        // the audio engine will be paused and ios control center will
+        // update the play/pause icon automatically because it reads from
+        // audio engine.
+        /////pause();
+        // set value of current audio state_ to "stopped"
+        /////state_ = 0;
+
         // Refresh UI
         emit playbackStateChanged(currentPlayingPath_);   // 0 stopped, 1 playing, 2 paused
         //
@@ -354,6 +358,9 @@ quint8  Player::playbackState() {
 }
 
 
+// WILL CORRECT THIS LOGIC OF CALLING THIS METHOD FROM QML.
+// THIS IS COZ readyAudioForNewPlay() ALREADY STORED DATA
+// TO VARIABLES AND QML CAN SIMPLY TAKE DIRECTLY FROM THOSE VARIABLES
 /**
   * For getting the name of current sound_
   * @returns the name.
@@ -370,5 +377,32 @@ QString Player::getTitle() {
     }
 }
 
+/////
+/**
+  * This function prepares the current active audio
+  * for new play AKA playing from the beginning.
+  * @returns the name.
+  */
+void Player::readyAudioForNewPlay() {
+    // Shift pcm to beginning to signal stop
+    ma_sound_seek_to_pcm_frame(soundsHash_[QString(*audIt_)], 0);
 
+    // pause the sound at beginning. Since pause() calls ma_stop,
+    // the audio engine will be paused and ios control center will
+    // update the play/pause icon automatically because it reads from
+    // audio engine.
+    pause();
+
+    // current playing state. 0 stopped, 1 playing, 2 paused
+    state_ = 0;
+
+    // now we can extract All details of current active audio here
+    currentPlayingTitle_ = getTitle();
+    currentPlayingArtist_ = "Unknown";
+    //MORE REQUIRED DETAILS WILL BE EXTRACTED HERE
+
+    // This plucks the data stored in respective variables at Media class,
+    // and ships them to the viewport where needed z.B. control center for iOS
+    updateAllAudioDetailsDisplayers();
+}
 

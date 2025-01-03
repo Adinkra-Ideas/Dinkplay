@@ -32,7 +32,8 @@ public:
     void    suspendAudio() override;
     void    unsuspendAudio() override;
     void    playOrPause() override;
-    void    stop();
+    void    endOfCurrentAudio(bool shouldStopCompletely = false); // 3 GREAT CHANGE CHNAGED THIS TO having a param
+    void    readyAudioForNewPlay();
 
 protected:
     ma_sound            sound_;

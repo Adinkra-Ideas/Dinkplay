@@ -53,6 +53,14 @@ ColumnLayout {
             value: 1
             to: 99
             stepSize: 1
+
+            handle: Rectangle {
+                x: lapCount.leftPadding + lapCount.visualPosition * (lapCount.availableWidth - width)
+                y: lapCount.topPadding + lapCount.availableHeight / 2 - height / 2
+                implicitWidth: (Qt.platform.os == "ios") ? 20 : 20
+                implicitHeight: implicitWidth
+                radius: implicitWidth * 0.5
+            }
         }
         TextField {
             validator: IntValidator {bottom: lapCount.from; top: lapCount.to}
@@ -103,6 +111,14 @@ ColumnLayout {
             value: 0
             to: 10800
             stepSize: 1
+
+            handle: Rectangle {
+                x: lapDuration.leftPadding + lapDuration.visualPosition * (lapDuration.availableWidth - width)
+                y: lapDuration.topPadding + lapDuration.availableHeight / 2 - height / 2
+                implicitWidth: (Qt.platform.os == "ios") ? 20 : 20
+                implicitHeight: implicitWidth
+                radius: implicitWidth * 0.5
+            }
         }
         TextField {
             validator: IntValidator {bottom: lapDuration.from; top: lapDuration.to}
@@ -153,6 +169,14 @@ ColumnLayout {
             value: 1
             to: 1800
             stepSize: 1
+
+            handle: Rectangle {
+                x: restDuration.leftPadding + restDuration.visualPosition * (restDuration.availableWidth - width)
+                y: restDuration.topPadding + restDuration.availableHeight / 2 - height / 2
+                implicitWidth: (Qt.platform.os == "ios") ? 20 : 20
+                implicitHeight: implicitWidth
+                radius: implicitWidth * 0.5
+            }
         }
         TextField {
             validator: IntValidator {bottom: restDuration.from; top: restDuration.to}
