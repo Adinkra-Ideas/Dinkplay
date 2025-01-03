@@ -63,7 +63,6 @@ qt_add_qml_module(appDinkplay
         Interval.hpp Interval.cpp
         Player.hpp Player.cpp
         IntervalWorker.hpp IntervalWorker.cpp
-        ma_lib/miniaudio.m # added for simulator
         # SOURCES iOS/src/MyMPRemoteCC.h iOS/src/MyMPRemoteCC.mm
 )
 # qt_target_qml_sources() provides the ability to add more files to a QML module after qt_add_qml_module() has been called. Typically, you pass the set of .qml files and resources to qt_add_qml_module() directly, but in some cases, it may be desirable, or even necessary, to add files after qt_add_qml_module() has been called. For example, you may wish to add files conditionally based on an if statement expression, or from subdirectories that will only be added if certain criteria are met. You might want to add a set of files with different characteristics to the others, such as a different resource prefix, or with linting and bytecode compilation disabled. The qt_target_qml_sources() command enables these scenarios. https://felgo.com/doc/qt/qt-target-qml-sources/
@@ -141,6 +140,7 @@ elseif (IOS)
         ${myAudios}
         ${default_artist_icon}
         ${asset_catalog_path}
+        #ma_lib/miniaudio.m # added for simulator
         iOS/src/MyMPRemoteCC.h iOS/src/MyMPRemoteCC.mm
     )
     set_source_files_properties(
@@ -179,7 +179,7 @@ elseif (IOS)
 
 
     target_link_libraries(appDinkplay PRIVATE
-        #miniaudio_iOS #removed for simulator
+        miniaudio_iOS #removed for simulator
         "-framework MediaPlayer"
         "-framework AVFoundation"
     )

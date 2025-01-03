@@ -73,13 +73,13 @@ Directory::Directory(QObject *parent) :
     Media{parent},
     backups_{"Adinkra-Ideas", "Dinkplay"}
 {
-    //testing
-    QString currDir_ = "./images";
-    QDir dir(currDir_);
-    QStringList all = dir.entryList(QStringList()/*, QDir::Dirs*/);
-    for (QString &one: all) {
-        qDebug() << "checking:" << one;
-    }
+    // //testing to see what got bundled into the app (ios)
+    // QString currDir_ = "./";
+    // QDir dir(currDir_);
+    // QStringList all = dir.entryList(QStringList()/*, QDir::Dirs*/);
+    // for (QString &one: all) {
+    //     qDebug() << "checking:" << one;
+    // }
 }
 
 Directory::~Directory(){}
