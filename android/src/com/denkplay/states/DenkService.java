@@ -64,17 +64,18 @@ public class DenkService extends QtService
         // Filter the intent and inform CPP if it was
         // a click from prev, play or pause
         String actionRcvd = intent.getAction();
-        if (actionRcvd != null) {
-            if (actionRcvd.equals("com.denkplay.states.action.prev")) {
-                sendToQt("((((Prev))))");
-            } else if (actionRcvd.equals("com.denkplay.states.action.play")) {
-                sendToQt("((((Play))))");
-            } else if (actionRcvd.equals("com.denkplay.states.action.pause")) {
-            sendToQt("((((Pause))))");
-            } else if (actionRcvd.equals("com.denkplay.states.action.next")) {
-                sendToQt("((((Next))))");
-            }
-        }
+        controlCPPMediaControl(actionRcvd);
+        // if (actionRcvd != null) {
+        //     if (actionRcvd.equals("com.denkplay.states.action.prev")) {
+        //         sendToQt("((((Prev))))");
+        //     } else if (actionRcvd.equals("com.denkplay.states.action.play")) {
+        //         sendToQt("((((Play))))");
+        //     } else if (actionRcvd.equals("com.denkplay.states.action.pause")) {
+        //     sendToQt("((((Pause))))");
+        //     } else if (actionRcvd.equals("com.denkplay.states.action.next")) {
+        //         sendToQt("((((Next))))");
+        //     }
+        // }
 
 
         // Call the Activity AKA ThisApp when this foreground service is clicked
@@ -131,6 +132,7 @@ public class DenkService extends QtService
             return ret;
     }
 
+    // this need to be renamed to useDummyIntentToRefreshBGServiceNotif()
     public void setPlayPauseIconInService(boolean playing) {
         playing_ = playing;
 
@@ -146,6 +148,21 @@ public class DenkService extends QtService
             // e.printStackTrace();
         }
     }
+
+    public void controlCPPMediaControl(String actionRcvd) {
+        if (actionRcvd != null) {
+            if (actionRcvd.equals("com.denkplay.states.action.prev")) {
+                sendToQt("((((Prev))))");
+            } else if (actionRcvd.equals("com.denkplay.states.action.play")) {
+                sendToQt("((((Play))))");
+            } else if (actionRcvd.equals("com.denkplay.states.action.pause")) {
+            sendToQt("((((Pause))))");
+            } else if (actionRcvd.equals("com.denkplay.states.action.next")) {
+                sendToQt("((((Next))))");
+            }
+        }
+    }
+
 
     // Binder given to clients.
     private final IBinder binder = new MyBinder();

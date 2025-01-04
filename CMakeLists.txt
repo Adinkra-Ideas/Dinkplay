@@ -63,16 +63,15 @@ qt_add_qml_module(appDinkplay
         Interval.hpp Interval.cpp
         Player.hpp Player.cpp
         IntervalWorker.hpp IntervalWorker.cpp
-        # SOURCES iOS/src/MyMPRemoteCC.h iOS/src/MyMPRemoteCC.mm
 )
-# qt_target_qml_sources() provides the ability to add more files to a QML module after qt_add_qml_module() has been called. Typically, you pass the set of .qml files and resources to qt_add_qml_module() directly, but in some cases, it may be desirable, or even necessary, to add files after qt_add_qml_module() has been called. For example, you may wish to add files conditionally based on an if statement expression, or from subdirectories that will only be added if certain criteria are met. You might want to add a set of files with different characteristics to the others, such as a different resource prefix, or with linting and bytecode compilation disabled. The qt_target_qml_sources() command enables these scenarios. https://felgo.com/doc/qt/qt-target-qml-sources/
-if (ANDROID)
-    qt_target_qml_sources(appDinkplay
-        RESOURCES android/AndroidManifest.xml android/build.gradle android/res/values/libs.xml android/res/xml/qtprovider_paths.xml android/gradle/wrapper/gradle-wrapper.jar android/gradle/wrapper/gradle-wrapper.properties android/gradle.properties android/gradlew android/gradlew.bat
-        RESOURCES android/src/com/denkplay/states/DenkService.java
-        RESOURCES android/src/com/denkplay/states/DenkActivity.java
-    )
-endif()
+# # qt_target_qml_sources() provides the ability to add more files to a QML module after qt_add_qml_module() has been called. Typically, you pass the set of .qml files and resources to qt_add_qml_module() directly, but in some cases, it may be desirable, or even necessary, to add files after qt_add_qml_module() has been called. For example, you may wish to add files conditionally based on an if statement expression, or from subdirectories that will only be added if certain criteria are met. You might want to add a set of files with different characteristics to the others, such as a different resource prefix, or with linting and bytecode compilation disabled. The qt_target_qml_sources() command enables these scenarios. https://felgo.com/doc/qt/qt-target-qml-sources/
+# if (ANDROID)
+#     qt_target_qml_sources(appDinkplay
+#         RESOURCES android/AndroidManifest.xml android/build.gradle android/res/values/libs.xml android/res/xml/qtprovider_paths.xml android/gradle/wrapper/gradle-wrapper.jar android/gradle/wrapper/gradle-wrapper.properties android/gradle.properties android/gradlew android/gradlew.bat
+#         RESOURCES android/src/com/denkplay/states/DenkService.java
+#         RESOURCES android/src/com/denkplay/states/DenkActivity.java
+#     )
+# endif()
 
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -112,7 +111,6 @@ target_link_libraries(appDinkplay PRIVATE
     Qt6::Core
     Qt6::QuickControls2
     Qt6::Qml
-    #Qt6::SpatialAudio this needed to be commented out before app could be built for iOS but I dont know how it got here in first place for android build. Was it a remnant I had forgotten to remove during my time of frustration post qmediaplayer?
 )
 if (WIN32)
     target_link_libraries(appDinkplay PRIVATE
@@ -121,6 +119,15 @@ if (WIN32)
 elseif (ANDROID)
     # This filepath is based on default Qt AppData path for windows. Change if on different OS
     include(C:/Users/user/AppData/Local/Android/Sdk/android_openssl/CMakeLists.txt)
+
+    target_sources(appDinkplay PRIVATE
+        android/AndroidManifest.xml android/build.gradle android/res/values/libs.xml android/res/xml/qtprovider_paths.xml android/gradle/wrapper/gradle-wrapper.jar android/gradle/wrapper/gradle-wrapper.properties android/gradle.properties android/gradlew android/gradlew.bat
+        android/src/com/denkplay/states/DenkService.java
+        android/src/com/denkplay/states/DenkActivity.java
+    )
+
+    # set_target_properties() is used to initialize qt macros
+    # for buld time.
     set_target_properties(appDinkplay PROPERTIES
        QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/android
     )
@@ -153,7 +160,8 @@ elseif (IOS)
         ${asset_catalog_path} PROPERTIES MACOSX_PACKAGE_LOCATION Resources
     )
 
-
+    # set_target_properties() is used to initialize qt macros
+    # for buld time.
     set_target_properties(appDinkplay PROPERTIES
         # Replaye Qt's default white splashscreen
         QT_IOS_LAUNCH_SCREEN "${CMAKE_SOURCE_DIR}/iOS/LaunchScr.storyboard"

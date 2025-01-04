@@ -33,6 +33,7 @@ public:
     void checkForBackPress() override;
     void notifyJavaSeviceAboutPlaying(bool isplaying) override;
     void updateAllAudioDetailsDisplayers() override;
+    bool seizeControlOfAudioSession() override;
 
     static Top * myInstance;
 

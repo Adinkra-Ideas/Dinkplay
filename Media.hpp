@@ -87,6 +87,7 @@ public:
     virtual void killAllThreads() = 0;
     virtual void notifyJavaSeviceAboutPlaying(bool isplaying) = 0;
     virtual void updateAllAudioDetailsDisplayers() = 0;
+    virtual bool seizeControlOfAudioSession() = 0;
     /**********************************************/
 
 public slots:

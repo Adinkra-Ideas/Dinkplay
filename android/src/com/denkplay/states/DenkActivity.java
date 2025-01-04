@@ -7,6 +7,9 @@ import android.util.Log;
 import android.content.Intent;
 import android.content.Context;
 import android.widget.Toast;
+import android.media.AudioManager;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
 
 import android.content.ComponentName;
 import android.content.ServiceConnection;
@@ -16,10 +19,60 @@ public class DenkActivity extends QtActivity {
     private Context context;
     private int myState_;
 
-    /* For holding the binded service */
+/* For holding the binded service BEGINS */
     private DenkService theService_;
     private boolean serviceBinded_ = false;
-    /* For holding the binded service */
+/* For holding the binded service ENDS */
+
+/* For holding vars required to manage audio interrupts BEGINS */
+    // AudioAttributes describes to android the use case for your audio.
+    // The system looks at them when an app gains and loses audio focus.
+    private AudioAttributes audioAttributes_ = new AudioAttributes.Builder()
+        .setUsage(AudioAttributes.USAGE_MEDIA)
+        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+        .build();
+    //
+    private AudioManager.OnAudioFocusChangeListener audioFocusChangeListener_ = new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            Log.d("Rachit", "focuschanged received. value = " + focusChange);
+            switch (focusChange) {
+                case AudioManager.AUDIOFOCUS_LOSS:
+                    // Permanent loss of audio focus. Pause playback indefinitely
+                    theService_.controlCPPMediaControl("com.denkplay.states.action.pause");
+                    break; // CONTINUE WITH IMPLEMENTING THE SUSPEND AND UNSUSPEND FOR THE REMAINING PART BEFORE MOVING TO HEADSET MANAGEMENT
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                    // Pause playback
+                    Log.d("Rachit", "Lost audio focus temporarily. media must now suspend");
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    // Lower the volume, keep playing
+                    Log.d("Rachit", "Lost audio focus temporarily. But the new audio capturer tells us that we can lower our audi rather than pause");
+                    break;
+                case AudioManager.AUDIOFOCUS_GAIN:
+                    // Your app has been re-granted audio focus again.
+                    // This is called after the capturer who captured the audio
+                    // session with either "AUDIOFOCUS_LOSS_TRANSIENT" or
+                    // "AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK" finally releases the
+                    // audio session. Now you can unsuspend your play.
+                    Log.d("Rachit", "gained audio focus back. media can now unsuspend");
+                    break;
+            }
+        }
+    };
+    // AudioFocusRequest is used to pass the AudioAttributes we built above to
+    // Android, and also tell Android how we intend to seize the audiosession's focus.
+    // This info enables android to notify the other app (if any) currently using audio session.
+    // A param of "AudioManager.AUDIOFOCUS_GAIN" means we want full audio focus permanently.
+    // "AUDIOFOCUS_GAIN_TRANSIENT" means we want full audio focus but for less than 45 seconds.
+    // "AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK" but for less than 45 seconds, and in the meantime, the other app currently holding audio session may decide to duck(lower their volume) rather than pause.
+    private AudioFocusRequest focusRequest_ = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+        .setAudioAttributes(audioAttributes_)
+        .setAcceptsDelayedFocusGain(true)
+        .setOnAudioFocusChangeListener(audioFocusChangeListener_)
+        .build();
+/* For holding vars required to manage audio interrupts ENDS */
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -77,11 +130,15 @@ public class DenkActivity extends QtActivity {
         super.onDestroy();
     }
 
+    ////////////////////////////////////////////////////////////////
+    // ******* METHODS FOR STARTING AND BINDING SERVICE BEGINS *****
+    ////////////////////////////////////////////////////////////////
+
     @Override
     public ComponentName startForegroundService(Intent intent) {
         ComponentName componentName = super.startForegroundService(intent);
 
-        // Bind to DenkService.
+        // Bind to DenkService AKA the started foreground service
         bindService(intent, connection, 0);
 
         return componentName;
@@ -104,6 +161,32 @@ public class DenkActivity extends QtActivity {
         }
     };
 
+    ////////////////////////////////////////////////////////
+    // **** METHODS FOR MANAGING AUDIO INTERRUPTS BEGINS ***
+    ////////////////////////////////////////////////////////
+
+
+
+    // media player is handled according to the
+          // change in the focus which Android system grants for
+    // audioFocusChangeListener_ = new AudioManager.OnAudioFocusChangeListener() {
+    //         @Override
+            // public void onAudioFocusChange(int focusChange) {
+    //             if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+    //                 Log.d("Rachit", "gained audio focus. media can now play");
+    //             } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+    //                 Log.d("Rachit", "Lost audio focus temporarily. media must now suspend");
+    //             } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+    //                 Log.d("Rachit", "Lost audio focus Permanently. media must now pause");
+    //             }
+        //     }
+        // };
+
+
+    //////////////////////////////////////////////////////
+    // **** METHODS DIRECTLY CALLED FROM CPP BEGINS ******
+    //////////////////////////////////////////////////////
+
     /*
     * We want to access the method inside service from
     * Cpp. This method is just to enable CPP reach the
@@ -112,6 +195,30 @@ public class DenkActivity extends QtActivity {
     */
     public void setPlayPauseIconInActivity(boolean playing) {
         theService_.setPlayPauseIconInService(playing);
+    }
+
+    // Checked before playing. if failed, it returns false
+    // to cpp. which will cause the play() in cpp to not exec
+    public boolean seizeControlOfAudioManager() {
+    /* NOW SINCE WE HAVE BUILT OUR LISTENERS AND STORED THE FINAL TO focusRequest_,
+    // WE NOW NEED TO RUN THE BELOW EACH TIME WE NEED TO START .
+    // WHAT THE BELOW CODE DOES IN THIS CASE IS THAT IT REQUEST ANDROID's audiosession
+    // MANAGER TO GRANT US CONTROL OF AUDIO SESSION AND IT PASSES OUR focusRequest_
+    // OBJECT(WHICH CONTAINS A DESCRIPTION OF HOW/WHY WE NEED THE audiosession) TO ANDROID.
+    // AND SINCE OUR focusRequest_ OBJECT ALSO CONTAINS THE LISTENER FOR INTERRUPTIONS,
+    // ANDROID WILL EXECUTE THAT LISTENER IF AN INTERRUPT COMES IN WHILE WE HAPPEN TO BE
+    // IN CONTROL OF audiosession.
+    */
+        // retrieve the running instance of audiosession manager from android
+        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        // request the audio focus from android and store response in the int variable to know android's response
+        int result = audioManager.requestAudioFocus(focusRequest_);
+        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            return true;
+        } else if (result == AudioManager.AUDIOFOCUS_REQUEST_FAILED) {
+            return false;
+        }
+        return false;
     }
 
     /**
@@ -139,3 +246,7 @@ public class DenkActivity extends QtActivity {
     }
 
 }
+
+
+
+// ALL CALLS TO new NEEDS TO BE RELEASED ON EXIT

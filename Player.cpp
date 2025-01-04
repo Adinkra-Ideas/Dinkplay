@@ -152,6 +152,12 @@ void Player::play() {
         return ;
     }
 
+    // Seize control of audio session for both
+    // android and iOS
+    if (! seizeControlOfAudioSession()) {
+        return ;
+    }
+
     // This is necessary so mini audio dont lose audio
     // when iOS is returning from an interruption
     ma_device_start(device_);

@@ -99,10 +99,25 @@ void Top::notifyJavaSeviceAboutPlaying(bool isplaying) {
     #endif
 }
 
+bool Top::seizeControlOfAudioSession() {
+    #ifdef Q_OS_ANDROID
+    auto result = javaObject.callMethod<bool>(
+        "seizeControlOfAudioManager",
+        "()Z");
+    qDebug() << "rachit returned " << result;
+    return result;
+    #endif
+
+    #ifdef Q_OS_IOS
+    seizeControlOfInfoCenter();
+    #endif
+    return true;
+}
+
 // will comment
 void Top::updateAllAudioDetailsDisplayers() {
     #ifdef Q_OS_IOS
-    seizeControlOfInfoCenter();
+    // seizeControlOfInfoCenter();
     updateInfoCenter(currentPlayingTitle_.toLocal8Bit().constData(),
                      currentPlayingArtist_.toLocal8Bit().constData());
     #endif
