@@ -14,6 +14,10 @@ static void logJavaResponse(JNIEnv *env, jobject /*thiz*/, jstring value)
         Top::myInstance->pause();
     } else if (javaMsg == QString("((((Next))))")) {
         Top::myInstance->changePlay(true);
+    } else if (javaMsg == QString("((((Suspend))))")) {
+        Top::myInstance->suspendAudio();
+    } else if (javaMsg == QString("((((Unsuspend))))")) {
+        Top::myInstance->unsuspendAudio();
     }
 
     // qDebug() << "the message from java" << env->GetStringUTFChars(value, nullptr);

@@ -201,10 +201,10 @@ QStringList Directory::getAudioPaths() {
 void Directory::doAddDir() {
     //////
     /// // just adding a bundled song for testing whether audio plays out
-    audioPaths_.push_back("audios/db.mp3");
-    soundsHash_["audios/db.mp3"] = nullptr;
-    audioPaths_.push_back("audios/kk.mp3");
-    soundsHash_["audios/kk.mp3"] = nullptr;
+    // audioPaths_.push_back("audios/db.mp3");
+    // soundsHash_["audios/db.mp3"] = nullptr;
+    // audioPaths_.push_back("audios/kk.mp3");
+    // soundsHash_["audios/kk.mp3"] = nullptr;
 
     // Since IOS selectedfiles paths have already been assigned to audioPaths_,
     // no need to repeat this block for iOS users.

@@ -159,6 +159,10 @@ public class DenkService extends QtService
             sendToQt("((((Pause))))");
             } else if (actionRcvd.equals("com.denkplay.states.action.next")) {
                 sendToQt("((((Next))))");
+            } else if (actionRcvd.equals("com.denkplay.states.action.suspend")) {
+                sendToQt("((((Suspend))))");
+            } else if (actionRcvd.equals("com.denkplay.states.action.unsuspend")) {
+                sendToQt("((((Unsuspend))))");
             }
         }
     }

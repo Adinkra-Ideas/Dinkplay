@@ -21,6 +21,7 @@ public class DenkActivity extends QtActivity {
 
 /* For holding the binded service BEGINS */
     private DenkService theService_;
+    private boolean serviceStarted_ = false;
     private boolean serviceBinded_ = false;
 /* For holding the binded service ENDS */
 
@@ -40,14 +41,14 @@ public class DenkActivity extends QtActivity {
                 case AudioManager.AUDIOFOCUS_LOSS:
                     // Permanent loss of audio focus. Pause playback indefinitely
                     theService_.controlCPPMediaControl("com.denkplay.states.action.pause");
-                    break; // CONTINUE WITH IMPLEMENTING THE SUSPEND AND UNSUSPEND FOR THE REMAINING PART BEFORE MOVING TO HEADSET MANAGEMENT
+                    break;
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                    // Pause playback
-                    Log.d("Rachit", "Lost audio focus temporarily. media must now suspend");
+                    // Audio session Capturer says we should pause pausing
+                    theService_.controlCPPMediaControl("com.denkplay.states.action.suspend");
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                    // Lower the volume, keep playing
-                    Log.d("Rachit", "Lost audio focus temporarily. But the new audio capturer tells us that we can lower our audi rather than pause");
+                    // Audio session Capturer says we can lower the volume and keep playing rather than pausing
+                    theService_.controlCPPMediaControl("com.denkplay.states.action.suspend");
                     break;
                 case AudioManager.AUDIOFOCUS_GAIN:
                     // Your app has been re-granted audio focus again.
@@ -55,7 +56,7 @@ public class DenkActivity extends QtActivity {
                     // session with either "AUDIOFOCUS_LOSS_TRANSIENT" or
                     // "AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK" finally releases the
                     // audio session. Now you can unsuspend your play.
-                    Log.d("Rachit", "gained audio focus back. media can now unsuspend");
+                    theService_.controlCPPMediaControl("com.denkplay.states.action.unsuspend");
                     break;
             }
         }
@@ -130,18 +131,22 @@ public class DenkActivity extends QtActivity {
         super.onDestroy();
     }
 
-    ////////////////////////////////////////////////////////////////
-    // ******* METHODS FOR STARTING AND BINDING SERVICE BEGINS *****
-    ////////////////////////////////////////////////////////////////
-
+////////////////////////////////////////////////////////////////
+// ******* METHODS FOR STARTING AND BINDING SERVICE BEGINS *****
+////////////////////////////////////////////////////////////////
     @Override
     public ComponentName startForegroundService(Intent intent) {
-        ComponentName componentName = super.startForegroundService(intent);
+        // only start this service if not yet started
+        if (! serviceStarted_) {
+            ComponentName componentName = super.startForegroundService(intent);
+            serviceStarted_ = true;
+        }
 
         // Bind to DenkService AKA the started foreground service
         bindService(intent, connection, 0);
 
-        return componentName;
+        // cannot return componentName anymore due to our implementation
+        return null;
     }
 
     /** connection is simply 2 callbacks. one used by bindService(), the other used by unbindService() */
@@ -160,33 +165,14 @@ public class DenkActivity extends QtActivity {
             serviceBinded_ = false;
         }
     };
-
-    ////////////////////////////////////////////////////////
-    // **** METHODS FOR MANAGING AUDIO INTERRUPTS BEGINS ***
-    ////////////////////////////////////////////////////////
-
+/////////////////////////////////////////////////////////
+// **** METHODS FOR STARTING AND BINDING SERVICE ENDS ***
+/////////////////////////////////////////////////////////
 
 
-    // media player is handled according to the
-          // change in the focus which Android system grants for
-    // audioFocusChangeListener_ = new AudioManager.OnAudioFocusChangeListener() {
-    //         @Override
-            // public void onAudioFocusChange(int focusChange) {
-    //             if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-    //                 Log.d("Rachit", "gained audio focus. media can now play");
-    //             } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-    //                 Log.d("Rachit", "Lost audio focus temporarily. media must now suspend");
-    //             } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-    //                 Log.d("Rachit", "Lost audio focus Permanently. media must now pause");
-    //             }
-        //     }
-        // };
-
-
-    //////////////////////////////////////////////////////
-    // **** METHODS DIRECTLY CALLED FROM CPP BEGINS ******
-    //////////////////////////////////////////////////////
-
+//////////////////////////////////////////////////////
+// **** METHODS DIRECTLY CALLED FROM CPP BEGINS ******
+//////////////////////////////////////////////////////
     /*
     * We want to access the method inside service from
     * Cpp. This method is just to enable CPP reach the
@@ -246,7 +232,3 @@ public class DenkActivity extends QtActivity {
     }
 
 }
-
-
-
-// ALL CALLS TO new NEEDS TO BE RELEASED ON EXIT
