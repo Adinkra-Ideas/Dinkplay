@@ -21,6 +21,12 @@ int main(int argc, char *argv[])
     {
         r = QtAndroidPrivate::requestPermission("android.permission.POST_NOTIFICATIONS").result();
     }
+    /* [[1]] Needed for detecting when bluetooth connect/disconnect from something */
+    r = QtAndroidPrivate::checkPermission("android.permission.BLUETOOTH_CONNECT").result();
+    if (r != QtAndroidPrivate::Authorized)
+    {
+        r = QtAndroidPrivate::requestPermission("android.permission.BLUETOOTH_CONNECT").result();
+    }
     #endif
 
     QGuiApplication app(argc, argv);

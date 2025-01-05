@@ -10,6 +10,11 @@ import android.widget.Toast;
 import android.media.AudioManager;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
+import android.bluetooth.BluetoothAdapter;///
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
+import androidx.core.content.ContextCompat;
+import android.bluetooth.BluetoothManager;
 
 import android.content.ComponentName;
 import android.content.ServiceConnection;
@@ -36,7 +41,6 @@ public class DenkActivity extends QtActivity {
     private AudioManager.OnAudioFocusChangeListener audioFocusChangeListener_ = new AudioManager.OnAudioFocusChangeListener() {
         @Override
         public void onAudioFocusChange(int focusChange) {
-            Log.d("Rachit", "focuschanged received. value = " + focusChange);
             switch (focusChange) {
                 case AudioManager.AUDIOFOCUS_LOSS:
                     // Permanent loss of audio focus. Pause playback indefinitely
@@ -75,11 +79,50 @@ public class DenkActivity extends QtActivity {
 /* For holding vars required to manage audio interrupts ENDS */
 
 
+/* [[1]] Needed for detecting when bluetooth connect/disconnect from something */
+    private BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("Rachit", "In onreceive Method");
+            String action = intent.getAction();
+            if (action == null) return;
+
+            if (action.equals(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED)) {
+                switch (intent.getIntExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE, -1)) {
+                    case BluetoothAdapter.STATE_DISCONNECTED:
+                        theService_.controlCPPMediaControl("com.denkplay.states.action.pause");
+                        break;
+                    case BluetoothAdapter.STATE_CONNECTED:
+                        // do nothing coz if you play/unsuspend, it will breach user privacy when
+                        // BluetoothAdapter.STATE_DISCONNECTED paused the audio, then a phone call came in
+                        // later and at the end of the phone call, the audio gets unsuspended into a loud speaker.
+                        break;
+                }
+            }
+        }
+    };
+/* [[1]] ENDS */
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = this;
         myState_ = 0;
+
+    /* [[1]] Needed for detecting when bluetooth connect/disconnect from something */
+    /*  NOW, SINCE WE HAVE BUILT OUR BroadcastReceiver CALLBACK AND STORED IT
+    *   TO VARIABLE bluetoothReceiver, WE NOW NEED TO RUN THE FOLLOWING LINES
+    *   ON APP LAUNCH TO RETRIEVE THE RUNNING INSTANCE OF BLUETOOTH SERVICE
+    *   AND TELL IT TO CALL OUR BroadcastReceiver CALLBACK EACH TIME THE STATE
+    *   OF CONNECTED BLUETOOTH DEVICE CHANGES
+    */
+        // First we retrieve the live instance of Android Bluetooth Service
+        BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(context.BLUETOOTH_SERVICE);
+        // Then from there, we obtain the local device Bluetooth adapter
+        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+        // Now, register listener for listening to changes in the local device Bluetooth adapter
+        ContextCompat.registerReceiver(this, bluetoothReceiver, new IntentFilter(bluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED), ContextCompat.RECEIVER_EXPORTED);
 
         Toast.makeText(this, "Starting Dinkplay..", Toast.LENGTH_SHORT).show();
     }
@@ -115,6 +158,10 @@ public class DenkActivity extends QtActivity {
     public void onDestroy() {
         unbindService(connection);
         serviceBinded_ = false;
+
+        /* [[1]] Needed for detecting when bluetooth connect/disconnect from something */
+        // remove listener for listening to changes in the local device Bluetooth adapter
+        unregisterReceiver(bluetoothReceiver);
 
         // This is a clean way to quickly exit the app onDestroy.
         // if you depend on super.onDestroy, exiting can take over
@@ -232,3 +279,4 @@ public class DenkActivity extends QtActivity {
     }
 
 }
+

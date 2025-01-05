@@ -19,8 +19,21 @@
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
     <!-- Access Audio files (API 33 and above) -->
 
+    <!-- [[1]] Needed for detecting when bluetooth connect/disconnect from something -->
+    <!-- ALL BLUETOOTH PERMISSIONS https://developer.android.com/develop/connectivity/bluetooth/bt-permissions#declare-->
+    <!-- API level 31 and above needs android.permission.BLUETOOTH_SCAN, and it is a runtime permissions meaning you must explicitly request user approval
+         but the API Level 30 and below needs just to declare the android.permission.BLUETOOTH and android.permission.BLUETOOTH_ADMIN. -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+
     <supports-screens android:anyDensity="true" android:largeScreens="true" android:normalScreens="true" android:smallScreens="true"/>
     <application android:name="org.qtproject.qt.android.bindings.QtApplication" android:hardwareAccelerated="true" android:label="Dinkplay" android:requestLegacyExternalStorage="true" android:allowBackup="true" android:fullBackupOnly="false" android:icon="@drawable/icon">
+        <!--<receiver android:name="com.denkplay.states.DenkActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.bluetooth.adapter.action.CONNECTION_STATE_CHANGED"/>
+            </intent-filter>
+        </receiver>-->
         <activity android:name="com.denkplay.states.DenkActivity"
             android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density"
             android:launchMode="singleInstance"
