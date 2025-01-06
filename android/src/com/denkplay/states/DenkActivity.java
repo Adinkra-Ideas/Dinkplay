@@ -10,7 +10,7 @@ import android.widget.Toast;
 import android.media.AudioManager;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
-import android.bluetooth.BluetoothAdapter;///
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
 import androidx.core.content.ContextCompat;
@@ -83,10 +83,8 @@ public class DenkActivity extends QtActivity {
     private BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("Rachit", "In onreceive Method");
             String action = intent.getAction();
             if (action == null) return;
-
             if (action.equals(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED)) {
                 switch (intent.getIntExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE, -1)) {
                     case BluetoothAdapter.STATE_DISCONNECTED:
@@ -102,6 +100,29 @@ public class DenkActivity extends QtActivity {
         }
     };
 /* [[1]] ENDS */
+
+
+/* [[2]] Needed for detecting when wire headset connect/disconnect */
+    private BroadcastReceiver wireHeadsetReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action == null) return;
+
+            if (action.equals(Intent.ACTION_HEADSET_PLUG)) {
+                switch (intent.getIntExtra("state", -1)) {
+                    case 0:
+                    /* if cond necessary to prevent app crash coz this callback is fired at app launch (maybe coz it used "registerReceiver" instead of "ContextCompat.registerReceiver"), at the time when theService_ is not yet started */
+                        if (serviceStarted_)
+                            theService_.controlCPPMediaControl("com.denkplay.states.action.pause");;
+                        break;
+                    case 1:
+                        break;
+                }
+            }
+        }
+    };
+/* [[2]] ENDS */
 
 
     @Override
@@ -124,6 +145,10 @@ public class DenkActivity extends QtActivity {
         // Now, register listener for listening to changes in the local device Bluetooth adapter
         ContextCompat.registerReceiver(this, bluetoothReceiver, new IntentFilter(bluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED), ContextCompat.RECEIVER_EXPORTED);
 
+    /* [[2]] Needed for detecting when wire headset connect/disconnect */
+        IntentFilter filter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
+        registerReceiver(wireHeadsetReceiver, filter);
+
         Toast.makeText(this, "Starting Dinkplay..", Toast.LENGTH_SHORT).show();
     }
 
@@ -134,7 +159,7 @@ public class DenkActivity extends QtActivity {
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         myState_ = 2;
     }
@@ -159,9 +184,12 @@ public class DenkActivity extends QtActivity {
         unbindService(connection);
         serviceBinded_ = false;
 
-        /* [[1]] Needed for detecting when bluetooth connect/disconnect from something */
+    /* [[1]] Needed for detecting when bluetooth connect/disconnect from something */
         // remove listener for listening to changes in the local device Bluetooth adapter
         unregisterReceiver(bluetoothReceiver);
+
+    /* [[2]] Needed for detecting when wire headset connect/disconnect */
+        unregisterReceiver(wireHeadsetReceiver);
 
         // This is a clean way to quickly exit the app onDestroy.
         // if you depend on super.onDestroy, exiting can take over
@@ -227,7 +255,10 @@ public class DenkActivity extends QtActivity {
     * binded service instance theService_
     */
     public void setPlayPauseIconInActivity(boolean playing) {
-        theService_.setPlayPauseIconInService(playing);
+        /* if cond necessary to prevent app crash coz this method is fired at app launch,
+        for whatever reason. At the time when theService_ is not yet started */
+        if (serviceStarted_)
+            theService_.setPlayPauseIconInService(playing);
     }
 
     // Checked before playing. if failed, it returns false

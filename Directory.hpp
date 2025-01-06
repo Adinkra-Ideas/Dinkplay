@@ -15,6 +15,7 @@
 #include <QStringList>
 #include <QSettings>
 #include <QStandardPaths>
+#include <QTemporaryDir>
 
 #include "Media.hpp"
 
@@ -29,6 +30,7 @@ public:
     void        loadSavedPaths() override;
 
     void        preparePathsForPlay();
+    void        addDefaultSound();
 
 private:
     void        doAddDir();

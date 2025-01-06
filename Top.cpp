@@ -108,7 +108,6 @@ bool Top::seizeControlOfAudioSession() {
     auto result = javaObject.callMethod<bool>(
         "seizeControlOfAudioManager",
         "()Z");
-    qDebug() << "rachit returned " << result;
     return result;
     #endif
 

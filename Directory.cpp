@@ -74,7 +74,7 @@ Directory::Directory(QObject *parent) :
     backups_{"Adinkra-Ideas", "Dinkplay"}
 {
     // //testing to see what got bundled into the app (ios)
-    // QString currDir_ = "./";
+    // QString currDir_ = ".";
     // QDir dir(currDir_);
     // QStringList all = dir.entryList(QStringList()/*, QDir::Dirs*/);
     // for (QString &one: all) {
@@ -201,8 +201,8 @@ QStringList Directory::getAudioPaths() {
 void Directory::doAddDir() {
     //////
     /// // just adding a bundled song for testing whether audio plays out
-    // audioPaths_.push_back("audios/db.mp3");
-    // soundsHash_["audios/db.mp3"] = nullptr;
+    // audioPaths_.push_back("assets:/db.mp3");
+    // soundsHash_["assets:/db.mp3"] = nullptr;
     // audioPaths_.push_back("audios/kk.mp3");
     // soundsHash_["audios/kk.mp3"] = nullptr;
 
@@ -214,15 +214,6 @@ void Directory::doAddDir() {
         currDir_ = QUrl(currDir_).toLocalFile();
     }
     QDir dir(currDir_);
-
-    // QDir dir(QUrl(currDir_).toLocalFile());
-
-    // // remove the file:/// from the beginning of file name
-    // // This problem exist coz we were initially building
-    // // for qmediaplayer
-    // if (QUrl(currDir_).isLocalFile()) {
-    //     currDir_ = QUrl(currDir_).toLocalFile();
-    // }
 
     // Fetch all filepaths that ends with .mp3 from the directory
     QStringList mp3 = dir.entryList(QStringList() << "*.mp3", QDir::Files);
@@ -243,6 +234,26 @@ void Directory::doAddDir() {
     preparePathsForPlay();
 }
 
+void Directory::addDefaultSound() {
+/* Add default sound in Android */
+    #ifdef Q_OS_ANDROID
+    QTemporaryDir tempDir;
+    QString tempFile;
+    if (tempDir.isValid()) {
+        tempFile = tempDir.path() + "/Dink_Tone.mp3";
+        if (QFile::copy("assets:/Dink_Tone.mp3", tempFile)) {
+            tempDir.setAutoRemove(false);
+        } else {
+            tempFile.clear();
+        }
+    }
+    if (! tempFile.isEmpty()) {
+        audioPaths_.push_back(tempFile);
+        soundsHash_[tempFile] = nullptr;
+    }
+    #endif
+}
+
 /**
   * By the time this method is called,
   * audioPaths_ should already have its
@@ -258,6 +269,10 @@ void Directory::doAddDir() {
   * @returns void
   */
 void Directory::preparePathsForPlay() {
+    if (audioPaths_.isEmpty()) {
+        addDefaultSound();
+    }
+
     // set iterator back to beginning
     audIt_ = audioPaths_.begin();
     // vpIt_ = videoPaths_.begin();
