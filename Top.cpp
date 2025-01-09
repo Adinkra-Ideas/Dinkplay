@@ -125,3 +125,37 @@ void Top::updateAllAudioDetailsDisplayers() {
                      currentPlayingArtist_.toLocal8Bit().constData());
     #endif
 }
+
+
+bool Top::objc_StartAccessingSecuredLocation(const char * urlPath) {
+    return startAccessingSecuredLocation(urlPath);
+}
+
+/**
+  * This method is called when the user clicks the
+  * folder icon from app interface, for selecting
+  * files/folder for play.
+  * It simply checks the platform and redirects
+  * to where the document picker dialog for that
+  * platform is implemented. objective-c for iOS,
+  * Cpp for android.
+  * @returns bool but simply coz void cant be used
+  * with Q_PROPERTY
+  */
+bool Top::manageDocumentPickModal() {
+    // We will change android/windows picker from qml to cpp when I got the time
+    #ifndef Q_OS_IOS
+    // Directory::openDialogFromCpp();
+    // return false;
+    #endif
+
+    // iOS uses its uidocument picker to open dialogues
+    // that returns security-scoped url data types, which contains
+    // special unseen infos. Using Qt's filedialog will simply return
+    // bare strings that wont work with startAccessingSecurityScopedResource
+    #ifdef Q_OS_IOS
+    startAccessingSecuredLocation("urlPath");
+    #endif
+
+    return 0;
+}

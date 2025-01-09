@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <MediaPlayer/MediaPlayer.h>
-#import <UIKit/UIKit.h>
+// #import <UIKit/UIKit.h>
+// #import <MobileCoreServices/MobileCoreServices.h>
 #include <stdio.h> // because nslog aint printing to qt debug
 #import "MyMPRemoteCC.h"
 
@@ -17,7 +18,7 @@ Top *cppObject;
   * @param none
   * @returns none
   */
-@interface MyMPRemoteCC : NSObject
+@interface MyMPRemoteCC : NSObject <UIDocumentPickerDelegate>
 {
   NSNotificationCenter *notifCenter;        // for adding and removing observers AKA notification for audio state-change listeners
   MPRemoteCommandCenter *myCommandCenter;   // For holding the control center instance
@@ -30,6 +31,9 @@ Top *cppObject;
 - (MPRemoteCommandHandlerStatus)nextAudio: (MPRemoteCommandHandlerStatus *)event;
 - (MPRemoteCommandHandlerStatus)playPauseAudio: (MPRemoteCommandHandlerStatus *)event;
 - (void)passAudioDetailsToInfoCenter: (NSString *)title :(NSString *)artist;
+- (void)openDocumentPicker;
+- (void)documentPicker: (UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls;
+
 
 @end
 @implementation MyMPRemoteCC
@@ -252,6 +256,84 @@ Top *cppObject;
 }
 
 
+- (void)openDocumentPicker
+{
+  //This is needed, when using this code on QT!
+  //Find the current app window, and its view controller object
+  // retrieve the active UI instance
+  UIApplication * app = [UIApplication sharedApplication];
+  UIWindow * rootWindow = app.windows[0];
+  UIViewController * rootViewController = rootWindow.rootViewController;
+
+  //Initialize the document picker. Set appropriate document types
+  //When reading: use document type of the file, that you're going to read
+  //When writing into a new file: use @"public.folder" to select a folder, where your new file will be created
+  // @[@"public.content",@"public.text",@"public.mp4"];
+  UIDocumentPickerViewController *documentPicker = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[@"public.mp3"] inMode:UIDocumentPickerModeOpen];
+
+  // Assigning the delegate. We tell the document picker object to look
+  // inside "this" when looking for callback method we will pass to it
+  documentPicker.delegate = self;
+
+  documentPicker.allowsMultipleSelection = YES;
+  documentPicker.modalPresentationStyle = UIModalPresentationFormSheet;
+
+  // If using iOS in fully separate controller classes, we use self.
+  // [self presentViewController:documentPicker animated:YES completion:nil];
+  // But we on QT, thus use the rootViewController we've found before instead
+  [rootViewController presentViewController:documentPicker animated:YES completion:nil];
+}
+/**
+  * This method is the callback used by above openDocumentPicker().
+  *
+  * @param
+  * @returns
+  */
+- (void)documentPicker: (UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls
+{
+  // If we come here, user successfully picked .mp3 file(s).
+  // Now we loop through the array, and copy to our sandbox/tmp
+
+  // But first we acquire the path to our app's sandbox/tmp
+  NSString * mySandboxTmpDir = NSTemporaryDirectory();
+  QString mySandboxTmpDir_cStr = [mySandboxTmpDir UTF8String];
+
+  // Here we're creating vars in order to avoid creating
+  // them multiple times inside a loop
+  QString tempFilePath;
+
+
+  for (NSURL * oneUrl in urls) {
+    if ([oneUrl startAccessingSecurityScopedResource]) // Let iOS know we're going use this Url
+    {
+      // NSLog(@"startAccessingSecurityScopedResource SUCCESS");
+      // NSLog(@"the one url:%@", oneUrl);
+
+      // convert the oneUrl to nsstring to cstring and then to qstring
+      QString oneUrlToQstring = [[oneUrl path] UTF8String];
+
+      if(QFile::exists(oneUrlToQstring)) {
+        qsizetype pos = oneUrlToQstring.lastIndexOf("/");
+        tempFilePath = oneUrlToQstring.sliced(pos + 1);
+        tempFilePath.prepend(mySandboxTmpDir_cStr);
+
+        // copy to our app's sandbox/tmp dir only if similar file name
+        // not yet existing there.
+        if (! QFile::exists(tempFilePath)) {
+          QFile::copy(oneUrlToQstring, tempFilePath);
+        }
+      }
+
+      // Let iOS know we're done using this Url
+      [oneUrl stopAccessingSecurityScopedResource];
+    }
+  }
+
+  // Now call cpp part to refresh its audio list index
+  cppObject->doAddDir();
+}
+
+
 @end
 
 
@@ -295,7 +377,51 @@ void updateInfoCenter(const char * title,
                   ];
 }
 
+// Since the signature is c++ compliant, no need to implement
+// a second link deeped in objective-c
+// bool startAccessingSecuredLocation(const char * urlPath) {
+//   NSString * filePath = [NSString stringWithCString:urlPath encoding:NSUTF8StringEncoding];
+//   NSURL *myUrl = [[NSURL alloc] initFileURLWithPath:filePath];
 
-// [UIImage imageNamed:@"Apple.png"] so it can use the build in features to detect whether it should display either Apple.png or Apple@2x.png.
+//   printf("%s\n\n\n", "BEGIN");
+//   NSLog(@"%@", myUrl);
+//   printf("\n%s", "NEXT");
+//   NSString *urlToString = [myUrl path];
+//   NSLog(@"%@", urlToString);
+//   printf("\n\n\n%s", "END");
+
+//   BOOL accessgranted = [myUrl startAccessingSecurityScopedResource];
+//   if (accessgranted) {
+//     printf("%s\n", "access granted");
+//     return true;
+//   }
+
+//   printf("%s\n", "access denied");
+
+// NSString* urlPaths = myUrl.path;
+// if(![[NSFileManager defaultManager] isReadableFileAtPath:urlPaths])
+// {
+//     printf("%s\n", "filemanager says it is readable");
+//     if([myUrl startAccessingSecurityScopedResource])
+//     {
+//         printf("%s\n", "now we entered");
+//         NSString* docsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+//         NSString* destPath = [NSString stringWithFormat:@"%@/%@", docsPath, [myUrl.path lastPathComponent]];
+//         // urlPaths = [FileHandler copyFileAtPath:myUrl.path toPath:destPath increment:YES];
+//         [myUrl stopAccessingSecurityScopedResource];
+//     } else printf("%s\n", "still we could not enter");
+// }
 
 
+
+
+//   // [mpRmObject passsss];
+
+//   return false;
+// }
+
+bool startAccessingSecuredLocation(const char * urlPath) {
+  [mpRmObject openDocumentPicker];
+
+  return false;
+}

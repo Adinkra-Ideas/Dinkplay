@@ -12,6 +12,7 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS
     Core
     QuickControls2
     Qml
+    Widgets
 )
 
 qt_standard_project_setup(REQUIRES 6.5)
@@ -100,6 +101,7 @@ target_link_libraries(appDinkplay PRIVATE
     Qt6::Core
     Qt6::QuickControls2
     Qt6::Qml
+    Qt6::Widgets
 )
 if (WIN32)
     target_link_libraries(appDinkplay PRIVATE
@@ -128,18 +130,18 @@ elseif (ANDROID)
         Qt6::CorePrivate
     )
 elseif (IOS)
-    file(GLOB_RECURSE myAudios CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/ui/images/*.mp3)
+    set(default_audio "${CMAKE_SOURCE_DIR}/android/assets/Dinkplay_Tone.mp3")
     set(default_artist_icon "${UI}/images/musicIco/artist.png")
     set(asset_catalog_path "iOS/Assets.xcassets") #naming the folder ".whatever" makes it pickable as a single file into bundle I believe
     target_sources(appDinkplay PRIVATE
-        ${myAudios}
+        ${default_audio}
         ${default_artist_icon}
         ${asset_catalog_path}
         #ma_lib/miniaudio.m # added for simulator
         iOS/src/MyMPRemoteCC.h iOS/src/MyMPRemoteCC.mm
     )
     set_source_files_properties(
-        ${myAudios} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/audios
+        ${default_audio} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/audios"
     )
     set_source_files_properties(
         ${default_artist_icon} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/images
@@ -164,12 +166,12 @@ elseif (IOS)
         XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS ${CMAKE_SOURCE_DIR}/iOS/appDinkplay.entitlements
 
         # ADD XCODE SIGNING FROM CMAKE (THESE CAN BE MANUALLY ENTERED IN XCODE DIRECTLY)
-        XCODE_ATTRIBUTE_DEVELOPMENT_TEAM 9252ZRKKG6 #big improvement to prevent the manual sign sign sign
+        XCODE_ATTRIBUTE_DEVELOPMENT_TEAM 9W37AU7273 #big improvement to prevent the manual sign sign sign
 
         # APPSTORE DEPLOYMENT SETTINGS TO PREVENT REJECTION
-        #XCODE_ATTRIBUTE_ENABLE_APP_SANDBOX "YES"
+        #XCODE_ATTRIBUTE_ENABLE_APP_SANDBOX "YES" #This only enters bunndle if added from here(cmake) or clicked from xcode. Adding it from Entitlements file using "<key>com.apple.security.app-sandbox</key><true/>" wont make it into the app
         #XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME "YES"
-        #XCODE_ATTRIBUTE_ENABLE_USER_SELECTED_FILES "readonly"
+        XCODE_ATTRIBUTE_ENABLE_USER_SELECTED_FILES "readwrite"
         #XCODE_ATTRIBUTE_ALLOW_DYLD_ENVIRONMENT_VARIABLES "YES"
     )
 

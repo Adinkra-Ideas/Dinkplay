@@ -38,6 +38,7 @@ class Media : public QObject
     /************ For Directory Management Begins *********/
     Q_PROPERTY(QString currDir /*READ getDir*/ WRITE addDir/* NOTIFY dirChanged*/)          // Returns the current directory
     Q_PROPERTY(QStringList audiopaths READ getAudioPaths NOTIFY audioPathsChanged)  // Returns the new list of files that should be indexed
+    Q_PROPERTY(bool openDialog READ manageDocumentPickModal)
     /******************************************************/
 
 public:
@@ -88,6 +89,8 @@ public:
     virtual void notifyJavaSeviceAboutPlaying(bool isplaying) = 0;
     virtual void updateAllAudioDetailsDisplayers() = 0;
     virtual bool seizeControlOfAudioSession() = 0;
+    virtual bool objc_StartAccessingSecuredLocation(const char * urlPath) = 0;
+    virtual bool manageDocumentPickModal() = 0;
     /**********************************************/
 
 public slots:

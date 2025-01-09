@@ -34,6 +34,8 @@ public:
     void notifyJavaSeviceAboutPlaying(bool isplaying) override;
     void updateAllAudioDetailsDisplayers() override;
     bool seizeControlOfAudioSession() override;
+    bool objc_StartAccessingSecuredLocation(const char * urlPath) override;
+    bool manageDocumentPickModal() override;
 
     static Top * myInstance;
 

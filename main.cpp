@@ -1,4 +1,5 @@
-#include <QGuiApplication>
+// #include <QGuiApplication>
+#include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QObject>
@@ -29,7 +30,8 @@ int main(int argc, char *argv[])
     }
     #endif
 
-    QGuiApplication app(argc, argv);
+    // QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
 

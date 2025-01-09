@@ -16,6 +16,7 @@
 #include <QSettings>
 #include <QStandardPaths>
 #include <QTemporaryDir>
+#include <QFileDialog>
 
 #include "Media.hpp"
 
@@ -30,10 +31,12 @@ public:
     void        loadSavedPaths() override;
 
     void        preparePathsForPlay();
-    void        addDefaultSound();
+    void        addStartupAudiosOnEmptyStartupAudioListings();
+    void        openDialogFromCpp();
+    void        pickIosAudiosFromSandboxTmpDir();
+    void        doAddDir();
 
 private:
-    void        doAddDir();
     QSettings   backups_;
 
 };

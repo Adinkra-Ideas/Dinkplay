@@ -103,7 +103,8 @@ Rectangle {
                     // If iPhone, we want to select individual files.
                     // on other platforms, we select full folder.
                     if (Qt.platform.os == "ios") {
-                        fileDialog.open()
+                        // fileDialog.open()
+                        Media.openDialog
                     } else {
                         folderDialog.open()
                     }
@@ -159,12 +160,12 @@ Rectangle {
         fileMode: FileDialog.OpenFiles
         options: FileDialog.ReadOnly
         nameFilters: ["Text files (*.mp3)"]
-        currentFolder: StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
+        // currentFolder: StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
 
         // selectedFile is the file that the user just selected last.
         // currentFolder is the folder that is first opened by FileDialog.
         onAccepted: {
-            fileDialog.currentFolder = fileDialog.currentFolder
+            // fileDialog.currentFolde?r = fileDialog.currentFolder
             // concatenat the array of selectedFiles into one string
             var hold = ""
             for (var i in fileDialog.selectedFiles) {
