@@ -113,13 +113,6 @@ void    Directory::addDir(QUrl path) {
     checkPermission();
     #endif
 
-
-    qDebug() << "received path:" << path;
-    // QFile file(path.toString());
-    QFile file(path.toString());
-    if(file.exists()) qDebug() << "the file exists1";
-    else  qDebug() << "the file does not exist1";
-
     // if there is an active, we stop the ma_sound.
     // THIS MUST BE DONE BEFORE TAMPERING WITH
     // audIt_ or *audIt_ or audioPaths_
@@ -204,10 +197,15 @@ QStringList Directory::getAudioPaths() {
     return audioPaths_;
 }
 
+// INVALID COMMENT
+// On iOS, this method will be called from objective-c
+// after the user-selected audios have been stored to
+// sandbox/tmp directory
 void Directory::doAddDir() {
+    // INVALID COMMENT
     // Since IOS audios will only be picked from sandbox/tmp,
     // no need to enter this block for iOS users.
-    #ifndef Q_OS_IOS
+    // #ifndef Q_OS_IOS
     // // we can clean this below code to if we can test with android to know there is no problem
     if (QUrl(currDir_).isLocalFile()) {
         currDir_ = QUrl(currDir_).toLocalFile();
@@ -227,6 +225,7 @@ void Directory::doAddDir() {
         }
     }
 
+    #ifndef Q_OS_IOS
     // preparing for backup to localStorage onExit.
     // This was also placed inside this ifdef coz iOS
     // wont backup onExit coz the logic we used is to
@@ -235,17 +234,16 @@ void Directory::doAddDir() {
     backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));
     #endif
 
-    // IOS audios will simply be picked from sandbox/tmp.
-    #ifdef Q_OS_IOS
-    // We check whether sounds exists in our
-    // sandbox/tmp directory, so we add them too.
-    pickIosAudiosFromSandboxTmpDir();
-    #endif
+    // // IOS audios will simply be picked from sandbox/tmp.
+    // #ifdef Q_OS_IOS
+    // // We check whether sounds exists in our
+    // // sandbox/tmp directory, so we add them too.
+    // pickIosAudiosFromSandboxTmpDir();
+    // #endif
 
     preparePathsForPlay();
 }
 
-// rename to addStartupAudiosOnEmptyStartupAudioListings()
 void Directory::addStartupAudiosOnEmptyStartupAudioListings() {
     // For Android, simply add the single factory audio file.
     // We had to copy it first into a temp directory created
@@ -286,9 +284,9 @@ void Directory::addStartupAudiosOnEmptyStartupAudioListings() {
     // sandbox/tmp directory, so we add them too.
     pickIosAudiosFromSandboxTmpDir();
     #endif
-
 }
 
+// THIS METHOD CAN BE ADAPTED TO REPLACE THE for() LOOP IN doAddDir()
 /**
   * This method is for iOS only.
   * It simply scans the app's sandbox/tmp directory

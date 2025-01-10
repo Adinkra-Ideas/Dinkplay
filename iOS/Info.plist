@@ -41,37 +41,11 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>NSSupportsPurgeableLocalStorage</key>
+        <!--<key>NSSupportsPurgeableLocalStorage</key>
 	<true/>
-	<key>NSDownloadsFolderUsageDescription</key>
-	<string>we use downloads</string>
-	<key>NSDocumentsFolderUsageDescription</key>
-	<string>we akso use</string>
 	<key>UISupportsDocumentBrowser</key>
-	<true/>
-	<key>NSRemindersFullAccessUsageDescription</key>
-	<string>fthrrrefg</string>
-	<key>NSAppleMusicUsageDescription</key>
-	<string>ghgg ggfjgfjgf</string>
-	<key>NSAppDataUsageDescription</key>
-	<string>fhfhhjggj</string>
-	<key>NSRemovableVolumesUsageDescription</key>
-	<string>dfkn  fkgfjnkn</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>dj vfdj v fjvf</string>
-	<key>NSFileProviderDomainUsageDescription</key>
-	<string>df vjdf jvfdvg</string>
-	<key>NSAppBundlesUsageDescription</key>
-	<string>dn cjnds vfdnjkv f</string>
-	<key>kTCCServiceMediaLibrary</key>
-	<string>jhdfhvufivf</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>hidhvndfvf</string>
-	<key>NSSystemAdministrationUsageDescription</key>
-	<string>j jh jv fv jf jv</string>
-        <key>NSUserSelectedFile</key>
-        <true/>
-        <key>NSUserSelectedFile</key>
-        <string>j jh jv fv jf jv</string>
+        <true/>-->
+        <key>NSPhotoLibraryUsageDescription</key>
+        <string>This app requires read access to the photo library</string>
 </dict>
 </plist>

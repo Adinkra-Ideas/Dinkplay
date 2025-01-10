@@ -3,7 +3,6 @@
 
 #include <QFile>
 #include <QString>
-// class QFile;
 
 #include "Top.hpp"  // because we need accessor pointer to the cpp part of this app
 class Top;          // Forward-declaring the cpp class is mandatory in order for the compiler to see it
@@ -15,7 +14,7 @@ void seizeControlOfInfoCenter();
 void updateInfoCenter(const char * title,
                       const char * artist);
 
-bool startAccessingSecuredLocation(const char * urlPath);
+void openIosFileDialog();
 
 #endif
 

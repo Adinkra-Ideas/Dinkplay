@@ -18,12 +18,12 @@ Top *cppObject;
   * @param none
   * @returns none
   */
-@interface MyMPRemoteCC : NSObject <UIDocumentPickerDelegate>
+@interface MyMPRemoteCC : NSObject /* <UIDocumentPickerDelegate> */
 {
   NSNotificationCenter *notifCenter;        // for adding and removing observers AKA notification for audio state-change listeners
   MPRemoteCommandCenter *myCommandCenter;   // For holding the control center instance
 
-@public
+@public /* This is for member vars that needs to be declared public. Here we have none. */
 }
 - (void)listenForInterruptions;
 - (void)setupMPRemoteCommandCenter;
@@ -33,7 +33,6 @@ Top *cppObject;
 - (void)passAudioDetailsToInfoCenter: (NSString *)title :(NSString *)artist;
 - (void)openDocumentPicker;
 - (void)documentPicker: (UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls;
-
 
 @end
 @implementation MyMPRemoteCC
@@ -109,8 +108,6 @@ Top *cppObject;
                   selector:@selector(onAudioSessionInterrupted:)
                   name:AVAudioSessionRouteChangeNotification
                   object:[AVAudioSession sharedInstance]];
-
-
   }
   @catch (NSException *exception) {
     // NSLog(@"%@", exception);
@@ -256,6 +253,12 @@ Top *cppObject;
 }
 
 
+/**
+  * Calling this method pops out the file browser so
+  * the user can select.
+  * @param
+  * @returns void
+  */
 - (void)openDocumentPicker
 {
   //This is needed, when using this code on QT!
@@ -285,9 +288,8 @@ Top *cppObject;
 }
 /**
   * This method is the callback used by above openDocumentPicker().
-  *
-  * @param
-  * @returns
+  * @param UIDocumentPickerViewController*, NSArray<NSURL *> *
+  * @returns void
   */
 - (void)documentPicker: (UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls
 {
@@ -307,7 +309,7 @@ Top *cppObject;
     if ([oneUrl startAccessingSecurityScopedResource]) // Let iOS know we're going use this Url
     {
       // NSLog(@"startAccessingSecurityScopedResource SUCCESS");
-      // NSLog(@"the one url:%@", oneUrl);
+      NSLog(@"the one url:%@", oneUrl);
 
       // convert the oneUrl to nsstring to cstring and then to qstring
       QString oneUrlToQstring = [[oneUrl path] UTF8String];
@@ -330,9 +332,9 @@ Top *cppObject;
   }
 
   // Now call cpp part to refresh its audio list index
-  cppObject->doAddDir();
+  // cppObject->doAddDir();
+  cppObject->addDir(mySandboxTmpDir_cStr);
 }
-
 
 @end
 
@@ -377,51 +379,13 @@ void updateInfoCenter(const char * title,
                   ];
 }
 
-// Since the signature is c++ compliant, no need to implement
-// a second link deeped in objective-c
-// bool startAccessingSecuredLocation(const char * urlPath) {
-//   NSString * filePath = [NSString stringWithCString:urlPath encoding:NSUTF8StringEncoding];
-//   NSURL *myUrl = [[NSURL alloc] initFileURLWithPath:filePath];
 
-//   printf("%s\n\n\n", "BEGIN");
-//   NSLog(@"%@", myUrl);
-//   printf("\n%s", "NEXT");
-//   NSString *urlToString = [myUrl path];
-//   NSLog(@"%@", urlToString);
-//   printf("\n\n\n%s", "END");
-
-//   BOOL accessgranted = [myUrl startAccessingSecurityScopedResource];
-//   if (accessgranted) {
-//     printf("%s\n", "access granted");
-//     return true;
-//   }
-
-//   printf("%s\n", "access denied");
-
-// NSString* urlPaths = myUrl.path;
-// if(![[NSFileManager defaultManager] isReadableFileAtPath:urlPaths])
-// {
-//     printf("%s\n", "filemanager says it is readable");
-//     if([myUrl startAccessingSecurityScopedResource])
-//     {
-//         printf("%s\n", "now we entered");
-//         NSString* docsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-//         NSString* destPath = [NSString stringWithFormat:@"%@/%@", docsPath, [myUrl.path lastPathComponent]];
-//         // urlPaths = [FileHandler copyFileAtPath:myUrl.path toPath:destPath increment:YES];
-//         [myUrl stopAccessingSecurityScopedResource];
-//     } else printf("%s\n", "still we could not enter");
-// }
-
-
-
-
-//   // [mpRmObject passsss];
-
-//   return false;
-// }
-
-bool startAccessingSecuredLocation(const char * urlPath) {
+/**
+  * This function is called from cpp when
+  * user wants to select audio files for play.
+  * @param
+  * @returns void
+  */
+void openIosFileDialog() {
   [mpRmObject openDocumentPicker];
-
-  return false;
 }

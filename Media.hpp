@@ -89,7 +89,7 @@ public:
     virtual void notifyJavaSeviceAboutPlaying(bool isplaying) = 0;
     virtual void updateAllAudioDetailsDisplayers() = 0;
     virtual bool seizeControlOfAudioSession() = 0;
-    virtual bool objc_StartAccessingSecuredLocation(const char * urlPath) = 0;
+    // virtual bool objc_StartAccessingSecuredLocation(const char * urlPath) = 0;
     virtual bool manageDocumentPickModal() = 0;
     /**********************************************/
 

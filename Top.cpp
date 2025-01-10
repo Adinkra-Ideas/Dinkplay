@@ -127,9 +127,9 @@ void Top::updateAllAudioDetailsDisplayers() {
 }
 
 
-bool Top::objc_StartAccessingSecuredLocation(const char * urlPath) {
-    return startAccessingSecuredLocation(urlPath);
-}
+// bool Top::objc_StartAccessingSecuredLocation(const char * urlPath) {
+//     return startAccessingSecuredLocation(urlPath);
+// }
 
 /**
   * This method is called when the user clicks the
@@ -154,7 +154,7 @@ bool Top::manageDocumentPickModal() {
     // special unseen infos. Using Qt's filedialog will simply return
     // bare strings that wont work with startAccessingSecurityScopedResource
     #ifdef Q_OS_IOS
-    startAccessingSecuredLocation("urlPath");
+    openIosFileDialog();
     #endif
 
     return 0;
