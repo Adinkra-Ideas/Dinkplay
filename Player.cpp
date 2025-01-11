@@ -197,8 +197,11 @@ void Player::pause() {
     // This is necessary so mini audio dont lose audio
     // when iOS is returning from an interruption.
     // But we leave it outside if_ios incase android needs it too.
-    // HAD TO COMMENT THIS OUT BECAUSE IN ANDROID, IF YOU DISCONNECT AND THEN RECONNECT BLUETOOTH, SOUND WILL ONLY COME BACK AFTER PLAY->PAUSE->PLAY
-    // ma_device_stop(device_);
+    // HAD TO MAKE THIS ON AVAILABLE FOR iOS BECAUSE IN ANDROID, IF YOU DISCONNECT AND THEN RECONNECT BLUETOOTH, SOUND WILL ONLY COME BACK AFTER PLAY->PAUSE->PLAY
+    // BUT IF IT IS ABSENT FOR iOS, it causes the play/pause icon in mediainfocenter to go out of sync
+    #ifdef Q_OS_IOS
+    ma_device_stop(device_);
+    #endif
 }
 
 /**

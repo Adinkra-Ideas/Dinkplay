@@ -2,7 +2,7 @@
 #import <MediaPlayer/MediaPlayer.h>
 // #import <UIKit/UIKit.h>
 // #import <MobileCoreServices/MobileCoreServices.h>
-#include <stdio.h> // because nslog aint printing to qt debug
+// #include <stdio.h>
 #import "MyMPRemoteCC.h"
 
 // Un-initialized pointer to cpp class.
@@ -18,7 +18,7 @@ Top *cppObject;
   * @param none
   * @returns none
   */
-@interface MyMPRemoteCC : NSObject /* <UIDocumentPickerDelegate> */
+@interface MyMPRemoteCC : NSObject <UIDocumentPickerDelegate>
 {
   NSNotificationCenter *notifCenter;        // for adding and removing observers AKA notification for audio state-change listeners
   MPRemoteCommandCenter *myCommandCenter;   // For holding the control center instance
@@ -264,7 +264,8 @@ Top *cppObject;
   //This is needed, when using this code on QT!
   //Find the current app window, and its view controller object
   // retrieve the active UI instance
-  UIApplication * app = [UIApplication sharedApplication];
+  /*UIApplication * app = [UIApplication sharedApplication]; //DEPRECATED*/
+  UIWindowScene * app = (UIWindowScene *) ([UIApplication sharedApplication].connectedScenes.allObjects[0]);
   UIWindow * rootWindow = app.windows[0];
   UIViewController * rootViewController = rootWindow.rootViewController;
 
@@ -272,7 +273,8 @@ Top *cppObject;
   //When reading: use document type of the file, that you're going to read
   //When writing into a new file: use @"public.folder" to select a folder, where your new file will be created
   // @[@"public.content",@"public.text",@"public.mp4"];
-  UIDocumentPickerViewController *documentPicker = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[@"public.mp3"] inMode:UIDocumentPickerModeOpen];
+  UIDocumentPickerViewController *documentPicker = [[UIDocumentPickerViewController alloc] initForOpeningContentTypes:@[[UTType typeWithFilenameExtension:@"mp3"]]]; //crashes the program. Therefore, will stick to
+  // UIDocumentPickerViewController *documentPicker = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[@"public.mp3"] inMode:UIDocumentPickerModeOpen];
 
   // Assigning the delegate. We tell the document picker object to look
   // inside "this" when looking for callback method we will pass to it
@@ -309,7 +311,7 @@ Top *cppObject;
     if ([oneUrl startAccessingSecurityScopedResource]) // Let iOS know we're going use this Url
     {
       // NSLog(@"startAccessingSecurityScopedResource SUCCESS");
-      NSLog(@"the one url:%@", oneUrl);
+      // NSLog(@"the one url:%@", oneUrl);
 
       // convert the oneUrl to nsstring to cstring and then to qstring
       QString oneUrlToQstring = [[oneUrl path] UTF8String];
@@ -378,7 +380,6 @@ void updateInfoCenter(const char * title,
                     :[NSString stringWithCString:artist encoding:NSUTF8StringEncoding]
                   ];
 }
-
 
 /**
   * This function is called from cpp when
