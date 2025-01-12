@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.19)
 
 project(Dinkplay VERSION 0.1 LANGUAGES CXX)
 
+# Required for erasing "missing dsym" error when building archive for app
+# store connect. Comment out during development.
+# set(QT_USE_RISKY_DSYM_ARCHIVING_WORKAROUND ON)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(UI ui)
@@ -136,7 +140,7 @@ elseif (IOS)
         ${default_audio}
         ${default_artist_icon}
         ${asset_catalog_path}
-        #ma_lib/miniaudio.m # added for simulator
+        # ma_lib/miniaudio.m # added for simulator
         iOS/src/MyMPRemoteCC.h iOS/src/MyMPRemoteCC.mm
     )
     set_source_files_properties(
