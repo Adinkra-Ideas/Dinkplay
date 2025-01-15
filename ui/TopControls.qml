@@ -11,10 +11,10 @@ Rectangle {
     signal playSignal;
     required property bool audioTab
     signal audioSignal;
-    // property bool videoTab
-    // signal videoSignal;
     required property bool settingsTab
     signal settingsSignal;
+    required property bool aboutTab
+    // signal aboutSignal;
 
     RowLayout {
         anchors.fill: parent
@@ -68,24 +68,6 @@ Rectangle {
                 }
             }
         }
-        // Item {
-        //     Layout.fillWidth: true;
-        //     Layout.fillHeight: true;
-        //     Image {
-        //         source: topControls.videoTab ? "images/musicIco/video_white.png" : "images/musicIco/video.png"
-        //         width: 30
-        //         height: 30
-        //         anchors.centerIn: parent
-        //         fillMode: Image.PreserveAspectFit
-        //     }
-        //     MouseArea {
-        //         anchors.fill: parent
-        //         onClicked: {
-        //             topControls.videoSignal()
-        //             // we will change image here to active
-        //         }
-        //     }
-        // }
         Item {
             id: add
             Layout.fillWidth: true;
@@ -135,6 +117,25 @@ Rectangle {
                 onClicked: {
                     topControls.settingsSignal()
                 }
+            }
+        }
+        Item {
+            Layout.fillWidth: true;
+            Layout.fillHeight: true;
+            visible: topControls.aboutTab
+            Image {
+                source: "images/musicIco/about_white.png"
+                width: 30
+                height: 30
+                anchors.centerIn: parent
+                fillMode: Image.PreserveAspectFit
+            }
+            MouseArea {
+                anchors.fill: parent
+                // onClicked: {
+                //     topControls.aboutSignal()
+                //     // we will change image here to active
+                // }
             }
         }
     }

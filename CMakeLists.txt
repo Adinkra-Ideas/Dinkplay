@@ -32,9 +32,9 @@ qt_add_qml_module(appDinkplay
         QML_FILES ${UI}/TopControls.qml
         QML_FILES ${UI}/Playing.qml
         QML_FILES ${UI}/Audio.qml
-        QML_FILES ${UI}/Video.qml
         QML_FILES ${UI}/Settings.qml
         QML_FILES ${UI}/MediaControls.qml
+        QML_FILES ${UI}/About.qml
     RESOURCES
         ${UI}/images/musicSpin.gif
         ${UI}/images/musicIco/artist.png
@@ -42,11 +42,11 @@ qt_add_qml_module(appDinkplay
         ${UI}/images/musicIco/playing_white.png
         ${UI}/images/musicIco/audio.png
         ${UI}/images/musicIco/audio_white.png
-        ${UI}/images/musicIco/video.png
-        ${UI}/images/musicIco/video_white.png
         ${UI}/images/musicIco/add.png
         ${UI}/images/musicIco/settings.png
         ${UI}/images/musicIco/settings_white.png
+        ${UI}/images/musicIco/about.png
+        ${UI}/images/musicIco/about_white.png
         ${UI}/images/musicIco/rand.png
         ${UI}/images/musicIco/rand_white.png
         ${UI}/images/musicIco/next.png

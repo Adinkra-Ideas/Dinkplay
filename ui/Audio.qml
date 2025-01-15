@@ -1,5 +1,10 @@
 import QtQuick
 
+// This only scrolls because of ListView default state
+// is to scroll. Else, implicitHeight == Window.height
+// meant the parent scrollview will always detect this
+// child's height to be same as Window.height meaning
+// it would have never scrolled.
 Item {
     implicitHeight: Window.height
     implicitWidth: Window.width

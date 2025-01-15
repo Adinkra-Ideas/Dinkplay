@@ -32,6 +32,7 @@ Window {
             anchors.fill: parent
             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
             ScrollBar.vertical.policy: ScrollBar.AlwaysOff
+            clip: true
             contentWidth: root.width
             contentHeight: audioPage.height
 
@@ -45,13 +46,17 @@ Window {
                 width: root.width
                 visible: true
             }
-            // Video {
-            //     id: videoPage
-            //     width: root.width
-            //     visible: false
-            // }
             Settings {
                 id: settingsPage
+                width: root.width
+                visible: false
+
+                onAboutPageSignal: {
+                    topControls.onAboutSignal()
+                }
+            }
+            About {
+                id: aboutPage
                 width: root.width
                 visible: false
             }
@@ -98,8 +103,8 @@ Window {
             height: 40
             playingTab: playingPage.visible
             audioTab: audioPage.visible
-            // videoTab: videoPage.visible
             settingsTab: settingsPage.visible
+            aboutTab: aboutPage.visible
 
             // onClickSet the play tab active and bring put the playing window into view
             onPlaySignal: {
@@ -112,21 +117,23 @@ Window {
                 view.contentHeight = audioPage.height
                 audioPage.visible = true
             }
-            // onVideoSignal: {
-            //     hideAllTabs()
-            //     view.contentHeight = videoPage.height
-            //     videoPage.visible = true
-            // }
             onSettingsSignal: {
                 hideAllTabs()
                 view.contentHeight = settingsPage.height
                 settingsPage.visible = true
             }
+            // this should enable the onAboutSignal
+            // to be called from external components
+            function onAboutSignal() {
+                hideAllTabs()
+                view.contentHeight = aboutPage.height
+                aboutPage.visible = true
+            }
             function hideAllTabs() {
                 playingPage.visible = false
                 audioPage.visible = false
-                // videoPage.visible = false
                 settingsPage.visible = false
+                aboutPage.visible = false
             }
         }
 
