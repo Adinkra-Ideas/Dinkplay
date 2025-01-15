@@ -264,24 +264,41 @@ Item {
         Item {
             id: aboutButton
             Layout.preferredWidth: parent.width
-            Layout.preferredHeight: 42
+            Layout.preferredHeight: 84
 
-            Button {
+            Text {
                 anchors {
                     bottom: parent.bottom
-                    horizontalCenter: parent.horizontalCenter
+                    left: parent.left
                 }
-                text: "About Dinkplay"
-                background: Rectangle {
-                    implicitWidth: 100
-                    implicitHeight: 30
-                    color: "grey"
-                    radius: 2
-                }
-                onClicked: {
-                    settingsPage.aboutPageSignal()
+                text: "> About Dinkplay"
+                color: "grey"
+                font.pointSize: 13
+                font.underline: true
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        settingsPage.aboutPageSignal()
+                    }
                 }
             }
+
+            // Button {
+            //     anchors {
+            //         bottom: parent.bottom
+            //         horizontalCenter: parent.horizontalCenter
+            //     }
+            //     text: "About Dinkplay"
+            //     background: Rectangle {
+            //         implicitWidth: 100
+            //         implicitHeight: 30
+            //         color: "grey"
+            //         radius: 2
+            //     }
+            //     onClicked: {
+            //         settingsPage.aboutPageSignal()
+            //     }
+            // }
         }
 
 
