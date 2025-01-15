@@ -61,8 +61,6 @@ Item {
                 border.color: "grey"
                 border.width: 0.5
                 radius: 5
-                // visible: !Media.intervalStatus
-                // enabled: !Media.intervalStatus
                 Text {
                     id: qtCredit
                     anchors {
@@ -94,8 +92,6 @@ Item {
             id: referenceReceivers
             Layout.preferredWidth: parent.width
             Layout.preferredHeight: 100
-            // visible: aboutPage.whatToShow === 0
-            // enabled: aboutPage.whatToShow === 0
             Text {
                 id: referenceText
                 text: "References:"
@@ -227,6 +223,5 @@ Item {
                 font.pointSize: 10
             }
         }
-
     }
 }
