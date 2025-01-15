@@ -5,7 +5,7 @@ import QtQuick.Controls
 Item {
     id: settingsPage
 
-    implicitHeight: intervalRunningAnimation.height + lapCountComponent.height + lapDurationComponent.height + restDurationComponent.height + startStopSwitch.height + aboutButton.height + last.height
+    implicitHeight: columnLayout.anchors.topMargin + intervalRunningAnimation.height + lapCountComponent.height + lapDurationComponent.height + restDurationComponent.height + startStopSwitch.height + aboutButton.height + last.height
 
     signal aboutPageSignal
 
@@ -14,6 +14,7 @@ Item {
     // }
 
     ColumnLayout {
+        id: columnLayout
         anchors {
             top: parent.top
             left: parent.left
@@ -21,7 +22,7 @@ Item {
             topMargin: 55       // TopControls height == 40
             leftMargin: 10
             rightMargin: 10
-            bottomMargin: 900    // MediaControls height == 55
+            // bottomMargin: 900    // MediaControls height == 55
         }
         spacing: 10
 
@@ -263,12 +264,11 @@ Item {
         Item {
             id: aboutButton
             Layout.preferredWidth: parent.width
-            Layout.preferredHeight: Window.height / 3
+            Layout.preferredHeight: 42
 
             Button {
                 anchors {
                     bottom: parent.bottom
-                    bottomMargin: 60
                     horizontalCenter: parent.horizontalCenter
                 }
                 text: "About Dinkplay"
