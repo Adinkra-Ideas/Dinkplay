@@ -180,7 +180,7 @@ elseif (IOS)
 
 
     target_link_libraries(appDinkplay PRIVATE
-        miniaudio_iOS #removed for simulator
+        miniaudio_iOSLgplv3 #removed for simulator
         "-framework MediaPlayer"
         "-framework AVFoundation"
     )
