@@ -25,8 +25,6 @@ qt_standard_project_setup(REQUIRES 6.5)
 # in qt_add_executable
 qt_add_resources(MYSOURCES
     qml.qrc
-    media_cat0.qrc
-    media_cat1.qrc
 )
 
 qt_add_executable(appDinkplay
