@@ -25,65 +25,60 @@ Item {
         enabled: aboutPage.whatToShow === 0
 
         Item {
-            id: dinkplayVersion
-            Layout.preferredWidth: parent.width
-            Layout.preferredHeight: 42
-            Text {
-                id: dinkplayVersionText
-                text: "Dinkplay v1.0.1"
-                color: "grey"
-                font.pointSize: 11
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                }
-            }
-        }
-
-        Item {
             id: creditReceivers
             Layout.preferredWidth: parent.width
             Layout.preferredHeight: 100
-            Text {
-                id: creditsText
-                text: "Credits:"
-                color: "grey"
-                font.pointSize: 13
-            }
+
             Rectangle {
                 id: creditReceiversBox
                 implicitWidth: parent.width
                 implicitHeight: 80
                 anchors {
-                    top: creditsText.bottom
-                    topMargin: 3
+                    fill: parent
                 }
                 color: "transparent"
                 border.color: "grey"
                 border.width: 0.5
                 radius: 5
+            }
+        }
+
+        Item {
+            id: dinkplayVersion
+            Layout.preferredWidth: parent.width
+            Layout.preferredHeight: qtCreditDesc.contentHeight
+
+            Rectangle {
+                id: creditDescBox
+                implicitWidth: parent.width
+                implicitHeight: qtCreditDesc.contentHeight + 15
+                color: "transparent"
+                border.color: "grey"
+                border.width: 0.5
+                radius: 5
                 Text {
-                    id: qtCredit
+                    id: qtCreditDesc
                     anchors {
                         top: parent.top
                         topMargin: 15
                         left: parent.left
                         leftMargin: 5
+                        right: parent.right
+                        rightMargin: 5
                     }
-                    text: "Qt 6 CE (LGPLv3 License)"
                     color: "grey"
-                    font.pointSize: 11
-                }
-                Text {
-                    id: maCredit
-                    anchors {
-                        top: qtCredit.bottom
-                        topMargin: 10
-                        left: parent.left
-                        leftMargin: 5
-                    }
-                    text: "Miniaudio (MIT License)"
-                    color: "grey"
-                    font.pointSize: 11
+                    font.pointSize: 12
+                    wrapMode: Text.Wrap
+                    textFormat: Text.RichText
+                    text: "A Scheduled Interval Audio Player App.<br /><br />Dinkplay allows users to use their favorite Audios as an Interval Timer. <br /><br />With Dinkplay, Audio contents can be played at specific start and stop intervals set by the User. This is in contrast to the existing Interval Timers that uses start and stop Tones to alert the user during a Timed Interval.<br /><br />Dinkplay App has been optimized to run with minimal resource usage. As a result, the Interval Timer works seamlessly even on a locked phone screen.<br /><br />Built with Qt 6 CE (<a style=\"color:#7393B3;text-decoration:none;\" href=\"https://lgplcredit\">LGPLv3 License</a>)<br />See also <a style=\"color:#7393B3;text-decoration:none;\" href=\"https://gplcredit\">GNU GPL</a> and <a style=\"color:#7393B3;text-decoration:none;\" href=\"https://github.com/Adinkra-Ideas/Dinkplay_Sources\">Minimal Corresponding Sourcee</a> in accordance with the Lesser General Public License.<br /><br />"
+                    onLinkActivated: (link) => {
+                                         if (link === "https://github.com/Adinkra-Ideas/Dinkplay_Sources")
+                                            Qt.openUrlExternally(link)
+                                         else if (link === "https://gplcredit")
+                                            aboutPage.whatToShow = 1
+                                         else if (link === "https://lgplcredit")
+                                            aboutPage.whatToShow = 2
+                                        }
                 }
             }
         }
@@ -92,62 +87,18 @@ Item {
             id: referenceReceivers
             Layout.preferredWidth: parent.width
             Layout.preferredHeight: 100
-            Text {
-                id: referenceText
-                text: "References:"
-                color: "grey"
-                font.pointSize: 13
-            }
+
             Rectangle {
                 id: referenceReceiversBox
                 implicitWidth: parent.width
                 implicitHeight: 80
                 anchors {
-                    top: referenceText.bottom
-                    topMargin: 3
+                    fill: parent
                 }
                 color: "transparent"
                 border.color: "grey"
                 border.width: 0.5
                 radius: 5
-                Text {
-                    id: gplCredit
-                    anchors {
-                        top: parent.top
-                        topMargin: 15
-                        left: parent.left
-                        leftMargin: 5
-                    }
-                    text: "GNU GPL License"
-                    color: "grey"
-                    font.pointSize: 11
-                    font.underline: true
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            aboutPage.whatToShow = 1
-                        }
-                    }
-                }
-                Text {
-                    id: lgplCredit
-                    anchors {
-                        top: gplCredit.bottom
-                        topMargin: 10
-                        left: parent.left
-                        leftMargin: 5
-                    }
-                    text: "LGPLv3 License"
-                    color: "grey"
-                    font.pointSize: 11
-                    font.underline: true
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            aboutPage.whatToShow = 2
-                        }
-                    }
-                }
             }
         }
 
