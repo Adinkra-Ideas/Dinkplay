@@ -1,8 +1,5 @@
 #import <Foundation/Foundation.h>
 #import <MediaPlayer/MediaPlayer.h>
-// #import <UIKit/UIKit.h>
-// #import <MobileCoreServices/MobileCoreServices.h>
-// #include <stdio.h>
 #import "MyMPRemoteCC.h"
 
 // Un-initialized pointer to cpp class.
@@ -30,6 +27,7 @@ Top *cppObject;
 - (MPRemoteCommandHandlerStatus)previousAudio: (MPRemoteCommandHandlerStatus *)event;
 - (MPRemoteCommandHandlerStatus)nextAudio: (MPRemoteCommandHandlerStatus *)event;
 - (MPRemoteCommandHandlerStatus)playPauseAudio: (MPRemoteCommandHandlerStatus *)event;
+- (NSString *) getDefaultImageFromDoc;
 - (void)passAudioDetailsToInfoCenter: (NSString *)title :(NSString *)artist;
 - (void)openDocumentPicker;
 - (void)documentPicker: (UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls;
@@ -224,6 +222,18 @@ Top *cppObject;
   return MPRemoteCommandHandlerStatusSuccess;
 }
 
+// The default image icon is inside app bundle.
+// but only Qt's cpp file accessor methods can
+// read its qrc path. Therefore we copy it to
+// document sandbox folder and use its path from there.
+- (NSString *) getDefaultImageFromDoc {
+  QString defaultMediaIcon = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/artist.png";
+  if (! QFile::exists(defaultMediaIcon)) {
+    QFile::copy(":/ui/images/musicIco/artist.png", defaultMediaIcon);
+  }
+  return defaultMediaIcon.toNSString();
+}
+
 // Not yet implemented
 // THIS METHOD SHOULD BE CALLED ONLY AT THE VERY BEGINNING OF AN AUDIO PLAY. AKA WHEN NEXT IS CLICKED OR WHEN TRACK AUTO MOVED TO NEXT
 // CALLING IT FROM EACH PLAY SIGNAL MEANS THE SEEKER WILL BEGIN FROM BEGINNING AFTER EACH PAUSE/PLAY
@@ -235,7 +245,7 @@ Top *cppObject;
   // get the image from func parameter
   UIImage *artworkImage = [UIImage imageNamed:@"images/artist2.png"];
   // if no image received as func arg, use default from bundle
-  artworkImage = (artworkImage) ? artworkImage : [UIImage imageNamed:@"images/artist.png"];
+  artworkImage = (artworkImage) ? artworkImage : [UIImage imageNamed:self.getDefaultImageFromDoc];
   // convert the UIImage into format that InfoCenter can display
   MPMediaItemArtwork *albumArt = [[MPMediaItemArtwork alloc] initWithBoundsSize:artworkImage.size requestHandler:^UIImage *(CGSize size) {
                   return artworkImage;

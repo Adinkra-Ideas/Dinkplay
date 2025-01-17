@@ -29,5 +29,6 @@
         <file>ui/images/musicIco/rand.png</file>
         <file>ui/images/musicIco/rand_white.png</file>
         <file>ui/audios/Default.mp3</file>
+        <file>ui/images/musicIco/artist.png</file>
     </qresource>
 </RCC>

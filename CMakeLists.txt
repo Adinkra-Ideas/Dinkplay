@@ -35,15 +35,6 @@ qt_add_executable(appDinkplay
 qt_add_qml_module(appDinkplay
     URI Dinkplay
     VERSION 1.0
-    # QML_FILES
-    #     Main.qml
-    #     QML_FILES ui/TopControls.qml
-    #     QML_FILES ui/Playing.qml
-    #     QML_FILES ui/Audio.qml
-    #     QML_FILES ui/Settings.qml
-    #     QML_FILES ui/MediaControls.qml
-    #     QML_FILES ui/About.qml
-    #RESOURCES
 
     SOURCES
         _main.cpp
@@ -122,21 +113,11 @@ elseif (ANDROID)
         Qt6::CorePrivate
     )
 elseif (IOS)
-    #set(default_audio "${CMAKE_SOURCE_DIR}/android/assets/Dinkplay_Tone.mp3")
-    set(default_artist_icon "ui/images/musicIco/artist.png")
-    set(asset_catalog_path "iOS/Assets.xcassets") #naming the folder ".whatever" makes it pickable as a single file into bundle I believe
+    set(asset_catalog_path "${CMAKE_SOURCE_DIR}/iOS/Assets.xcassets") #naming the folder ".whatever" makes it pickable as a single file into bundle I believe
     target_sources(appDinkplay PRIVATE
-        ${default_audio}
-        ${default_artist_icon}
         ${asset_catalog_path}
-        # ma_lib/miniaudio.m # added for simulator
+        ma_lib/miniaudio.h     ma_lib/miniaudio.m
         iOS/src/MyMPRemoteCC.h iOS/src/MyMPRemoteCC.mm
-    )
-    # set_source_files_properties(
-    #     ${default_audio} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/audios"
-    # )
-    set_source_files_properties(
-        ${default_artist_icon} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/images
     )
     set_source_files_properties(
         ${asset_catalog_path} PROPERTIES MACOSX_PACKAGE_LOCATION Resources
@@ -145,7 +126,7 @@ elseif (IOS)
     # set_target_properties() is used to initialize qt macros
     # for buld time.
     set_target_properties(appDinkplay PROPERTIES
-        # Replaye Qt's default white splashscreen
+        # Replace Qt's default white splashscreen
         QT_IOS_LAUNCH_SCREEN "${CMAKE_SOURCE_DIR}/iOS/LaunchScr.storyboard"
 
         MACOSX_BUNDLE TRUE #####
@@ -159,17 +140,11 @@ elseif (IOS)
 
         # ADD XCODE SIGNING FROM CMAKE (THESE CAN BE MANUALLY ENTERED IN XCODE DIRECTLY)
         XCODE_ATTRIBUTE_DEVELOPMENT_TEAM 9W37AU7273 #big improvement to prevent the manual sign sign sign
-
-        # APPSTORE DEPLOYMENT SETTINGS TO PREVENT REJECTION
-        #XCODE_ATTRIBUTE_ENABLE_APP_SANDBOX "YES" #This only enters bunndle if added from here(cmake) or clicked from xcode. Adding it from Entitlements file using "<key>com.apple.security.app-sandbox</key><true/>" wont make it into the app
-        #XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME "YES"
-        XCODE_ATTRIBUTE_ENABLE_USER_SELECTED_FILES "readwrite"
-        #XCODE_ATTRIBUTE_ALLOW_DYLD_ENVIRONMENT_VARIABLES "YES"
     )
 
 
     target_link_libraries(appDinkplay PRIVATE
-        miniaudio_iOSLgplv3 #removed for simulator
+        #miniaudio_iOSLgplv3 #removed for simulator
         "-framework MediaPlayer"
         "-framework AVFoundation"
     )
