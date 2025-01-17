@@ -24,7 +24,7 @@ Item {
                 width: parent.width / 2
                 height: parent.height / 2
                 anchors.centerIn: parent
-                source: "images/musicSpin.gif"
+                source: "qrc:/ui/images/musicSpin.gif"
                 fillMode: AnimatedImage.PreserveAspectFit
                 paused: Media.player !== 1
             }
@@ -86,7 +86,7 @@ Item {
                 id: artistImage
                 width: (parent.width < parent.height) ? parent.width / 4 : parent.height / 4
                 height: width
-                source: "images/musicIco/artist.png"
+                source: "qrc:/ui/images/musicIco/artist.png"
                 fillMode: AnimatedImage.PreserveAspectFit
                 visible: false // required for // rounded edge effect for image
                 anchors.horizontalCenter: parent.horizontalCenter

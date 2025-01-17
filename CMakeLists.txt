@@ -8,7 +8,6 @@ project(Dinkplay VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(UI ui)
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS
     Quick
@@ -20,44 +19,34 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS
 
 qt_standard_project_setup(REQUIRES 6.5)
 
+# define the .qrc files that qt will compile
+# to source and store their file paths into
+# the MYSOURCES variable for adding as
+# in qt_add_executable
+qt_add_resources(MYSOURCES
+    qml.qrc
+)
+
 qt_add_executable(appDinkplay
     main.cpp
+    ${MYSOURCES}
 )
 
 qt_add_qml_module(appDinkplay
     URI Dinkplay
     VERSION 1.0
-    QML_FILES
-        Main.qml
-        QML_FILES ${UI}/TopControls.qml
-        QML_FILES ${UI}/Playing.qml
-        QML_FILES ${UI}/Audio.qml
-        QML_FILES ${UI}/Settings.qml
-        QML_FILES ${UI}/MediaControls.qml
-        QML_FILES ${UI}/About.qml
-    RESOURCES
-        ${UI}/images/musicSpin.gif
-        ${UI}/images/musicIco/artist.png
-        ${UI}/images/musicIco/playing.png
-        ${UI}/images/musicIco/playing_white.png
-        ${UI}/images/musicIco/audio.png
-        ${UI}/images/musicIco/audio_white.png
-        ${UI}/images/musicIco/add.png
-        ${UI}/images/musicIco/settings.png
-        ${UI}/images/musicIco/settings_white.png
-        ${UI}/images/musicIco/about.png
-        ${UI}/images/musicIco/about_white.png
-        ${UI}/images/musicIco/rand.png
-        ${UI}/images/musicIco/rand_white.png
-        ${UI}/images/musicIco/next.png
-        ${UI}/images/musicIco/pause.png
-        ${UI}/images/musicIco/play.png
-        ${UI}/images/musicIco/prev.png
-        ${UI}/images/musicIco/loop.png
-        ${UI}/images/musicIco/loop1.png
-        ${UI}/images/musicIco/loop2.png
-        ${UI}/images/musicIco/exercise.gif
+    # QML_FILES
+    #     Main.qml
+    #     QML_FILES ui/TopControls.qml
+    #     QML_FILES ui/Playing.qml
+    #     QML_FILES ui/Audio.qml
+    #     QML_FILES ui/Settings.qml
+    #     QML_FILES ui/MediaControls.qml
+    #     QML_FILES ui/About.qml
+    #RESOURCES
+
     SOURCES
+        _main.cpp
         Media.hpp Media.cpp
         Top.hpp Top.cpp
         Directory.hpp Directory.cpp
@@ -133,8 +122,8 @@ elseif (ANDROID)
         Qt6::CorePrivate
     )
 elseif (IOS)
-    set(default_audio "${CMAKE_SOURCE_DIR}/android/assets/Dinkplay_Tone.mp3")
-    set(default_artist_icon "${UI}/images/musicIco/artist.png")
+    #set(default_audio "${CMAKE_SOURCE_DIR}/android/assets/Dinkplay_Tone.mp3")
+    set(default_artist_icon "ui/images/musicIco/artist.png")
     set(asset_catalog_path "iOS/Assets.xcassets") #naming the folder ".whatever" makes it pickable as a single file into bundle I believe
     target_sources(appDinkplay PRIVATE
         ${default_audio}
@@ -143,9 +132,9 @@ elseif (IOS)
         # ma_lib/miniaudio.m # added for simulator
         iOS/src/MyMPRemoteCC.h iOS/src/MyMPRemoteCC.mm
     )
-    set_source_files_properties(
-        ${default_audio} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/audios"
-    )
+    # set_source_files_properties(
+    #     ${default_audio} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/audios"
+    # )
     set_source_files_properties(
         ${default_artist_icon} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/images
     )

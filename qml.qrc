@@ -1,0 +1,33 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Main.qml</file>
+        <file>ui/TopControls.qml</file>
+        <file>ui/Playing.qml</file>
+        <file>ui/Audio.qml</file>
+        <file>ui/Settings.qml</file>
+        <file>ui/MediaControls.qml</file>
+        <file>ui/About.qml</file>
+        <file>ui/images/musicIco/play.png</file>
+        <file>ui/images/musicIco/pause.png</file>
+        <file>ui/images/musicIco/next.png</file>
+        <file>ui/images/musicIco/loop.png</file>
+        <file>ui/images/musicIco/loop1.png</file>
+        <file>ui/images/musicIco/loop2.png</file>
+        <file>ui/images/musicIco/prev.png</file>
+        <file>ui/images/musicIco/exercise.gif</file>
+        <file>ui/images/musicSpin.gif</file>
+        <file>ui/images/musicIco/artist.png</file>
+        <file>ui/images/musicIco/playing.png</file>
+        <file>ui/images/musicIco/playing_white.png</file>
+        <file>ui/images/musicIco/audio.png</file>
+        <file>ui/images/musicIco/audio_white.png</file>
+        <file>ui/images/musicIco/add.png</file>
+        <file>ui/images/musicIco/settings.png</file>
+        <file>ui/images/musicIco/settings_white.png</file>
+        <file>ui/images/musicIco/about.png</file>
+        <file>ui/images/musicIco/about_white.png</file>
+        <file>ui/images/musicIco/rand.png</file>
+        <file>ui/images/musicIco/rand_white.png</file>
+        <file>ui/audios/Default.mp3</file>
+    </qresource>
+</RCC>

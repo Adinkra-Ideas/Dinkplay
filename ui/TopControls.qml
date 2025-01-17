@@ -38,7 +38,7 @@ Rectangle {
             //     }
             // }
             Image {
-                source: topControls.playingTab ? "images/musicIco/playing_white.png" : "images/musicIco/playing.png"
+                source: topControls.playingTab ? "qrc:/ui/images/musicIco/playing_white.png" : "qrc:/ui/images/musicIco/playing.png"
                 width: 30
                 height: 30
                 anchors.centerIn: parent
@@ -55,7 +55,7 @@ Rectangle {
             Layout.fillWidth: true;
             Layout.fillHeight: true;
             Image {
-                source: topControls.audioTab ? "images/musicIco/audio_white.png" : "images/musicIco/audio.png"
+                source: topControls.audioTab ? "qrc:/ui/images/musicIco/audio_white.png" : "qrc:/ui/images/musicIco/audio.png"
                 width: 30
                 height: 30
                 anchors.centerIn: parent
@@ -73,7 +73,7 @@ Rectangle {
             Layout.fillWidth: true;
             Layout.fillHeight: true;
             Image {
-                source: "images/musicIco/add.png"
+                source: "qrc:/ui/images/musicIco/add.png"
                 width: 30
                 height: 30
                 anchors.centerIn: parent
@@ -106,7 +106,7 @@ Rectangle {
                 }
             }
             Image {
-                source: topControls.settingsTab ? "images/musicIco/settings_white.png" : "images/musicIco/settings.png"
+                source: topControls.settingsTab ? "qrc:/ui/images/musicIco/settings_white.png" : "qrc:/ui/images/musicIco/settings.png"
                 width: 30
                 height: 30
                 anchors.centerIn: parent
@@ -124,7 +124,7 @@ Rectangle {
             Layout.fillHeight: true;
             visible: topControls.aboutTab
             Image {
-                source: "images/musicIco/about_white.png"
+                source: "qrc:/ui/images/musicIco/about_white.png"
                 width: 30
                 height: 30
                 anchors.centerIn: parent

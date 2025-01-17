@@ -25,7 +25,7 @@ Rectangle {
             Layout.fillWidth: true;
             Layout.fillHeight: true;
             Image {
-                source: "images/musicIco/prev.png"
+                source: "qrc:/ui/images/musicIco/prev.png"
                 width: 30
                 height: 30
                 anchors.right: parent.right
@@ -44,7 +44,7 @@ Rectangle {
             Layout.fillWidth: true;
             Layout.fillHeight: true;
             Image {
-                source: (Media.player === 1) ? "images/musicIco/pause.png" : "images/musicIco/play.png"
+                source: (Media.player === 1) ? "qrc:/ui/images/musicIco/pause.png" : "qrc:/ui/images/musicIco/play.png"
                 width: 40
                 height: 40
                 anchors.centerIn: parent
@@ -63,7 +63,7 @@ Rectangle {
             Layout.fillWidth: true;
             Layout.fillHeight: true;
             Image {
-                source: "images/musicIco/next.png"
+                source: "qrc:/ui/images/musicIco/next.png"
                 width: 30
                 height: 30
                 anchors.left: parent.left
@@ -83,7 +83,7 @@ Rectangle {
             Layout.fillWidth: true;
             Layout.fillHeight: true;
             Image {
-                source: Media.repeat == 0 ? "images/musicIco/loop.png" : Media.repeat == 1 ? "images/musicIco/loop1.png" : Media.repeat == 2 ? "images/musicIco/loop2.png" : ""
+                source: Media.repeat == 0 ? "qrc:/ui/images/musicIco/loop.png" : Media.repeat == 1 ? "qrc:/ui/images/musicIco/loop1.png" : Media.repeat == 2 ? "qrc:/ui/images/musicIco/loop2.png" : ""
                 width: 30
                 height: 30
                 anchors.centerIn: parent

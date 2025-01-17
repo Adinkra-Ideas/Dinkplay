@@ -268,20 +268,31 @@ void Directory::addStartupAudiosOnEmptyStartupAudioListings() {
         soundsHash_[tempFile] = nullptr;
     }
     #endif
-
+// THIS ANDROID WILL BE MERGED INTO IOS PART BELOW
     // For iOS, first we add the single factory sound,
     // Then we check whether sounds exists in our
     // sandbox/tmp directory. if yes, we add them too.
     #ifdef Q_OS_IOS
-    // we will first add factory default sound here
-    // Add the filepath to our sound stringlist
-    audioPaths_.push_back("audios/Dinkplay_Tone.mp3");
-    // use the filepath as key in our soundHash_
-    // dict, with its decodedSound ptr = nullptr
-    soundsHash_["audios/Dinkplay_Tone.mp3"] = nullptr;
+    QTemporaryDir tempDir;
+    QString tempFile;
+    if (tempDir.isValid()) {
+        tempFile = tempDir.path() + "/Default.mp3";
+        if (QFile::copy(":/ui/audios/Default.mp3", tempFile)) {
+            tempDir.setAutoRemove(false);
+        } else {
+            tempFile.clear();
+        }
+    }
+    if (! tempFile.isEmpty()) {
+        // Add the filepath to our sound stringlist
+        audioPaths_.push_back(tempFile);
+        // use the filepath as key in our soundHash_
+        // dict, with its decodedSound ptr = nullptr
+        soundsHash_[tempFile] = nullptr;
+    }
 
-    // Now we check whether sounds exists in our
-    // sandbox/tmp directory, so we add them too.
+    // Now we check whether more sounds exists in our
+    // iOS sandbox/tmp directory, so we add them too.
     pickIosAudiosFromSandboxTmpDir();
     #endif
 }

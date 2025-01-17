@@ -35,7 +35,7 @@ Item {
             AnimatedImage {
                 width: parent.width
                 height: parent.height
-                source: "images/musicIco/exercise.gif"
+                source: "qrc:/ui/images/musicIco/exercise.gif"
                 fillMode: AnimatedImage.PreserveAspectFit
                 paused: Media.player !== 1 /* pause when music player is paused */
             }
