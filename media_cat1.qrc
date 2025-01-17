@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>ui/audios/Default.mp3</file>
+    </qresource>
+</RCC>

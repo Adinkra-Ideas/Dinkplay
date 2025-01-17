@@ -5,8 +5,7 @@ import QtQuick.Effects
 Item {
     property bool isLandscape: Window.width > Window.height
 
-    // implicitHeight: Window.height
-    implicitHeight: child1.height + child2.height
+    implicitHeight: Window.height
 
     GridLayout {
         id: thePlaying
