@@ -138,8 +138,9 @@ Item {
             height: 30 + audioNameInMenu.contentHeight + removeMenu.height /* 30 for top and bottom margins */
             anchors.bottom: parent.bottom
             color: "white"
-            topLeftRadius: 10
-            topRightRadius: 10
+            // topLeftRadius: 10
+            // topRightRadius: 10
+            radius: 10
             clip: true
 
             // Audio name menu item row BEGINS
@@ -168,7 +169,7 @@ Item {
                     top: audioNameInMenu.bottom
                     topMargin: 10
                 }
-                color: "#F0EAD6"
+                color: "#E5E4E2"
 
                 property bool isClicked: true
                 property int doHide: 0
@@ -180,7 +181,7 @@ Item {
                 Behavior on isClicked {
                     SequentialAnimation {
                         ColorAnimation { target: removeMenu; property: "color"; to: "#1777B7"; duration: 200 }
-                        ColorAnimation { target: removeMenu; property: "color"; to: "#F0EAD6"; duration: 200 }
+                        ColorAnimation { target: removeMenu; property: "color"; to: "#E5E4E2"; duration: 200 }
                         // The below line is intended to change removeMenu.doHide after the clicked removeMenu
                         // has displayed clicked animation color. Now Changing the value of removeMenu.doHide
                         // will trigger onDoHideChanged which will hide the overlayMenu box
