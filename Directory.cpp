@@ -106,6 +106,13 @@ void Directory::loadSavedPaths() {
     preparePathsForPlay();
 }
 
+void Directory::deleteAudioPath(qint16 pathPos) {
+    qDebug() << "requesting to delete pos: " << pathPos;
+
+    // After delete, now refresh the qml view displaying audioPaths_ as list
+    emit audioPathsChanged();
+}
+
 
 void    Directory::addDir(QUrl path) {
     // Permission request for android users

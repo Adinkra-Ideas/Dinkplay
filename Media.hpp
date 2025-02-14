@@ -37,7 +37,8 @@ class Media : public QObject
 
     /************ For Directory Management Begins *********/
     Q_PROPERTY(QString currDir /*READ getDir*/ WRITE addDir/* NOTIFY dirChanged*/)          // Returns the current directory
-    Q_PROPERTY(QStringList audiopaths READ getAudioPaths NOTIFY audioPathsChanged)  // Returns the new list of files that should be indexed
+    Q_PROPERTY(QStringList audiopaths READ getAudioPaths NOTIFY audioPathsChanged)  // Returns the new list of files that should be indexed.
+    Q_PROPERTY(qint16 deleteAudioPath WRITE deleteAudioPath NOTIFY audioPathsChanged)
     Q_PROPERTY(bool openDialog READ manageDocumentPickModal)
     /******************************************************/
 
@@ -61,9 +62,9 @@ public:
 
     /********** implemented in Player.cpp ***********/
     virtual quint8  playbackState() = 0;
+    virtual void    setPlaybackState(quint8) = 0;
     virtual void    setSource(const char * path) = 0;
     virtual void    playSource(QString path) = 0;
-    virtual void    setPlaybackState(quint8) = 0;
     virtual void    stopAnyCurrentPlaying() = 0;
     virtual void    play() = 0;
     virtual void    pause() = 0;
@@ -78,6 +79,7 @@ public:
     // virtual QString getDir() const = 0;
     virtual QStringList getAudioPaths() = 0;
     virtual void loadSavedPaths() = 0;
+    virtual void deleteAudioPath(qint16 pathPos) = 0;
     /*************************************************/
 
     /******** Implemented in ChangePlay.cpp **********/

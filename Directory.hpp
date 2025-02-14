@@ -29,6 +29,7 @@ public:
     void        addDir(QUrl path) override;
     QStringList getAudioPaths() override;
     void        loadSavedPaths() override;
+    void        deleteAudioPath(qint16 pathPos) override;
 
     void        preparePathsForPlay();
     void        addStartupAudiosOnEmptyStartupAudioListings();
