@@ -50,6 +50,11 @@ Item {
                 onClicked: {
                     Media.playSource = modelData
                 }
+                onPressAndHold: {
+                    overlayMenu.overlayMenuAudioName = audioName.text
+                    overlayMenu.overlayMenuAudioIndex = index
+                    overlayMenu.toggleOverlayMenuVisibility()
+                }
             }
             Image {
                 id: itemOption
