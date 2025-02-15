@@ -129,12 +129,12 @@ protected:
     QString                  currDir_; // Dir selected by the user, from where media files was last added
     quint8                    repeat_; // 0 == repeat none, 1 == repeat 1, 2 == repeat all
 
-    QStringList           audioPaths_;  // holds all the mp3 files found in directory selected by the user for media search
+    QStringList           audioPaths_;  // holds path to each mp3 files found in directory selected by the user for media search
     QStringList::iterator      audIt_;  // iterator to audioPaths_
     QString       currentPlayingPath_;  // stores the filepath of currently active audio
     QString      currentPlayingTitle_;  // stores the title of currently active audio
     QString     currentPlayingArtist_;  // stores the Artist of currently active audio
-    std::unordered_map<QString, ma_sound *> soundsHash_; // used as a storage for Holding audioPaths_ keys and their associated values == their decoded ma_sound.
+    std::unordered_map<QString, ma_sound *> soundsHash_; // used as a storage for Holding one path from audioPaths_ as keys and their associated values == their decoded ma_sound.
     bool                    suspended_; // if true, it means the current nowPlaying audio is suspended. In this case, calling unsuspendAudio() will play it. If false, calling unsuspendAudio will do nothing.
 };
 

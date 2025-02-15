@@ -106,8 +106,41 @@ void Directory::loadSavedPaths() {
     preparePathsForPlay();
 }
 
+/**
+  * When we add an mp3 to Dinkplay using the file browser,
+  * the mp3's filepath gets added as an element in audioPaths_
+  * array and also gets added as a key to soundHash_ map with
+  * its value being the decoded sound file.
+  * This method simply receives a pos of an mp3 filepath stored
+  * in audioPaths_ as param, then it deletes the mp3's filepath
+  * from audioPaths_ that is associated with that pos, then it
+  * removes the deleted file's existence from soundHash_ map,
+  * freeing up memory if needed.
+  * Be aware that the original file on the device is not deleted.
+  * Just the decoded copy that Dinkplay generated for use.
+  * @returns void
+  */
 void Directory::deleteAudioPath(qint16 pathPos) {
-    qDebug() << "requesting to delete pos: " << pathPos;
+    // if there is an active, we stop the ma_sound.
+    stopAnyCurrentPlaying();
+
+    // retrieve the mp3 file path or return on failure
+    QString posToPath = (pathPos >= 0 && pathPos < audioPaths_.size()) ? audioPaths_.at(pathPos) : "";
+    if (posToPath.isEmpty()) {
+        return ;
+    }
+
+    // remove the posToPath from audioPaths_ and free up its memory
+    audioPaths_.removeOne(posToPath);
+    audioPaths_.squeeze();
+
+    // free the decoded sound from soundsHash_[posToPath] if not nullptr
+    if (soundsHash_[posToPath] != nullptr) {
+        ma_sound_uninit(soundsHash_[posToPath]);
+        delete soundsHash_[posToPath];
+    }
+    // remove the posToPath from soundsHash_
+    soundsHash_.erase(posToPath);
 
     // After delete, now refresh the qml view displaying audioPaths_ as list
     emit audioPathsChanged();
