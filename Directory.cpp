@@ -160,10 +160,10 @@ void Directory::deleteAudioPath(qint16 pathPos) {
 
 
 void    Directory::addDir(QUrl path) {
-    // Permission request for android users
-    #ifdef Q_OS_ANDROID
-    checkPermission();
-    #endif
+    // // Permission request for android users
+    // #ifdef Q_OS_ANDROID
+    // checkPermission();
+    // #endif
 
     // if there is an active, we stop the ma_sound.
     // THIS MUST BE DONE BEFORE TAMPERING WITH
@@ -182,27 +182,27 @@ void    Directory::addDir(QUrl path) {
         path = QUrl::fromLocalFile(path.toString());
     }
 
-    // Arranging directory path according to android uncertainties and specifications
-    #ifdef Q_OS_ANDROID
-    // decode twice from %253A to %3A then to :
-    path.setUrl(QUrl::fromPercentEncoding(path.toString().toLatin1()));
-    path.setUrl(QUrl::fromPercentEncoding(path.toString().toLatin1()));
-    //here
-    qsizetype pos = QString(path.toString()).indexOf("/tree/"); // /tree/primary:
-    qsizetype subPathPos = QString(path.toString()).indexOf(":", pos);
-    QString subPath;
-    if (subPathPos != -1) {
-        subPath = QString(path.toString()).sliced(subPathPos + 1);
-        if (subPath.size() > 0 && subPath.at(0) != '/')
-            subPath.prepend("/");
-    }
+    // // Arranging directory path according to android uncertainties and specifications
+    // #ifdef Q_OS_ANDROID
+    // // decode twice from %253A to %3A then to :
+    // path.setUrl(QUrl::fromPercentEncoding(path.toString().toLatin1()));
+    // path.setUrl(QUrl::fromPercentEncoding(path.toString().toLatin1()));
+    // //here
+    // qsizetype pos = QString(path.toString()).indexOf("/tree/"); // /tree/primary:
+    // qsizetype subPathPos = QString(path.toString()).indexOf(":", pos);
+    // QString subPath;
+    // if (subPathPos != -1) {
+    //     subPath = QString(path.toString()).sliced(subPathPos + 1);
+    //     if (subPath.size() > 0 && subPath.at(0) != '/')
+    //         subPath.prepend("/");
+    // }
 
-    if (QString(path.toString()).sliced(pos + 6).startsWith("primary")) // inbuilt memory contains */tree/primary*
-        path.setUrl(subPath.prepend("/storage/emulated/0"));
-    else
-        path.setUrl(QString(path.toString()).sliced(pos + 6, subPathPos - (pos + 6)).prepend("/storage/").append(subPath)); // 6 == len("/tree/"), 9 == len("xxxx-xxxx")
-    path = QUrl::fromLocalFile(path.toString());
-    #endif
+    // if (QString(path.toString()).sliced(pos + 6).startsWith("primary")) // inbuilt memory contains */tree/primary*
+    //     path.setUrl(subPath.prepend("/storage/emulated/0"));
+    // else
+    //     path.setUrl(QString(path.toString()).sliced(pos + 6, subPathPos - (pos + 6)).prepend("/storage/").append(subPath)); // 6 == len("/tree/"), 9 == len("xxxx-xxxx")
+    // path = QUrl::fromLocalFile(path.toString());
+    // #endif
 
     // If IOS, it means we received a big string with each selected filepath separated by a comma.
     // here we break the string and assign them directly.
@@ -277,14 +277,14 @@ void Directory::doAddDir() {
         }
     }
 
-    #ifndef Q_OS_IOS
-    // preparing for backup to localStorage onExit.
-    // This was also placed inside this ifdef coz iOS
-    // wont backup onExit coz the logic we used is to
-    // load only the audio files from its sandbox/tmp
-    // directory during each launch.
-    backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));
-    #endif
+    // #ifndef Q_OS_IOS
+    // // preparing for backup to localStorage onExit.
+    // // This was also placed inside this ifdef coz iOS
+    // // wont backup onExit coz the logic we used is to
+    // // load only the audio files from its sandbox/tmp
+    // // directory during each launch.
+    // backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));
+    // #endif
 
     // // IOS audios will simply be picked from sandbox/tmp.
     // #ifdef Q_OS_IOS
@@ -406,6 +406,61 @@ void Directory::preparePathsForPlay() {
     emit audioPathsChanged();
 }
 
+
+/**
+  * This method is used to add one audio
+  * file to Dinkplay's Audio List.
+  * @param oneFile path to the audio file
+  * @returns void
+  */
+void Directory::addFileToDinkplay(QString oneFile) {
+    // this might be necessary for playing audio in non ios and non android
+    // environment. e.g., windows
+    // oneFile = QUrl::fromLocalFile(oneFile).toString();
+
+    // Arranging directory path according to android uncertainties and specifications
+    #ifdef Q_OS_ANDROID
+    // decode twice from %253A to %3A then to :
+    oneFile = QUrl::fromPercentEncoding(oneFile.toLatin1());
+    oneFile = QUrl::fromPercentEncoding(oneFile.toLatin1());
+
+    // trimming the useless beginning contents
+    // for both sd card and internal storage files.
+    qsizetype pos = oneFile.indexOf("/document/"); // /tree/primary: for dir, /document/primary: for file selection
+    qsizetype subPathPos = oneFile.indexOf(":", pos);
+    QString subPath;
+    if (subPathPos != -1) {
+        subPath = oneFile.sliced(subPathPos + 1);
+        if (subPath.size() > 0 && subPath.at(0) != '/')
+            subPath.prepend("/");
+    }
+
+    // prepend file located in internal storage with "/storage/emulated/0".
+    // else if located in sd card, prepend with "/storage/"
+    if (oneFile.sliced(pos + 10).startsWith("primary")) // inbuilt memory contains */document/primary*
+        oneFile = subPath.prepend("/storage/emulated/0");
+    else
+        oneFile = oneFile.sliced(pos + 10, subPathPos - (pos + 10)).prepend("/storage/").append(subPath); // 6 == len("/tree/"), 9 == len("xxxx-xxxx")
+    #endif
+
+    // add the oneFile
+    if (! audioPaths_.contains(oneFile)) {  // no repeat
+        // Add the filepath to our sound stringlist
+        audioPaths_.push_back(oneFile);
+        // use the filepath as key in our soundHash_
+        // dict, with its decodedSound ptr = nullptr
+        soundsHash_[oneFile] = nullptr;
+    }
+
+}
+
+
+/**
+  * This method is called from non iOS devices.
+  * It opens a native filedialog and then adds
+  * the user-selected audio files to dinkplay.
+  * @returns void
+  */
 void Directory::openDialogFromCpp() {
     // Permission request for android users
     #ifdef Q_OS_ANDROID
@@ -420,7 +475,7 @@ void Directory::openDialogFromCpp() {
     QStringList fileNames;
     if (dialog.exec()) {
         fileNames = dialog.selectedFiles();
-        // DO THIS ALSO FOR iOS LATER
+        // DO THIS ALSO FOR iOS LATER WHEN CHANGING FROM cppObject->addDir TO cppObject->addFileToDinkplay
         // if there is an active, we stop the ma_sound.
         // THIS MUST BE DONE BEFORE TAMPERING WITH
         // audIt_ or *audIt_ or audioPaths_
@@ -429,47 +484,13 @@ void Directory::openDialogFromCpp() {
         return ; // do nothing if user cancelled file dialog they opened
     }
 
-    //here
     for (QString &oneFile: fileNames) {
         // skip non-mp3 files
         if (! oneFile.endsWith(".mp3")) {
             continue ;
         }
 
-        // decode twice from %253A to %3A then to :
-        oneFile = QUrl::fromPercentEncoding(oneFile.toLatin1());
-        oneFile = QUrl::fromPercentEncoding(oneFile.toLatin1());
-
-        qDebug() << "checking:" << oneFile;
-
-        // trimming the useless beginning contents
-        // for both sd card and internal storage files.
-        qsizetype pos = oneFile.indexOf("/document/"); // /tree/primary: for dir, /document/primary: for file selection
-        qsizetype subPathPos = oneFile.indexOf(":", pos);
-        QString subPath;
-        if (subPathPos != -1) {
-            subPath = oneFile.sliced(subPathPos + 1);
-            if (subPath.size() > 0 && subPath.at(0) != '/')
-                subPath.prepend("/");
-        }
-
-        // prepend file located in internal storage with "/storage/emulated/0".
-        // else if located in sd card, prepend with "/storage/"
-        if (oneFile.sliced(pos + 10).startsWith("primary")) // inbuilt memory contains */document/primary*
-            oneFile = subPath.prepend("/storage/emulated/0");
-        else
-            oneFile = oneFile.sliced(pos + 10, subPathPos - (pos + 10)).prepend("/storage/").append(subPath); // 6 == len("/tree/"), 9 == len("xxxx-xxxx")
-        // oneFile = QUrl::fromLocalFile(oneFile).toString();
-
-        if (! audioPaths_.contains(oneFile)) {  // no repeat
-            // Add the filepath to our sound stringlist
-            audioPaths_.push_back(oneFile);
-            // use the filepath as key in our soundHash_
-            // dict, with its decodedSound ptr = nullptr
-            soundsHash_[oneFile] = nullptr;
-        }
-
-        qDebug() << "checking:" << oneFile;
+        addFileToDinkplay(oneFile);
     }
 
     #ifndef Q_OS_IOS
@@ -481,7 +502,7 @@ void Directory::openDialogFromCpp() {
     backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));
     #endif
 
-    //
+    // DO THIS ALSO FOR iOS LATER WHEN CHANGING FROM cppObject->addDir TO cppObject->addFileToDinkplay
     preparePathsForPlay();
 }
 

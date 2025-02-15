@@ -36,6 +36,7 @@ public:
     void        openDialogFromCpp();
     void        pickIosAudiosFromSandboxTmpDir();
     void        doAddDir();
+    void        addFileToDinkplay(QString oneFile);
 
 private:
     QSettings   backups_;
