@@ -143,10 +143,8 @@ void Top::updateAllAudioDetailsDisplayers() {
   * with Q_PROPERTY
   */
 bool Top::manageDocumentPickModal() {
-    // We will change android/windows picker from qml to cpp when I got the time
     #ifndef Q_OS_IOS
-    // Directory::openDialogFromCpp();
-    // return false;
+    Directory::openDialogFromCpp();
     #endif
 
     // iOS uses its uidocument picker to open dialogues

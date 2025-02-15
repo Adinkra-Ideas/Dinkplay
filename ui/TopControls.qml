@@ -84,12 +84,11 @@ Rectangle {
                 onClicked: {
                     // If iPhone, we want to select individual files.
                     // on other platforms, we select full folder.
-                    if (Qt.platform.os == "ios") {
-                        // fileDialog.open()
+                    // if (Qt.platform.os == "ios") {
                         Media.openDialog
-                    } else {
-                        folderDialog.open()
-                    }
+                    // } else {
+                        // folderDialog.open()
+                    // }
                 }
             }
         }

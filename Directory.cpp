@@ -130,6 +130,7 @@ void Directory::deleteAudioPath(qint16 pathPos) {
         return ;
     }
 
+    qDebug() << "checking delete" << posToPath;
     // remove the posToPath from audioPaths_ and free up its memory
     audioPaths_.removeOne(posToPath);
     audioPaths_.squeeze();
@@ -186,7 +187,7 @@ void    Directory::addDir(QUrl path) {
     // decode twice from %253A to %3A then to :
     path.setUrl(QUrl::fromPercentEncoding(path.toString().toLatin1()));
     path.setUrl(QUrl::fromPercentEncoding(path.toString().toLatin1()));
-
+    //here
     qsizetype pos = QString(path.toString()).indexOf("/tree/"); // /tree/primary:
     qsizetype subPathPos = QString(path.toString()).indexOf(":", pos);
     QString subPath;
@@ -406,34 +407,83 @@ void Directory::preparePathsForPlay() {
 }
 
 void Directory::openDialogFromCpp() {
+    // Permission request for android users
+    #ifdef Q_OS_ANDROID
+    checkPermission();
+    #endif
 
+    QFileDialog dialog(0);
+    dialog.setFileMode(QFileDialog::ExistingFiles);
+    // dialog.setNameFilter(tr("*.mp3"));
+    dialog.setDirectory(QStandardPaths::writableLocation(QStandardPaths::PicturesLocation));
+
+    QStringList fileNames;
+    if (dialog.exec()) {
+        fileNames = dialog.selectedFiles();
+        // DO THIS ALSO FOR iOS LATER
+        // if there is an active, we stop the ma_sound.
+        // THIS MUST BE DONE BEFORE TAMPERING WITH
+        // audIt_ or *audIt_ or audioPaths_
+        stopAnyCurrentPlaying();
+    } else {
+        return ; // do nothing if user cancelled file dialog they opened
+    }
+
+    //here
+    for (QString &oneFile: fileNames) {
+        // skip non-mp3 files
+        if (! oneFile.endsWith(".mp3")) {
+            continue ;
+        }
+
+        // decode twice from %253A to %3A then to :
+        oneFile = QUrl::fromPercentEncoding(oneFile.toLatin1());
+        oneFile = QUrl::fromPercentEncoding(oneFile.toLatin1());
+
+        qDebug() << "checking:" << oneFile;
+
+        // trimming the useless beginning contents
+        // for both sd card and internal storage files.
+        qsizetype pos = oneFile.indexOf("/document/"); // /tree/primary: for dir, /document/primary: for file selection
+        qsizetype subPathPos = oneFile.indexOf(":", pos);
+        QString subPath;
+        if (subPathPos != -1) {
+            subPath = oneFile.sliced(subPathPos + 1);
+            if (subPath.size() > 0 && subPath.at(0) != '/')
+                subPath.prepend("/");
+        }
+
+        // prepend file located in internal storage with "/storage/emulated/0".
+        // else if located in sd card, prepend with "/storage/"
+        if (oneFile.sliced(pos + 10).startsWith("primary")) // inbuilt memory contains */document/primary*
+            oneFile = subPath.prepend("/storage/emulated/0");
+        else
+            oneFile = oneFile.sliced(pos + 10, subPathPos - (pos + 10)).prepend("/storage/").append(subPath); // 6 == len("/tree/"), 9 == len("xxxx-xxxx")
+        // oneFile = QUrl::fromLocalFile(oneFile).toString();
+
+        if (! audioPaths_.contains(oneFile)) {  // no repeat
+            // Add the filepath to our sound stringlist
+            audioPaths_.push_back(oneFile);
+            // use the filepath as key in our soundHash_
+            // dict, with its decodedSound ptr = nullptr
+            soundsHash_[oneFile] = nullptr;
+        }
+
+        qDebug() << "checking:" << oneFile;
+    }
+
+    #ifndef Q_OS_IOS
+    // preparing for backup to localStorage onExit.
+    // This was also placed inside this ifdef coz iOS
+    // wont backup onExit coz the logic we used is to
+    // load only the audio files from its sandbox/tmp
+    // directory during each launch.
+    backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));
+    #endif
+
+    //
+    preparePathsForPlay();
 }
-
-// void Directory::openDialogFromCpp() {
-//     QFileDialog dialog(0);
-//     dialog.setFileMode(QFileDialog::ExistingFile);
-//     dialog.setDirectory("assets-library://");
-
-//     QStringList fileN = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
-//     for (QString &one: fileN) {
-//         qDebug() << "debugger" << one;
-//     }
-
-//     QStringList fileNames;
-//     if (dialog.exec())
-//         fileNames = dialog.selectedFiles();
-
-//     for (QString &one: fileNames) {
-//         qDebug() << "checking:" << one;
-//     }
-
-//     // QUrl url = QFileDialog::getOpenFileUrl(0,
-//     //                                        tr("Open File"),
-//     //                                        tr("/data/Containers/Bundle/Application/6935D002-44A6-4328-86A2-1CEAC71DC409/")
-//     //                                     );
-//     // qDebug() << "Received URL: " << url;
-
-// }
 
 //qDebug() << "path: " << path.toString();
 //qsizetype pos = path.toString().lastIndexOf("/");
