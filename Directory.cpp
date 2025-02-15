@@ -142,8 +142,19 @@ void Directory::deleteAudioPath(qint16 pathPos) {
     // remove the posToPath from soundsHash_
     soundsHash_.erase(posToPath);
 
-    // After delete, now refresh the qml view displaying audioPaths_ as list
-    emit audioPathsChanged();
+    // backup the new audioPaths_ values to localStorage if not iOS.
+    #ifndef Q_OS_IOS
+    backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));
+    #endif
+    // If iOS, also delete the file
+    #ifdef Q_OS_IOS
+    if (QFile::remove(posToPath)) {
+        qDebug() << "file completely deleted";
+    } else qDebug() << "file not completely deleted";
+    #endif
+
+    // After delete, now prepare audio for play once again
+    preparePathsForPlay();
 }
 
 
