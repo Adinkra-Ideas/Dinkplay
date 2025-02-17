@@ -130,7 +130,6 @@ void Directory::deleteAudioPath(qint16 pathPos) {
         return ;
     }
 
-    qDebug() << "checking delete" << posToPath;
     // remove the posToPath from audioPaths_ and free up its memory
     audioPaths_.removeOne(posToPath);
     audioPaths_.squeeze();
@@ -147,11 +146,10 @@ void Directory::deleteAudioPath(qint16 pathPos) {
     #ifndef Q_OS_IOS
     backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));
     #endif
-    // If iOS, also delete the file
+    // If iOS, also delete the file since it is a copied tmp file
+    // in our app's sandbox
     #ifdef Q_OS_IOS
-    if (QFile::remove(posToPath)) {
-        qDebug() << "file completely deleted";
-    } else qDebug() << "file not completely deleted";
+    QFile::remove(posToPath);
     #endif
 
     // After delete, now prepare audio for play once again
@@ -159,142 +157,142 @@ void Directory::deleteAudioPath(qint16 pathPos) {
 }
 
 
-void    Directory::addDir(QUrl path) {
-    // // Permission request for android users
-    // #ifdef Q_OS_ANDROID
-    // checkPermission();
-    // #endif
+// void    Directory::addDir(QUrl path) {
+//     // // Permission request for android users
+//     // #ifdef Q_OS_ANDROID
+//     // checkPermission();
+//     // #endif
 
-    // if there is an active, we stop the ma_sound.
-    // THIS MUST BE DONE BEFORE TAMPERING WITH
-    // audIt_ or *audIt_ or audioPaths_
-    stopAnyCurrentPlaying();
+//     // if there is an active, we stop the ma_sound.
+//     // THIS MUST BE DONE BEFORE TAMPERING WITH
+//     // audIt_ or *audIt_ or audioPaths_
+//     stopAnyCurrentPlaying();
 
-    // Remove the rubbish prefixes that Qt does randomly.
-    // Sometimes it sends file:///C:/Users/
-    // Other Times it sends C:/Users/
-    while (path.isLocalFile()) {
-        path = QUrl(path).toLocalFile();
-    }
-    // Now change path to a schemed path AKA file:///
-    if (! path.isLocalFile()) {
-        path.setScheme(QString());
-        path = QUrl::fromLocalFile(path.toString());
-    }
+//     // Remove the rubbish prefixes that Qt does randomly.
+//     // Sometimes it sends file:///C:/Users/
+//     // Other Times it sends C:/Users/
+//     while (path.isLocalFile()) {
+//         path = QUrl(path).toLocalFile();
+//     }
+//     // Now change path to a schemed path AKA file:///
+//     if (! path.isLocalFile()) {
+//         path.setScheme(QString());
+//         path = QUrl::fromLocalFile(path.toString());
+//     }
 
-    // // Arranging directory path according to android uncertainties and specifications
-    // #ifdef Q_OS_ANDROID
-    // // decode twice from %253A to %3A then to :
-    // path.setUrl(QUrl::fromPercentEncoding(path.toString().toLatin1()));
-    // path.setUrl(QUrl::fromPercentEncoding(path.toString().toLatin1()));
-    // //here
-    // qsizetype pos = QString(path.toString()).indexOf("/tree/"); // /tree/primary:
-    // qsizetype subPathPos = QString(path.toString()).indexOf(":", pos);
-    // QString subPath;
-    // if (subPathPos != -1) {
-    //     subPath = QString(path.toString()).sliced(subPathPos + 1);
-    //     if (subPath.size() > 0 && subPath.at(0) != '/')
-    //         subPath.prepend("/");
-    // }
+//     // // Arranging directory path according to android uncertainties and specifications
+//     // #ifdef Q_OS_ANDROID
+//     // // decode twice from %253A to %3A then to :
+//     // path.setUrl(QUrl::fromPercentEncoding(path.toString().toLatin1()));
+//     // path.setUrl(QUrl::fromPercentEncoding(path.toString().toLatin1()));
+//     // //here
+//     // qsizetype pos = QString(path.toString()).indexOf("/tree/"); // /tree/primary:
+//     // qsizetype subPathPos = QString(path.toString()).indexOf(":", pos);
+//     // QString subPath;
+//     // if (subPathPos != -1) {
+//     //     subPath = QString(path.toString()).sliced(subPathPos + 1);
+//     //     if (subPath.size() > 0 && subPath.at(0) != '/')
+//     //         subPath.prepend("/");
+//     // }
 
-    // if (QString(path.toString()).sliced(pos + 6).startsWith("primary")) // inbuilt memory contains */tree/primary*
-    //     path.setUrl(subPath.prepend("/storage/emulated/0"));
-    // else
-    //     path.setUrl(QString(path.toString()).sliced(pos + 6, subPathPos - (pos + 6)).prepend("/storage/").append(subPath)); // 6 == len("/tree/"), 9 == len("xxxx-xxxx")
-    // path = QUrl::fromLocalFile(path.toString());
-    // #endif
+//     // if (QString(path.toString()).sliced(pos + 6).startsWith("primary")) // inbuilt memory contains */tree/primary*
+//     //     path.setUrl(subPath.prepend("/storage/emulated/0"));
+//     // else
+//     //     path.setUrl(QString(path.toString()).sliced(pos + 6, subPathPos - (pos + 6)).prepend("/storage/").append(subPath)); // 6 == len("/tree/"), 9 == len("xxxx-xxxx")
+//     // path = QUrl::fromLocalFile(path.toString());
+//     // #endif
 
-    // If IOS, it means we received a big string with each selected filepath separated by a comma.
-    // here we break the string and assign them directly.
-    // #ifdef Q_OS_IOS
-    // QStringList allPaths = path.toString().split(',', Qt::SkipEmptyParts);
-    // for (QString &onePath: allPaths) {
-    //     // If path begins with "file:///", we have to change it to "/"
-    //     // before assigning to audioPaths_
-    //     if (QUrl(onePath).isLocalFile()) {
-    //         // we will use the path to generate a temp file here
+//     // If IOS, it means we received a big string with each selected filepath separated by a comma.
+//     // here we break the string and assign them directly.
+//     // #ifdef Q_OS_IOS
+//     // QStringList allPaths = path.toString().split(',', Qt::SkipEmptyParts);
+//     // for (QString &onePath: allPaths) {
+//     //     // If path begins with "file:///", we have to change it to "/"
+//     //     // before assigning to audioPaths_
+//     //     if (QUrl(onePath).isLocalFile()) {
+//     //         // we will use the path to generate a temp file here
 
-    //         audioPaths_.push_back(QUrl(onePath).toLocalFile());
-    //         // Add the new path to our soundHash_ with its sound ptr = nullptr
-    //         soundsHash_[QUrl(onePath).toLocalFile()] = nullptr;
-    //         qDebug() << "the received path in if: " << path.toString();
-    //     } else {
-    //         audioPaths_.push_back(onePath);
-    //         // Add the new path to our soundHash_ with its sound ptr = nullptr
-    //         soundsHash_[onePath] = nullptr;
-    //         qDebug() << "the received path in else: " << onePath;
-    //     }
-    // }
-    // #endif
+//     //         audioPaths_.push_back(QUrl(onePath).toLocalFile());
+//     //         // Add the new path to our soundHash_ with its sound ptr = nullptr
+//     //         soundsHash_[QUrl(onePath).toLocalFile()] = nullptr;
+//     //         qDebug() << "the received path in if: " << path.toString();
+//     //     } else {
+//     //         audioPaths_.push_back(onePath);
+//     //         // Add the new path to our soundHash_ with its sound ptr = nullptr
+//     //         soundsHash_[onePath] = nullptr;
+//     //         qDebug() << "the received path in else: " << onePath;
+//     //     }
+//     // }
+//     // #endif
 
 
-    //////
-    // Extracting the unique App_ID of this app
-    // QString thisAppID = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
-    // qsizetype pos = thisAppID.lastIndexOf("/");
-    // currDir_ = thisAppID.sliced(0, pos + 1);
-    // thisAppID = thisAppID.sliced(pos + 1);
-    // currDir_.append(thisAppID + "/");
-    // now you can use dir.entryList to print out sandox content of *this app
+//     //////
+//     // Extracting the unique App_ID of this app
+//     // QString thisAppID = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+//     // qsizetype pos = thisAppID.lastIndexOf("/");
+//     // currDir_ = thisAppID.sliced(0, pos + 1);
+//     // thisAppID = thisAppID.sliced(pos + 1);
+//     // currDir_.append(thisAppID + "/");
+//     // now you can use dir.entryList to print out sandox content of *this app
 
-    currDir_ = path.toString();
-    if (! currDir_.endsWith('/')) {
-        currDir_.append('/');
-    }
+//     currDir_ = path.toString();
+//     if (! currDir_.endsWith('/')) {
+//         currDir_.append('/');
+//     }
 
-    doAddDir();
-}
+//     doAddDir();
+// }
 
 QStringList Directory::getAudioPaths() {
     return audioPaths_;
 }
 
-// INVALID COMMENT
-// On iOS, this method will be called from objective-c
-// after the user-selected audios have been stored to
-// sandbox/tmp directory
-void Directory::doAddDir() {
-    // INVALID COMMENT
-    // Since IOS audios will only be picked from sandbox/tmp,
-    // no need to enter this block for iOS users.
-    // #ifndef Q_OS_IOS
-    // // we can clean this below code to if we can test with android to know there is no problem
-    if (QUrl(currDir_).isLocalFile()) {
-        currDir_ = QUrl(currDir_).toLocalFile();
-    }
-    QDir dir(currDir_);
+// // INVALID COMMENT
+// // On iOS, this method will be called from objective-c
+// // after the user-selected audios have been stored to
+// // sandbox/tmp directory
+// void Directory::doAddDir() {
+//     // INVALID COMMENT
+//     // Since IOS audios will only be picked from sandbox/tmp,
+//     // no need to enter this block for iOS users.
+//     // #ifndef Q_OS_IOS
+//     // // we can clean this below code to if we can test with android to know there is no problem
+//     if (QUrl(currDir_).isLocalFile()) {
+//         currDir_ = QUrl(currDir_).toLocalFile();
+//     }
+//     QDir dir(currDir_);
 
-    // Fetch all filepaths that ends with .mp3 from the directory
-    QStringList mp3 = dir.entryList(QStringList() << "*.mp3", QDir::Files);
+//     // Fetch all filepaths that ends with .mp3 from the directory
+//     QStringList mp3 = dir.entryList(QStringList() << "*.mp3", QDir::Files);
 
-    for (QString &aMp3: mp3) {
-        if (! audioPaths_.contains(currDir_ + aMp3)) {  // no repeat
-            // Add the filepath to our sound stringlist
-            audioPaths_.push_back(currDir_ + aMp3);
-            // use the filepath as key in our soundHash_
-            // dict, with its decodedSound ptr = nullptr
-            soundsHash_[currDir_ + aMp3] = nullptr;
-        }
-    }
+//     for (QString &aMp3: mp3) {
+//         if (! audioPaths_.contains(currDir_ + aMp3)) {  // no repeat
+//             // Add the filepath to our sound stringlist
+//             audioPaths_.push_back(currDir_ + aMp3);
+//             // use the filepath as key in our soundHash_
+//             // dict, with its decodedSound ptr = nullptr
+//             soundsHash_[currDir_ + aMp3] = nullptr;
+//         }
+//     }
 
-    // #ifndef Q_OS_IOS
-    // // preparing for backup to localStorage onExit.
-    // // This was also placed inside this ifdef coz iOS
-    // // wont backup onExit coz the logic we used is to
-    // // load only the audio files from its sandbox/tmp
-    // // directory during each launch.
-    // backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));
-    // #endif
+//     // #ifndef Q_OS_IOS
+//     // // preparing for backup to localStorage onExit.
+//     // // This was also placed inside this ifdef coz iOS
+//     // // wont backup onExit coz the logic we used is to
+//     // // load only the audio files from its sandbox/tmp
+//     // // directory during each launch.
+//     // backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));
+//     // #endif
 
-    // // IOS audios will simply be picked from sandbox/tmp.
-    // #ifdef Q_OS_IOS
-    // // We check whether sounds exists in our
-    // // sandbox/tmp directory, so we add them too.
-    // pickIosAudiosFromSandboxTmpDir();
-    // #endif
+//     // // IOS audios will simply be picked from sandbox/tmp.
+//     // #ifdef Q_OS_IOS
+//     // // We check whether sounds exists in our
+//     // // sandbox/tmp directory, so we add them too.
+//     // pickIosAudiosFromSandboxTmpDir();
+//     // #endif
 
-    preparePathsForPlay();
-}
+//     preparePathsForPlay();
+// }
 
 void Directory::addStartupAudiosOnEmptyStartupAudioListings() {
     // For Android, simply add the single factory audio file.
@@ -475,14 +473,15 @@ void Directory::openDialogFromCpp() {
     QStringList fileNames;
     if (dialog.exec()) {
         fileNames = dialog.selectedFiles();
-        // DO THIS ALSO FOR iOS LATER WHEN CHANGING FROM cppObject->addDir TO cppObject->addFileToDinkplay
-        // if there is an active, we stop the ma_sound.
-        // THIS MUST BE DONE BEFORE TAMPERING WITH
-        // audIt_ or *audIt_ or audioPaths_
-        stopAnyCurrentPlaying();
     } else {
         return ; // do nothing if user cancelled file dialog they opened
     }
+
+    // here
+    // if there is an active, we stop the ma_sound.
+    // THIS MUST BE DONE BEFORE TAMPERING WITH
+    // audIt_ or *audIt_ or audioPaths_
+    stopAnyCurrentPlaying();
 
     for (QString &oneFile: fileNames) {
         // skip non-mp3 files
@@ -502,7 +501,8 @@ void Directory::openDialogFromCpp() {
     backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));
     #endif
 
-    // DO THIS ALSO FOR iOS LATER WHEN CHANGING FROM cppObject->addDir TO cppObject->addFileToDinkplay
+    // Now make the audio list usable after tampering
+    // with audioPaths_'s data
     preparePathsForPlay();
 }
 

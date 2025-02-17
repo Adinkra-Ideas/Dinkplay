@@ -26,17 +26,19 @@ public:
     explicit Directory(QObject *parent = nullptr);
     virtual ~Directory();
 
-    void        addDir(QUrl path) override;
+    // void        addDir(QUrl path) override;
     QStringList getAudioPaths() override;
     void        loadSavedPaths() override;
     void        deleteAudioPath(qint16 pathPos) override;
+    void        preparePathsForPlay() override;
+    void        addFileToDinkplay(QString oneFile) override;
 
-    void        preparePathsForPlay();
+
     void        addStartupAudiosOnEmptyStartupAudioListings();
     void        openDialogFromCpp();
     void        pickIosAudiosFromSandboxTmpDir();
-    void        doAddDir();
-    void        addFileToDinkplay(QString oneFile);
+    // void        doAddDir();
+
 
 private:
     QSettings   backups_;

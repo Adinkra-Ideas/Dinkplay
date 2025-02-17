@@ -1,5 +1,5 @@
 import QtQuick
-import QtQuick.Controls
+// import QtQuick.Controls
 
 // This only scrolls because of ListView default state
 // is to scroll. Else, implicitHeight == Window.height

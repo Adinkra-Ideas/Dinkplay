@@ -293,6 +293,7 @@ Top *cppObject;
   documentPicker.allowsMultipleSelection = YES;
   documentPicker.modalPresentationStyle = UIModalPresentationFormSheet;
 
+  // Passing the callback.
   // If using iOS in fully separate controller classes, we use self.
   // [self presentViewController:documentPicker animated:YES completion:nil];
   // But we on QT, thus use the rootViewController we've found before instead
@@ -306,15 +307,21 @@ Top *cppObject;
 - (void)documentPicker: (UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls
 {
   // If we come here, user successfully picked .mp3 file(s).
-  // Now we loop through the array, and copy to our sandbox/tmp
 
+  // if there is an active, we stop the ma_sound.
+  // THIS MUST BE DONE BEFORE TAMPERING WITH
+  // audIt_ or *audIt_ or audioPaths_
+  cppObject->stopAnyCurrentPlaying();
+
+  // Now we loop through the array, and copy to our sandbox/tmp
+  // here
   // But first we acquire the path to our app's sandbox/tmp
   NSString * mySandboxTmpDir = NSTemporaryDirectory();
   QString mySandboxTmpDir_cStr = [mySandboxTmpDir UTF8String];
 
   // Here we're creating vars in order to avoid creating
   // them multiple times inside a loop
-  QString tempFilePath;
+  QString tempFileName;
 
 
   for (NSURL * oneUrl in urls) {
@@ -328,13 +335,17 @@ Top *cppObject;
 
       if(QFile::exists(oneUrlToQstring)) {
         qsizetype pos = oneUrlToQstring.lastIndexOf("/");
-        tempFilePath = oneUrlToQstring.sliced(pos + 1);
-        tempFilePath.prepend(mySandboxTmpDir_cStr);
+        tempFileName = oneUrlToQstring.sliced(pos + 1);
+        tempFileName.prepend(mySandboxTmpDir_cStr);
 
         // copy to our app's sandbox/tmp dir only if similar file name
         // not yet existing there.
-        if (! QFile::exists(tempFilePath)) {
-          QFile::copy(oneUrlToQstring, tempFilePath);
+        if (! QFile::exists(tempFileName)) {
+          QFile::copy(oneUrlToQstring, tempFileName);
+
+          // index this file into audio list after copying it to
+          // our app's sandbox directory.
+          cppObject->addFileToDinkplay(tempFileName);
         }
       }
 
@@ -345,7 +356,11 @@ Top *cppObject;
 
   // Now call cpp part to refresh its audio list index
   // cppObject->doAddDir();
-  cppObject->addDir(mySandboxTmpDir_cStr);
+  // cppObject->addDir(mySandboxTmpDir_cStr);
+
+  // Now make the audio list usable after tampering
+  // with audioPaths_'s data
+  cppObject->preparePathsForPlay();
 }
 
 @end

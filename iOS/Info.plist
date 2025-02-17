@@ -20,10 +20,13 @@
 	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+        <!-- CFBundleShortVersionString is the private version used by app store.
+        Subsequent updates' value must be greater than existing. -->
 	<key>CFBundleShortVersionString</key>
-	<string>0.1</string>
+        <string>0.4</string>
+        <!-- CFBundleVersion is the public viewable version and can be any value. -->
 	<key>CFBundleVersion</key>
-	<string>0.1</string>
+        <string>1.0.4</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NOTE</key>
