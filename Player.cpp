@@ -41,6 +41,9 @@ Player::Player(QObject *parent) :
     // up so we can use ma_device_start() and
     // ma_device_stop() when necessary.
     device_ = ma_engine_get_device(&engine_);
+
+    // Also store value of the sample rate for future use
+    sampleRate_ = ma_engine_get_sample_rate(&engine_ );
 }
 
 Player::~Player() {
@@ -130,6 +133,8 @@ void Player::setSource(const char * path) {
 /**
   * Path is the sound file intended
   * to be played.
+  * I think this is used to play
+  * a new sound from the beginning.
   * @returns void
   */
 void Player::playSource(QString path) {
@@ -138,6 +143,11 @@ void Player::playSource(QString path) {
     }
 
     setSource(path.toLocal8Bit().constData());
+
+    // Store total length of focused audio is seconds to totalAudioSecs_
+    ma_sound_get_length_in_pcm_frames(soundsHash_[QString(*audIt_)], &totalPcmFrames_);
+    totalAudioSecs_ = (totalPcmFrames_ / sampleRate_);
+
     play();
 }
 
@@ -151,6 +161,10 @@ void Player::play() {
     if (!engineInit_ || audioPaths_.isEmpty()) {
         return ;
     }
+
+    //
+    qDebug() << "play called with milliseconds time= " << ma_sound_get_time_in_milliseconds(soundsHash_[QString(*audIt_)]);
+    qDebug() << "play called with number of frames= " << ma_sound_get_time_in_pcm_frames(soundsHash_[QString(*audIt_)]);
 
     // Seize control of audio session for both
     // android and iOS
@@ -182,6 +196,7 @@ void Player::pause() {
     if (!engineInit_ || audioPaths_.isEmpty()) {
         return ;
     }
+
     // pause the sound
     ma_sound_stop(soundsHash_[QString(*audIt_)]);
     // emit paused only if sounds paused

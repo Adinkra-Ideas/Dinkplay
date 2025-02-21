@@ -141,3 +141,8 @@ protected:
 };
 
 #endif // MEDIA_HPP
+
+// TO REVERSE AUDIO
+// if (soundsHash_[QString(path)] != null) {
+//     reverseBitORByte(soundsHash_[QString(path)]->pDataSource);
+// }
