@@ -4,40 +4,85 @@ import QtQuick.Controls
 
 Rectangle {
     Item {
-        height: 25
+        id: timeSeeker
+        height: 30
         anchors {
             left: parent.left
             right: parent.right
-            bottom: parent.bottom
+            bottom: mediaControllers.top
+        }
+
+        Text {
+            id: currentTimeOfAudio
+            anchors {
+                top: parent.top
+                left: parent.left
+                leftMargin: 13
+            }
+            text: "53:24"  // will inherit dynamic value from cpp
+            color: "white"
+            font.pointSize: 10
+        }
+
+        Text {
+            id: lengthTimeOfAudio
+            anchors {
+                verticalCenter: currentTimeOfAudio.verticalCenter
+                right: parent.right
+                rightMargin: 13
+            }
+            text: "01:50:12"  // will inherit dynamic value from cpp
+            color: "white"
+            font.pointSize: 10
         }
 
         Slider {
             id: seekerSlider
-            height: 20
+            height: 12
+            width: parent.width
             anchors {
                 left: parent.left
-                leftMargin: 5
                 right: parent.right
-                rightMargin: 5
+                bottom: parent.bottom
+                bottomMargin: 5
             }
             from: 0
-            value: 1
-            to: 99 // length of audio
+            value: 0
+            to: 99 // will inherit dynamic value from cpp
             stepSize: 1
 
             handle: Rectangle {
                 x: seekerSlider.leftPadding + seekerSlider.visualPosition * (seekerSlider.availableWidth - width)
                 y: seekerSlider.topPadding + seekerSlider.availableHeight / 2 - height / 2
-                implicitWidth: (Qt.platform.os == "ios") ? 20 : 20
+                implicitWidth: (Qt.platform.os == "ios") ? 12 : 12
                 implicitHeight: implicitWidth
                 radius: implicitWidth * 0.5
+            }
+
+            background: Rectangle {
+                x: seekerSlider.leftPadding
+                y: seekerSlider.topPadding + seekerSlider.availableHeight / 2 - height / 2
+                implicitWidth: seekerSlider.availableWidth
+                implicitHeight: 2
+                width: seekerSlider.availableWidth
+                height: implicitHeight
+                radius: 2
+                color: "#4f4f4f"
+
+                Rectangle {
+                    width: seekerSlider.visualPosition * parent.width
+                    height: parent.height
+                    color: "#1777B7"
+                    radius: 2
+                }
             }
         }
     }
 
 
     GridLayout {
-        height: 55
+        id: mediaControllers
+        height: 40
         anchors {
             left: parent.left
             right: parent.right
