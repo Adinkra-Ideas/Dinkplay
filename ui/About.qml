@@ -109,7 +109,7 @@ Item {
             id: last
             color: "transparent"
             Layout.preferredWidth: parent.width
-            Layout.preferredHeight: 60 // MediaControls height == 55
+            Layout.preferredHeight: 75 // MediaControls height == 70
         }
 
     }

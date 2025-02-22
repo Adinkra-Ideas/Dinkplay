@@ -17,7 +17,7 @@ Item {
             topMargin: 55       // TopControls height == 40
             leftMargin: 10
             rightMargin: 10
-            bottomMargin: 55    // MediaControls height == 55
+            bottomMargin: 70    // MediaControls height == 70
         }
         clip: true
 
@@ -112,7 +112,7 @@ Item {
 
         anchors {
             fill: parent
-            bottomMargin: 55    /* MediaControls height == 55*/
+            bottomMargin: 70    /* MediaControls height == 70*/
         }
         color: "#b5000000"
         visible: false

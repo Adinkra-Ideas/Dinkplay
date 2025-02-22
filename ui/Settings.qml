@@ -22,7 +22,7 @@ Item {
             topMargin: 55       // TopControls height == 40
             leftMargin: 10
             rightMargin: 10
-            // bottomMargin: 900    // MediaControls height == 55
+            // bottomMargin: 900    // MediaControls height == 70
         }
         spacing: 10
 
@@ -307,7 +307,7 @@ Item {
             id: last
             color: "transparent"
             Layout.preferredWidth: parent.width
-            Layout.preferredHeight: 60 // MediaControls height == 55
+            Layout.preferredHeight: 75 // MediaControls height == 70
         }
 
     }
