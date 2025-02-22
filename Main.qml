@@ -152,7 +152,7 @@ Window {
             // anchors.bottomMargin: 10
             anchors.left: root.left
             anchors.right: root.right
-            height: 55
+            height: 80// 55 // WE NEED TO MAKE ADJUSTMENT TO ALL CALLERS THAT RESPECTED 55
         }
     }
 }

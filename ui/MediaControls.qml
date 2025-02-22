@@ -1,11 +1,49 @@
 import QtQuick
 import QtQuick.Layouts
-// import QtMultimedia
+import QtQuick.Controls
 
 Rectangle {
+    Item {
+        height: 25
+        anchors {
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
+        }
+
+        Slider {
+            id: seekerSlider
+            height: 20
+            anchors {
+                left: parent.left
+                leftMargin: 5
+                right: parent.right
+                rightMargin: 5
+            }
+            from: 0
+            value: 1
+            to: 99 // length of audio
+            stepSize: 1
+
+            handle: Rectangle {
+                x: seekerSlider.leftPadding + seekerSlider.visualPosition * (seekerSlider.availableWidth - width)
+                y: seekerSlider.topPadding + seekerSlider.availableHeight / 2 - height / 2
+                implicitWidth: (Qt.platform.os == "ios") ? 20 : 20
+                implicitHeight: implicitWidth
+                radius: implicitWidth * 0.5
+            }
+        }
+    }
+
+
     GridLayout {
-        anchors.fill: parent
-        anchors.margins: 10
+        height: 55
+        anchors {
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
+            margins: 10
+        }
         columnSpacing: 10
         flow:  GridLayout.LeftToRight
         columns: 5
