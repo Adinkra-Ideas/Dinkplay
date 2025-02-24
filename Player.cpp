@@ -127,12 +127,10 @@ void Player::setSource(const char * path) {
     ma_sound_get_length_in_pcm_frames(soundsHash_[QString(*audIt_)], &totalPcmFrames_);
     totalAudioSecs_ = (totalPcmFrames_ / sampleRate_);
 
-    qDebug() << "totalAudioSecs_ =" << totalAudioSecs_;
-
     // refresh the UI
     emit playbackStateChanged(currentPlayingPath_);
     // refresh the length of time shown for nowPlaying audio
-    emit focusedAudioLengthChanged();
+    emit lengthofFocusedAudioChanged();
     //
     notifyJavaSeviceAboutPlaying(false);
 }
@@ -424,4 +422,3 @@ void Player::readyAudioForNewPlay() {
     // and ships them to the viewport where needed z.B. control center for iOS
     updateAllAudioDetailsDisplayers();
 }
-

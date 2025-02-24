@@ -1,8 +1,19 @@
 #include "SeekToTime.hpp"
 
 SeekToTime::SeekToTime(QObject *parent) :
-        Media{parent}
-{}
+        Media{parent},
+        threadLoopState_{true},
+        seekToTimeWorker_{this, threadLoopState_}
+{
+    connect(this, &Media::startTheSeekToTimeThread, &seekToTimeWorker_, &SeekToTimeWorker::startTheSeekToTimethreadLoop);
+    connect(&seekToTimeWorker_, &SeekToTimeWorker::oneSecondReached, this, &Media::currTimeOfFocusedAudioChanged);
+    seekToTimeWorker_.moveToThread(&theSeekToTimeThread);
+    theSeekToTimeThread.start();
+
+    // This signal will start the blocking method inside the thread
+    emit startTheSeekToTimeThread();
+
+}
 
 SeekToTime::~SeekToTime() {}
 
@@ -30,7 +41,7 @@ QString SeekToTime::secondsToDigitalClock(quint32 total) {
 
 /**
   * When a new audio is set as source from Player.cpp,
-  * the signal focusedAudioLengthChanged will be emitted,
+  * the signal lengthofFocusedAudioChanged will be emitted,
   * causing the frontend to refresh by re-pulling the READ
   * method assigned to the length time displayer of
   * MediaControls.qml
@@ -38,6 +49,25 @@ QString SeekToTime::secondsToDigitalClock(quint32 total) {
   * @returns QString the Audio length converted to
   * digital clock
   */
-QString SeekToTime::getFocusedAudioLength() {
+QString SeekToTime::getLengthOfFocusedAudio() {
     return secondsToDigitalClock(totalAudioSecs_);
 }
+
+
+QString SeekToTime::getCurrTimeOfFocusedAudio() {
+    quint32 frameNumberToSeconds = 0;
+
+    // convert frame currently under cursor to seconds,
+    // then pass to secondsToDigitalClock()
+    if (audioPaths_.size() && soundsHash_.find(*audIt_) != soundsHash_.end()) {
+        frameNumberToSeconds = ma_sound_get_time_in_pcm_frames(soundsHash_[QString(*audIt_)]) / sampleRate_;
+    }
+
+    return secondsToDigitalClock(frameNumberToSeconds);
+}
+// loop emits every sec to now refresh
+// setter also emits at end of setting
+// refresh current time digital clock in frontend mediacontrols
+// emit currTimeOfFocusedAudioChanged();
+
+// QString SeekToTime::setCurrTimeOfFocusedAudio() {

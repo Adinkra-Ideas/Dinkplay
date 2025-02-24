@@ -19,7 +19,7 @@ Rectangle {
                 left: parent.left
                 leftMargin: 13
             }
-            text: "53:24"  // will inherit dynamic value from cpp
+            text: Media.focusedAudioCurrTime  // will inherit dynamic value from cpp
             color: "white"
             font.pointSize: 10
         }

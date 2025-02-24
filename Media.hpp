@@ -43,7 +43,8 @@ class Media : public QObject
     /******************************************************/
 
     /************ For Seek To Time Management Begins *********/
-    Q_PROPERTY(QString focusedAudioLength READ getFocusedAudioLength NOTIFY focusedAudioLengthChanged)
+    Q_PROPERTY(QString focusedAudioLength READ getLengthOfFocusedAudio NOTIFY lengthofFocusedAudioChanged)
+    Q_PROPERTY(QString focusedAudioCurrTime READ getCurrTimeOfFocusedAudio NOTIFY currTimeOfFocusedAudioChanged)
     /******************************************************/
 
 public:
@@ -55,7 +56,7 @@ public:
     quint8      getRepeat();
     /*******************************************************/
 
-    /*****  Implemented in Interval.hpp Begns  *****/
+    /*****  Implemented in Interval.hpp Begins  *****/
     virtual void killIntervalThread() = 0;
     virtual void setIntervalStatus(bool flag) = 0;
     virtual bool getIntervalStatus() = 0;
@@ -93,7 +94,8 @@ public:
     /*************************************************/
 
     /******** Implemented in SeekToTime.cpp **********/
-    virtual QString getFocusedAudioLength() = 0;
+    virtual QString getLengthOfFocusedAudio() = 0;
+    virtual QString getCurrTimeOfFocusedAudio() = 0;
     /*************************************************/
 
     /******* Implemented in Top.cpp ***************/
@@ -101,7 +103,6 @@ public:
     virtual void notifyJavaSeviceAboutPlaying(bool isplaying) = 0;
     virtual void updateAllAudioDetailsDisplayers() = 0;
     virtual bool seizeControlOfAudioSession() = 0;
-    // virtual bool objc_StartAccessingSecuredLocation(const char * urlPath) = 0;
     virtual bool manageDocumentPickModal() = 0;
     /**********************************************/
 
@@ -109,7 +110,7 @@ public slots:
     virtual void checkForBackPress() = 0;
 
 signals:
-    /******* Mostly Used in Interval.hpp Begns  ********/
+    /******* Mostly Used in Interval.hpp Begins  ********/
     // For starting the Blocking method in its sub thread
     void startTheIntervalLooping();
     // For Refreshing the UI onIntervalStatusChanged
@@ -117,8 +118,6 @@ signals:
     /***************************************************/
 
     /********* Mostly used in Directory.hpp ************/
-    // For getting the PWD dir Selected by the user
-    // void dirChanged();
     // For getting the indexed filelists to frontend
     void audioPathsChanged();
     /***************************************************/
@@ -126,6 +125,8 @@ signals:
     /********* Mostly Used from Player.cpp *************/
     // Whenever a playing sound changes
     void playbackStateChanged(QString newPath);
+    // Notify mediacontrols about length of new audio
+    void lengthofFocusedAudioChanged();
     /***************************************************/
 
     /******** Mostly used from here in media.cpp *******/
@@ -133,10 +134,11 @@ signals:
     void repeatChanged();
     /***************************************************/
 
-    /******** Mostly used from here in Player.cpp *******/
-    // For notifying frontend mediacontrols about total
-    // length of new audio
-    void focusedAudioLengthChanged();
+    /******** Mostly used from SeekToTime.cpp **********/
+    // Notify mediacontrols about current time of audio
+    void currTimeOfFocusedAudioChanged();
+    // For starting the Blocking method in its sub thread
+    void startTheSeekToTimeThread();
     /***************************************************/
 
 protected:
@@ -156,6 +158,7 @@ protected:
     ma_uint32   sampleRate_;        // sampleRate is the number of PCM frames that are processed per second. Useful for converting PCM frames to seconds or milliseconds since ma_sound_seek_to_pcm_frame() has no seek to seconds alt. To jump to 2 secs just do (sampleRate * 2)
     ma_uint64   totalPcmFrames_;    // totalPcmFrames_ is the total number of PCM frames in focused audio file. Useful for getting the total length of focused audio in seconds with (totalPcmFrames_ / sampleRate_)
     ma_uint32   totalAudioSecs_;    // totalAudioSecs_ == total length of focused audio in seconds
+    // ma_uint32   currentFrameNumber_;// currentFrameNumber_ == Current frame number of now playing cursor in focused audio
 };
 
 #endif // MEDIA_HPP

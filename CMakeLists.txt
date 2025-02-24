@@ -43,9 +43,10 @@ qt_add_qml_module(appDinkplay
         Directory.hpp Directory.cpp
         ChangePlay.hpp ChangePlay.cpp
         Interval.hpp Interval.cpp
-        Player.hpp Player.cpp
         IntervalWorker.hpp IntervalWorker.cpp
-        SOURCES SeekToTime.hpp SeekToTime.cpp
+        Player.hpp Player.cpp
+        SeekToTime.hpp SeekToTime.cpp
+        SeekToTimeWorker.hpp SeekToTimeWorker.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

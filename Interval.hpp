@@ -1,4 +1,3 @@
-// CLEANED
 #ifndef INTERVAL_HPP
 #define INTERVAL_HPP
 
