@@ -19,11 +19,13 @@
 #include "ChangePlay.hpp"
 #include "Interval.hpp"
 #include "Player.hpp"
+#include "SeekToTime.hpp"
 
 class Top : public Directory,
             public ChangePlay,
             public Interval,
-            public Player
+            public Player,
+            public SeekToTime
 {
 public:
     explicit Top(QObject * parent = nullptr);

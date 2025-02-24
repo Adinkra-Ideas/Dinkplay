@@ -122,10 +122,17 @@ void Player::setSource(const char * path) {
     /////ma_sound_seek_to_pcm_frame(soundsHash_[QString(path)], 0);
     // connect end call back
     ma_sound_set_end_callback(soundsHash_[QString(path)], my_end_callback, this);
-    // set current playing state to "stopped"
-    /////state_ = 0;
+
+    // Store total length of focused audio in seconds to totalAudioSecs_
+    ma_sound_get_length_in_pcm_frames(soundsHash_[QString(*audIt_)], &totalPcmFrames_);
+    totalAudioSecs_ = (totalPcmFrames_ / sampleRate_);
+
+    qDebug() << "totalAudioSecs_ =" << totalAudioSecs_;
+
     // refresh the UI
     emit playbackStateChanged(currentPlayingPath_);
+    // refresh the length of time shown for nowPlaying audio
+    emit focusedAudioLengthChanged();
     //
     notifyJavaSeviceAboutPlaying(false);
 }
@@ -143,10 +150,6 @@ void Player::playSource(QString path) {
     }
 
     setSource(path.toLocal8Bit().constData());
-
-    // Store total length of focused audio is seconds to totalAudioSecs_
-    ma_sound_get_length_in_pcm_frames(soundsHash_[QString(*audIt_)], &totalPcmFrames_);
-    totalAudioSecs_ = (totalPcmFrames_ / sampleRate_);
 
     play();
 }
@@ -355,16 +358,7 @@ void Player::endOfCurrentAudio(bool shouldStopCompletely) { // 4 GREAT CHANGE CH
         // parameter set to true OR or current audio reached its end and repeat_ had a
         // value of 0 when the audio ended AKA dont repeat anything.
 
-        readyAudioForNewPlay(); /////
-        // Shift pcm to beginning to signal stop
-        /////ma_sound_seek_to_pcm_frame(soundsHash_[QString(*audIt_)], 0);
-        // pause the sound at beginning. Since pause() calls ma_stop,
-        // the audio engine will be paused and ios control center will
-        // update the play/pause icon automatically because it reads from
-        // audio engine.
-        /////pause();
-        // set value of current audio state_ to "stopped"
-        /////state_ = 0;
+        readyAudioForNewPlay();
 
         // Refresh UI
         emit playbackStateChanged(currentPlayingPath_);   // 0 stopped, 1 playing, 2 paused
