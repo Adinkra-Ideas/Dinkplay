@@ -19,19 +19,14 @@ public:
     // WE HAVE NOT YET IMPLEMENTED THREAD KILLER
     // Then we can move to seeker proper implementation
 
-    QString     getLengthOfFocusedAudio() override;
-    void        updateCurrTimeOfFocusedAudio() override;
-    const QString &   getCurrStringTimeOfFocusedAudio() const override;
-    const quint32 &   getCurrIntegerTimeOfFocusedAudio() const override;
+    const quint32 & getLengthOfFocusedAudio() const override;
+    void            updateCursorTimeOfFocusedAudio() override;
+    const quint32 & getCursorTimeOfFocusedAudio() const override;
+    void            setCursorTimeOfFocusedAudio(const quint32 & newTime) override;
 
-    QString secondsToDigitalClock(quint32 total);
+    const QString secondsToDigitalClock(quint32 total) const override;
 
 protected:
-
-
-    QString digitaltime_;
-
-    QString currTimeOfFocusedAudio_;
 
 private:
     SeekToTimeWorker  seekToTimeWorker_; // Thread for timer

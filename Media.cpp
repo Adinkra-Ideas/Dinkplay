@@ -3,10 +3,10 @@
 Media::Media(QObject *parent) :
     QObject{parent},
     repeat_{2},
-    suspended_{false} {
+    suspended_{false},
+    currentFrameNumberToSec_{0} {
     // set iterator accordingly
     audIt_ = audioPaths_.begin();
-    // vpIt_ = videoPaths_.begin();
 }
 
 Media::~Media() {}

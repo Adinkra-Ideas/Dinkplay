@@ -44,9 +44,8 @@ class Media : public QObject
 
     // try adding the and sign
     /************ For Seek To Time Management Begins *********/
-    Q_PROPERTY(QString focusedAudioLength READ getLengthOfFocusedAudio NOTIFY lengthofFocusedAudioChanged)
-    Q_PROPERTY(QString focusedAudioCurrTimeString READ getCurrStringTimeOfFocusedAudio NOTIFY currTimeOfFocusedAudioChanged)
-    Q_PROPERTY(quint32 focusedAudioCurrTimeInt READ getCurrIntegerTimeOfFocusedAudio NOTIFY currTimeOfFocusedAudioChanged)
+    Q_PROPERTY(quint32 focusedAudioLengthInt READ getLengthOfFocusedAudio NOTIFY lengthofFocusedAudioChanged)
+    Q_PROPERTY(quint32 focusedAudioCursorTimeInt READ getCursorTimeOfFocusedAudio WRITE setCursorTimeOfFocusedAudio NOTIFY currTimeOfFocusedAudioChanged)
     /******************************************************/
 
 public:
@@ -96,10 +95,10 @@ public:
     /*************************************************/
 
     /******** Implemented in SeekToTime.cpp **********/
-    virtual QString     getLengthOfFocusedAudio() = 0;
-    virtual void        updateCurrTimeOfFocusedAudio() = 0;
-    virtual const QString &   getCurrStringTimeOfFocusedAudio() const = 0;
-    virtual const quint32 &   getCurrIntegerTimeOfFocusedAudio() const = 0;
+    virtual const quint32 & getLengthOfFocusedAudio() const = 0;
+    virtual void            updateCursorTimeOfFocusedAudio() = 0;
+    virtual const quint32 & getCursorTimeOfFocusedAudio() const = 0;
+    virtual void            setCursorTimeOfFocusedAudio(const quint32 & newTime) = 0;
     /*************************************************/
 
     /******* Implemented in Top.cpp ***************/
@@ -112,6 +111,7 @@ public:
 
 public slots:
     virtual void checkForBackPress() = 0;
+    virtual const QString secondsToDigitalClock(quint32 total) const = 0;
 
 signals:
     /******* Mostly Used in Interval.hpp Begins  ********/
@@ -159,11 +159,10 @@ protected:
     std::unordered_map<QString, ma_sound *> soundsHash_; // used as a storage for Holding one path from audioPaths_ as keys and their associated values == their decoded ma_sound.
     bool                    suspended_; // if true, it means the current nowPlaying audio is suspended. In this case, calling unsuspendAudio() will play it. If false, calling unsuspendAudio will do nothing.
 
-    ma_uint32   sampleRate_;            // sampleRate is the number of PCM frames that are processed per second. Useful for converting PCM frames to seconds or milliseconds since ma_sound_seek_to_pcm_frame() has no seek to seconds alt. To jump to 2 secs just do (sampleRate * 2)
-    ma_uint64   totalPcmFrames_;        // totalPcmFrames_ is the total number of PCM frames in focused audio file. Useful for getting the total length of focused audio in seconds with (totalPcmFrames_ / sampleRate_)
-    ma_uint32   totalAudioSecs_;        // totalAudioSecs_ == total length of focused audio in seconds
-    quint32     currentFrameNumberInt_; // currentFrameNumberInt_ == Current frame number of now playing cursor in focused audio
-    QString     currentFrameNumberString_;
+    ma_uint32   sampleRate_;                // sampleRate is the number of PCM frames that are processed per second. Useful for converting PCM frames to seconds or milliseconds since ma_sound_seek_to_pcm_frame() has no seek to seconds alt. To jump to 2 secs just do (sampleRate * 2)
+    ma_uint64   totalPcmFrames_;            // totalPcmFrames_ is the total number of PCM frames in focused audio file. Useful for getting the total length of focused audio in seconds with (totalPcmFrames_ / sampleRate_)
+    quint32     totalAudioSecs_;            // totalAudioSecs_ == total length of focused audio in seconds
+    quint32     currentFrameNumberToSec_;   // currentFrameNumberInt_ == Current frame number of now playing cursor in focused audio
 };
 
 #endif // MEDIA_HPP

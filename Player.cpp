@@ -163,10 +163,6 @@ void Player::play() {
         return ;
     }
 
-    //
-    qDebug() << "play called with milliseconds time= " << ma_sound_get_time_in_milliseconds(soundsHash_[QString(*audIt_)]);
-    qDebug() << "play called with number of frames= " << ma_sound_get_time_in_pcm_frames(soundsHash_[QString(*audIt_)]);
-
     // Seize control of audio session for both
     // android and iOS
     if (! seizeControlOfAudioSession()) {

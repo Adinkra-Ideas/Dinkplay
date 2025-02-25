@@ -62,41 +62,41 @@ Window {
             }
         }
 
-        // an activity listener to hide the MediaControls when idle
-        MouseArea {
-            id: activityListener
-            anchors.fill: parent
-            z: 1
-            propagateComposedEvents: true
-            hoverEnabled: true
-            property bool inactiveMouse: false
-            // set inactiveMouse to inactive every 3 seconds
-            Timer {
-                id: timer
-                interval: 7000
-                onTriggered: {
-                    activityListener.inactiveMouse = true
-                }
-            }
-            function mouseEventHandler(mouse) {
-                if (activityListener.inactiveMouse)
-                    activityListener.inactiveMouse = false
-                timer.restart()
-                timer.start()
-                mouse.accepted = false
-            }
-            onPressed: mouse => mouseEventHandler(mouse)
-            onPositionChanged: mouse => mouseEventHandler(mouse)
-            onWheel: mouse => mouseEventHandler(mouse)
-            onDoubleClicked: mouse => mouse.accepted = false // setting mouse.accepted to false prevents the cursor from grabbing
-        }
+        // // an activity listener to hide the MediaControls when idle
+        // MouseArea {
+        //     id: activityListener
+        //     anchors.fill: parent
+        //     z: 1
+        //     propagateComposedEvents: true
+        //     hoverEnabled: true
+        //     property bool inactiveMouse: false
+        //     // set inactiveMouse to inactive every 3 seconds
+        //     Timer {
+        //         id: timer
+        //         interval: 7000
+        //         onTriggered: {
+        //             activityListener.inactiveMouse = true
+        //         }
+        //     }
+        //     function mouseEventHandler(mouse) {
+        //         if (activityListener.inactiveMouse)
+        //             activityListener.inactiveMouse = false
+        //         timer.restart()
+        //         timer.start()
+        //         mouse.accepted = false
+        //     }
+        //     onPressed: mouse => mouseEventHandler(mouse)
+        //     onPositionChanged: mouse => mouseEventHandler(mouse)
+        //     onWheel: mouse => mouseEventHandler(mouse)
+        //     onDoubleClicked: mouse => mouse.accepted = false // setting mouse.accepted to false prevents the cursor from grabbing
+        // }
 
         TopControls {
             id: topControls
             color: mainWindow.color
-            property bool showTopControls: !activityListener.inactiveMouse
-            opacity: showTopControls
-            Behavior on opacity { NumberAnimation { duration: 500 } }
+            // property bool showTopControls: !activityListener.inactiveMouse
+            // opacity: showTopControls
+            // Behavior on opacity { NumberAnimation { duration: 500 } }
             anchors.top: root.top
             anchors.left: root.left
             anchors.right: root.right
@@ -140,19 +140,17 @@ Window {
         MediaControls {
             id: mediaControls
             color: mainWindow.color
-            visible:  Media.audio !== 0
-            property bool showMediaControls: !activityListener.inactiveMouse
-            // onOpacityChanged can't be used as it is animated and therefore not immediate
-            onShowMediaControlsChanged: {
-                activityListener.cursorShape = showMediaControls ? Qt.ArrowCursor : Qt.BlankCursor
-            }
-            opacity: showMediaControls
-            Behavior on opacity { NumberAnimation { duration: 500 } }
+            // visible:  Media.audio !== 0
+            // property bool showMediaControls: !activityListener.inactiveMouse
+            // onShowMediaControlsChanged: {
+            //     activityListener.cursorShape = showMediaControls ? Qt.ArrowCursor : Qt.BlankCursor
+            // }
+            // opacity: showMediaControls
+            // Behavior on opacity { NumberAnimation { duration: 500 } }
             anchors.bottom: root.bottom
-            // anchors.bottomMargin: 10
             anchors.left: root.left
             anchors.right: root.right
-            height: 70//
+            height: 70
         }
     }
 }

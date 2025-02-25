@@ -19,7 +19,7 @@ Rectangle {
                 left: parent.left
                 leftMargin: 13
             }
-            text: Media.focusedAudioCurrTimeString  // will inherit dynamic value from cpp
+            text: "00:00"
             color: "white"
             font.pointSize: 10
         }
@@ -31,7 +31,7 @@ Rectangle {
                 right: parent.right
                 rightMargin: 13
             }
-            text: Media.focusedAudioLength //"01:50:12"  // will inherit dynamic value from cpp
+            text: Media.secondsToDigitalClock(Media.focusedAudioLengthInt)
             color: "white"
             font.pointSize: 10
         }
@@ -48,8 +48,54 @@ Rectangle {
             }
             from: 0
             value: 0
-            to: 99 // will inherit dynamic value from cpp
+            to: Media.focusedAudioLengthInt
             stepSize: 1
+
+            // If we had assigned Media.focusedAudioCursorTimeInt directly
+            // to value, the slider will keep receiving pulses from the
+            // Media.focusedAudioCursorTimeInt cpp when the user is dragging
+            // it, forcing it to appear to be jumping away from the user's grip.
+            // This connections method allows me check whether user is not
+            // dragging the slider, AKA (! seekerSlider.pressed) before
+            // allowing the slider receive cpp pulses for changing its position.
+            // The (! seekerSlider.waitForRecovery)
+            // condition ensures that the slider position only changes through
+            // cpp pulses when new pulse time of +1 second to the one currently
+            // in seekerSlider.value is received, after a the user did a seeking action.
+            // This prevents the slider first jumping back to former time after user does
+            // a seeking action, before returning to new time after audio engine starts fully
+            // working.
+            property int waitForRecovery: 0
+            Connections {
+                target: Media
+                function onFocusedAudioCursorTimeIntChanged() {
+                    if ( ! seekerSlider.pressed && ! seekerSlider.waitForRecovery ) {
+                        seekerSlider.value = Media.focusedAudioCursorTimeInt
+                    } else if ( seekerSlider.waitForRecovery && (Media.focusedAudioCursorTimeInt == 1 + seekerSlider.value) ) {
+                        seekerSlider.waitForRecovery = false
+                        seekerSlider.value = Media.focusedAudioCursorTimeInt
+                    }
+                }
+            }
+            // value pulls integer current time of playing audio
+            // from cpp each time the cpp focusedAudioCursorTimeInt
+            // changes value. Here, we display it as digital clock
+            onValueChanged: {
+                currentTimeOfAudio.text = Media.secondsToDigitalClock(value)
+            }
+            // when user drags the slider, display the moving time
+            // in real time
+            onMoved: {
+                currentTimeOfAudio.text = Media.secondsToDigitalClock(value)
+            }
+            // Logic for catching onRelease part after slider has being held down,
+            // so that we can pass the time to cpp for playing from that point
+            onPressedChanged: {
+                if ( ! pressed ) {
+                    seekerSlider.waitForRecovery = true
+                    Media.focusedAudioCursorTimeInt = value
+                }
+            }
 
             handle: Rectangle {
                 x: seekerSlider.leftPadding + seekerSlider.visualPosition * (seekerSlider.availableWidth - width)
