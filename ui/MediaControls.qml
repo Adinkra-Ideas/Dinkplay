@@ -60,8 +60,11 @@ Rectangle {
             // allowing the slider receive cpp pulses for changing its position.
             // The (! seekerSlider.waitForRecovery)
             // condition ensures that the slider position only changes through
-            // cpp pulses when new pulse time of +1 second to the one currently
+            // cpp pulses either 1) when new pulse time of +1 second to the one currently
             // in seekerSlider.value is received, after a the user did a seeking action.
+            // or 2) when user did a seeking action but before waitForRecovery could be set back
+            // to false, they changed play to another audio. In this case, the condition of
+            // (Media.focusedAudioCursorTimeInt == 1) will ensure the slider keeps working well.
             // This prevents the slider first jumping back to former time after user does
             // a seeking action, before returning to new time after audio engine starts fully
             // working.
@@ -71,7 +74,8 @@ Rectangle {
                 function onFocusedAudioCursorTimeIntChanged() {
                     if ( ! seekerSlider.pressed && ! seekerSlider.waitForRecovery ) {
                         seekerSlider.value = Media.focusedAudioCursorTimeInt
-                    } else if ( seekerSlider.waitForRecovery && (Media.focusedAudioCursorTimeInt == 1 + seekerSlider.value) ) {
+                    } else if ( seekerSlider.waitForRecovery
+                               && ( (Media.focusedAudioCursorTimeInt == 1 + seekerSlider.value) || Media.focusedAudioCursorTimeInt == 1) ) {
                         seekerSlider.waitForRecovery = false
                         seekerSlider.value = Media.focusedAudioCursorTimeInt
                     }
