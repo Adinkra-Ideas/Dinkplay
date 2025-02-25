@@ -6,7 +6,7 @@ SeekToTime::SeekToTime(QObject *parent) :
         seekToTimeWorker_{this, threadLoopState_}
 {
     connect(this, &Media::startTheSeekToTimeThread, &seekToTimeWorker_, &SeekToTimeWorker::startTheSeekToTimethreadLoop);
-    connect(&seekToTimeWorker_, &SeekToTimeWorker::oneSecondReached, this, &Media::currTimeOfFocusedAudioChanged);
+    connect(&seekToTimeWorker_, &SeekToTimeWorker::oneSecondReached, this, &Media::updateCurrTimeOfFocusedAudio);
     seekToTimeWorker_.moveToThread(&theSeekToTimeThread);
     theSeekToTimeThread.start();
 
@@ -54,17 +54,26 @@ QString SeekToTime::getLengthOfFocusedAudio() {
 }
 
 
-QString SeekToTime::getCurrTimeOfFocusedAudio() {
-    quint32 frameNumberToSeconds = 0;
+const QString & SeekToTime::getCurrStringTimeOfFocusedAudio() const {
+    return currentFrameNumberString_;
+}
+
+const quint32 & SeekToTime::getCurrIntegerTimeOfFocusedAudio() const {
+    return currentFrameNumberInt_;
+}
+
+void SeekToTime::updateCurrTimeOfFocusedAudio() {
+    currentFrameNumberInt_ = 0;
+    currentFrameNumberString_ = "00:00";
 
     // convert frame currently under cursor to seconds,
-    // then pass to secondsToDigitalClock()
+    // then pass to secondsToDigitalClock() to get seconds formated to digital clock
     if (audioPaths_.size() && soundsHash_.find(*audIt_) != soundsHash_.end()) {
-        frameNumberToSeconds = ma_sound_get_time_in_pcm_frames(soundsHash_[QString(*audIt_)]) / sampleRate_;
+        currentFrameNumberInt_ = ma_sound_get_time_in_pcm_frames(soundsHash_[QString(*audIt_)]) / sampleRate_;
+        currentFrameNumberString_ = secondsToDigitalClock(currentFrameNumberInt_);
     }
-
-    return secondsToDigitalClock(frameNumberToSeconds);
 }
+
 // loop emits every sec to now refresh
 // setter also emits at end of setting
 // refresh current time digital clock in frontend mediacontrols

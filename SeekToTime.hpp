@@ -19,8 +19,10 @@ public:
     // WE HAVE NOT YET IMPLEMENTED THREAD KILLER
     // Then we can move to seeker proper implementation
 
-    QString getLengthOfFocusedAudio() override;
-    QString getCurrTimeOfFocusedAudio() override;
+    QString     getLengthOfFocusedAudio() override;
+    void        updateCurrTimeOfFocusedAudio() override;
+    const QString &   getCurrStringTimeOfFocusedAudio() const override;
+    const quint32 &   getCurrIntegerTimeOfFocusedAudio() const override;
 
     QString secondsToDigitalClock(quint32 total);
 
