@@ -2,7 +2,7 @@
 #define PLAYER_HPP
 
 #include <QObject>
-// #include <QDebug>
+#include <QDebug>
 
 #include "Media.hpp"
 
@@ -47,12 +47,3 @@ protected:
 };
 
 #endif // PLAYER_HPP
-
-
-// FOR SEEKING AKA DRAG TIME FORWARD OR BACKWARD
-//     * we can move to any time in seconds using sampleRate * numberOFseconds z.B, ma_sound_seek_to_pcm_frame(soundsHash_[QString(*audIt_)], sampleRate_ * 25);
-
-// FOR THREAD THAT UPDATES TIME EVERY SECOND IF PLAYING STATE IS TRUE
-//     * we can read current Point of focused Audio using
-//     ma_sound_get_time_in_pcm_frames(soundsHash_[QString(*audIt_)]);
-

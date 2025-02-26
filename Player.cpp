@@ -63,6 +63,15 @@ Player::~Player() {
 //          CANONICALS ENDS             *
 // **************************************
 
+size_t	ft_strlen(char *c)
+{
+    size_t	i;
+
+    i = 0;
+    while (c[(i)] != '\0')
+        i++;
+    return (i);
+}
 
 /**
   * Sets the received path string
@@ -105,7 +114,8 @@ void Player::setSource(const char * path) {
     // paths at destructor, when the app is closed.
     if (soundsHash_[QString(path)] == nullptr) {
         soundsHash_[QString(path)] = new ma_sound;
-        result_ = ma_sound_init_from_file(&engine_, path, 0, NULL, NULL, soundsHash_[QString(path)]);
+        // result_ = ma_sound_init_from_file(&engine_, path, 0, NULL, NULL, soundsHash_[QString(path)]); //COMMENTED OUT FOR REVERSE
+        result_ = ma_sound_init_from_file(&engine_, path, MA_SOUND_FLAG_DECODE /*| MA_SOUND_FLAG_ASYNC*/, NULL, NULL, soundsHash_[QString(path)]);
         if (result_ == MA_SUCCESS) {
             // calls itself again this time with a sound to play
             setSource(path);
@@ -134,6 +144,11 @@ void Player::setSource(const char * path) {
     //
     notifyJavaSeviceAboutPlaying(false);
 }
+
+// TO REVERSE AUDIO
+// if (soundsHash_[QString(path)] != null) {
+//     reverseBitORByte(soundsHash_[QString(path)]->pDataSource);
+// }
 
 /**
   * Path is the sound file intended
@@ -181,6 +196,12 @@ void Player::play() {
         emit playbackStateChanged(currentPlayingPath_); // 0 stopped, 1 playing, 2 paused
         notifyJavaSeviceAboutPlaying(true);
     }
+
+    qDebug() << "trr total frame count == " << totalPcmFrames_;
+    ma_data_source_base* pDataSourceBase = (ma_data_source_base*) ((ma_sound*) soundsHash_[QString(*audIt_)])->pDataSource;
+    qDebug() << "trr range begin in frame == " << pDataSourceBase->rangeBegInFrames;
+    qDebug() << "trr range end in frame == " << pDataSourceBase->rangeEndInFrames;
+    pSound->pResourceManagerDataSource
 }
 
 /**

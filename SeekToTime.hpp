@@ -14,9 +14,6 @@ public:
     explicit SeekToTime(QObject *parent = nullptr);
     ~SeekToTime();
 
-    // WE HAVE NOT YET IMPLEMENTED THREAD KILLER
-    // Then we can move to seeker proper implementation
-
     const quint32 & getLengthOfFocusedAudio() const override;
     void            updateCursorTimeOfFocusedAudio() override;
     const quint32 & getCursorTimeOfFocusedAudio() const override;
