@@ -15,6 +15,7 @@ public:
     ~SeekToTimeWorker();
 
     void startTheSeekToTimethreadLoop();
+    void stopTheSeekToTimethreadLoop();
 
 signals:
     void oneSecondReached();

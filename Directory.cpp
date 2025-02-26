@@ -311,11 +311,7 @@ void Directory::addStartupAudiosOnEmptyStartupAudioListings() {
         }
     }
     if (! tempFile.isEmpty()) {
-        // Add the filepath to our sound stringlist
-        audioPaths_.push_back(tempFile);
-        // use the filepath as key in our soundHash_
-        // dict, with its decodedSound ptr = nullptr
-        soundsHash_[tempFile] = nullptr;
+        indexToAudioList(tempFile);
     }
     #endif
 // THIS ANDROID WILL BE MERGED INTO IOS PART BELOW
@@ -334,11 +330,7 @@ void Directory::addStartupAudiosOnEmptyStartupAudioListings() {
         }
     }
     if (! tempFile.isEmpty()) {
-        // Add the filepath to our sound stringlist
-        audioPaths_.push_back(tempFile);
-        // use the filepath as key in our soundHash_
-        // dict, with its decodedSound ptr = nullptr
-        soundsHash_[tempFile] = nullptr;
+        indexToAudioList(tempFile);
     }
 
     // Now we check whether more sounds exists in our
@@ -360,13 +352,7 @@ void Directory::pickIosAudiosFromSandboxTmpDir() {
     QDir tmpDir(sandboxTmpDir);
     QStringList all = tmpDir.entryList(QStringList() << "*.mp3", QDir::Files);
     for (QString &one: all) {
-        if (! audioPaths_.contains(sandboxTmpDir + one)) { // no repeat
-            // Add the filepath to our sound stringlist
-            audioPaths_.push_back(sandboxTmpDir + one);
-            // use the filepath as key in our soundHash_
-            // dict, with its decodedSound ptr = nullptr
-            soundsHash_[sandboxTmpDir + one] = nullptr;
-        }
+        indexToAudioList(sandboxTmpDir + one);
     }
 }
 
@@ -442,14 +428,7 @@ void Directory::addFileToDinkplay(QString oneFile) {
     #endif
 
     // add the oneFile
-    if (! audioPaths_.contains(oneFile)) {  // no repeat
-        // Add the filepath to our sound stringlist
-        audioPaths_.push_back(oneFile);
-        // use the filepath as key in our soundHash_
-        // dict, with its decodedSound ptr = nullptr
-        soundsHash_[oneFile] = nullptr;
-    }
-
+    indexToAudioList(oneFile);
 }
 
 
@@ -477,19 +456,36 @@ void Directory::openDialogFromCpp() {
         return ; // do nothing if user cancelled file dialog they opened
     }
 
-    // here
     // if there is an active, we stop the ma_sound.
     // THIS MUST BE DONE BEFORE TAMPERING WITH
     // audIt_ or *audIt_ or audioPaths_
     stopAnyCurrentPlaying();
 
     for (QString &oneFile: fileNames) {
-        // skip non-mp3 files
-        if (! oneFile.endsWith(".mp3")) {
-            continue ;
+        // for paths that were selected from shortcuts
+        // AKA Media or Download FileProvider, they carry the link like
+        // content://com.android.providers.downloads.documents/document/344
+        // Since it is impossible to trace the actual location of the file
+        // to /storage/ path, we use QML internal link resolver to copy the
+        // file and play it from another location we will create.
+        // see https://ekkesapps.wordpress.com/qt-6-cmake/android-scopedstorage-filedialog/
+        if (oneFile.indexOf("content://com.android.providers") == 0) {
+            // First we retrieve the filename
+            QString filename = QFileInfo(oneFile).fileName();
+            // Then we save it to temporal playable location
+            if (filename.endsWith(".mp3") || filename.endsWith(".mp4")) {
+                if ( QFile::exists(QQmlFile::urlToLocalFileOrQrc(oneFile)) ) {
+                    saveFilesFromMediaandDownloadFileproviderLinks(oneFile, filename);
+                }
+            }
         }
-
-        addFileToDinkplay(oneFile);
+        // Else it is a ExternalStorage file that the user selected from
+        // internal or sd card directly.
+        // In this case, we can trace the /storage/ path and play it directly
+        // without first copying to temp playable location
+        else if (oneFile.endsWith(".mp3") || oneFile.endsWith(".mp4")) {
+            addFileToDinkplay(oneFile);
+        } 
     }
 
     #ifndef Q_OS_IOS
@@ -504,6 +500,34 @@ void Directory::openDialogFromCpp() {
     // Now make the audio list usable after tampering
     // with audioPaths_'s data
     preparePathsForPlay();
+}
+
+void Directory::saveFilesFromMediaandDownloadFileproviderLinks(QString filePath, QString filename) {
+    #ifdef Q_OS_ANDROID
+    QTemporaryDir tempDir;
+    QString tempFile;
+    if (tempDir.isValid()) {
+        tempFile = tempDir.path().append("/") + filename;
+        if (QFile::copy(filePath, tempFile)) {
+            tempDir.setAutoRemove(false);
+        } else {
+            tempFile.clear();
+        }
+    }
+    if (! tempFile.isEmpty()) {
+        indexToAudioList(tempFile);
+    }
+    #endif
+}
+
+void Directory::indexToAudioList(QString audioFilePath) {
+    if (! audioPaths_.contains(audioFilePath)) { // no repeat
+        // Add the filepath to our sound stringlist
+        audioPaths_.push_back(audioFilePath);
+        // use the filepath as key in our soundHash_
+        // dict, with its decodedSound ptr = nullptr
+        soundsHash_[audioFilePath] = nullptr;
+    }
 }
 
 //qDebug() << "path: " << path.toString();

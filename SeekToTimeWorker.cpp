@@ -21,3 +21,12 @@ void SeekToTimeWorker::startTheSeekToTimethreadLoop() {
         emit oneSecondReached();
     }
 }
+
+/**
+  * Simply sets the threadLoopState_ to false
+  * so that any blocking loop will be released.
+  * @returns void
+  */
+void SeekToTimeWorker::stopTheSeekToTimethreadLoop() {
+    threadLoopState_ = false;
+}

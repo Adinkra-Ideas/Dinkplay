@@ -66,7 +66,7 @@ void IntervalWorker::startTheIntervalLoop() {
   */
 void IntervalWorker::StopTheIntervalLoop() {
     // Break any running loop
-    // If intervalState_ was true, set it to false and emit shange
+    // If intervalState_ was true, set it to false and emit change
     if (intervalState_ == true) {
         intervalState_ = false;
         // call the UI (through this thread's parent) to refresh interval screen

@@ -70,16 +70,11 @@ Top::~Top(){
     #ifdef Q_OS_IOS
     destroyMyMPRemoteCC();
     #endif
-
-    // qDebug() << "App is getting Killedffffffff";
-
-    // //
-    // checkForBackPress();
 }
 
 void Top::killAllThreads() {
     killIntervalThread();
-
+    killSeekToTimeThread();
 }
 
 // will comment

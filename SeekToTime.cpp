@@ -14,7 +14,10 @@ SeekToTime::SeekToTime(QObject *parent) :
     emit startTheSeekToTimeThread();
 }
 
-SeekToTime::~SeekToTime() {}
+SeekToTime::~SeekToTime() {
+    theSeekToTimeThread.quit();
+    theSeekToTimeThread.wait();
+}
 
 /**
   * Converts the received Seconds
@@ -77,4 +80,10 @@ void SeekToTime::updateCursorTimeOfFocusedAudio() {
     }
 
     emit currTimeOfFocusedAudioChanged();
+}
+
+void SeekToTime::killSeekToTimeThread() {
+    // Stop any loop in thread and
+    // destroy the thread
+    seekToTimeWorker_.stopTheSeekToTimethreadLoop();
 }

@@ -17,6 +17,8 @@
 #include <QStandardPaths>
 #include <QTemporaryDir>
 #include <QFileDialog>
+#include <QFileInfo>
+#include <QQmlFile>
 
 #include "Media.hpp"
 
@@ -34,9 +36,11 @@ public:
     void        addFileToDinkplay(QString oneFile) override;
 
 
-    void        addStartupAudiosOnEmptyStartupAudioListings();
-    void        openDialogFromCpp();
-    void        pickIosAudiosFromSandboxTmpDir();
+    void indexToAudioList(QString audioFilePath);
+    void addStartupAudiosOnEmptyStartupAudioListings();
+    void openDialogFromCpp();
+    void pickIosAudiosFromSandboxTmpDir();
+    void saveFilesFromMediaandDownloadFileproviderLinks(QString filePath, QString filename);
     // void        doAddDir();
 
 

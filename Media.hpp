@@ -95,6 +95,7 @@ public:
     /*************************************************/
 
     /******** Implemented in SeekToTime.cpp **********/
+    virtual void            killSeekToTimeThread() = 0;
     virtual const quint32 & getLengthOfFocusedAudio() const = 0;
     virtual void            updateCursorTimeOfFocusedAudio() = 0;
     virtual const quint32 & getCursorTimeOfFocusedAudio() const = 0;

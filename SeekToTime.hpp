@@ -3,8 +3,6 @@
 
 #include <QThread>
 #include <QString>
-#include <QDebug>
-
 #include "Media.hpp"
 #include "SeekToTimeWorker.hpp"
 
@@ -23,8 +21,8 @@ public:
     void            updateCursorTimeOfFocusedAudio() override;
     const quint32 & getCursorTimeOfFocusedAudio() const override;
     void            setCursorTimeOfFocusedAudio(const quint32 & newTime) override;
-
-    const QString secondsToDigitalClock(quint32 total) const override;
+    const QString   secondsToDigitalClock(quint32 total) const override;
+    void            killSeekToTimeThread() override;
 
 protected:
 
