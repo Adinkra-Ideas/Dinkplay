@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDebug>
+#include <cstdlib> // malloc
 
 #include "Media.hpp"
 

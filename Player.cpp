@@ -63,16 +63,6 @@ Player::~Player() {
 //          CANONICALS ENDS             *
 // **************************************
 
-size_t	ft_strlen(char *c)
-{
-    size_t	i;
-
-    i = 0;
-    while (c[(i)] != '\0')
-        i++;
-    return (i);
-}
-
 /**
   * Sets the received path string
   * as source for active media.
@@ -197,12 +187,41 @@ void Player::play() {
         notifyJavaSeviceAboutPlaying(true);
     }
 
+    // Here, we have successfully copied the raw frames into holdTheFrames.
+    // Tomorrow, we will dirst try to play the data from holdTheFrames.
+    // Then we will reverse the data in hold the frames
+
+    // if the ma_sound_stop() is not first called before the call to
+    // ma_data_source_read_pcm_frames(), it will crash the program.
+    pause();
+    ma_data_source* dDataSource = ((ma_sound*) soundsHash_[QString(*audIt_)])->pDataSource;
+    size_t byteSizeOfOnlyRawAudioFrames = device_->playback.channels * (totalPcmFrames_ * 4);
+    char* holdTheFrames = (char *)malloc(byteSizeOfOnlyRawAudioFrames + 1);
+    ma_uint64 totalFramesReaded;
+    //
+    ma_result resulte = ma_data_source_read_pcm_frames(dDataSource, holdTheFrames, totalPcmFrames_, &totalFramesReaded);
+    qDebug() << "trr byteSizeOfOnlyRawAudioFrames" << byteSizeOfOnlyRawAudioFrames;
+    qDebug() << "trr result== " << resulte;
+    qDebug() << "trr totalFramesReaded == " << totalFramesReaded;
     qDebug() << "trr total frame count == " << totalPcmFrames_;
-    ma_data_source_base* pDataSourceBase = (ma_data_source_base*) ((ma_sound*) soundsHash_[QString(*audIt_)])->pDataSource;
-    qDebug() << "trr range begin in frame == " << pDataSourceBase->rangeBegInFrames;
-    qDebug() << "trr range end in frame == " << pDataSourceBase->rangeEndInFrames;
-    pSound->pResourceManagerDataSource
+    free(holdTheFrames);
+    holdTheFrames = nullptr;
+    // ma_data_source_base* pDataSourceBase = (ma_data_source_base*) dDataSource;
+    // ma_data_source_base* pDataSourceBase = (ma_data_source_base*) ((ma_sound*) soundsHash_[QString(*audIt_)])->pDataSource;
+    // qDebug() << "trr range begin in frame == " << pDataSourceBase->rangeBegInFrames;
+    // qDebug() << "trr range end in frame == " << pDataSourceBase->rangeEndInFrames;
+    // pSound->pResourceManagerDataSource
 }
+
+// LEARNINGS
+// 1) pDataSourceBase->rangeEndInFrames just holds the max value of uint64 so that all
+// possible decoded audio will be accommodated. It doesnt return the end in frame.
+// It is only passed as param3 to ma_data_source_read_pcm_frames so that
+// ma_data_source_read_pcm_frames will stop when it has read the full source from param1
+// 2) One frame in mp3 is equivalent to one byte. The reason a raw audio size in byte
+// is different from the totalPcmFrames_ is because of the number of output channels. If 2
+// channels. then 1 frame will equal 2 bytes. 2 channels == 3 bytes and so on.
+// This was tested using mp3. I dont know about wav or the rest formats' byte size per frame.
 
 /**
   * Simply pauses the active sound
@@ -230,7 +249,7 @@ void Player::pause() {
     // This is necessary so mini audio dont lose audio
     // when iOS is returning from an interruption.
     // But we leave it outside if_ios incase android needs it too.
-    // HAD TO MAKE THIS ON AVAILABLE FOR iOS BECAUSE IN ANDROID, IF YOU DISCONNECT AND THEN RECONNECT BLUETOOTH, SOUND WILL ONLY COME BACK AFTER PLAY->PAUSE->PLAY
+    // HAD TO MAKE THIS ONLY AVAILABLE FOR iOS BECAUSE IN ANDROID, IF YOU DISCONNECT AND THEN RECONNECT BLUETOOTH, SOUND WILL ONLY COME BACK AFTER PLAY->PAUSE->PLAY
     // BUT IF IT IS ABSENT FOR iOS, it causes the play/pause icon in mediainfocenter to go out of sync
     #ifdef Q_OS_IOS
     ma_device_stop(device_);
@@ -358,11 +377,6 @@ void Player::endOfCurrentAudio(bool shouldStopCompletely) { // 4 GREAT CHANGE CH
         // verify that there is no next or repeat to do
         if (repeat_ == 1) {
             readyAudioForNewPlay(); /////
-            // set cursor to beginning
-            /////ma_sound_seek_to_pcm_frame(soundsHash_[QString(*audIt_)], 0);
-            // pause the sound at beginning
-            /////ma_sound_stop(soundsHash_[QString(*audIt_)]);
-            // call play()
             play();
         } else if (repeat_ == 2) {
             changePlay(true);
