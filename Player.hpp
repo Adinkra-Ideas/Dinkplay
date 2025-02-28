@@ -45,6 +45,9 @@ protected:
 
     bool        engineInit_;    // True if mini audio engine was successfully init-ed, else false
     quint8      state_;         // Holds the current media playback state at any given time. 0 == stopped, 1 == playing, 2 == paused
+
+    char* holdTheFrames;
+    ma_encoder encoder;
 };
 
 #endif // PLAYER_HPP
