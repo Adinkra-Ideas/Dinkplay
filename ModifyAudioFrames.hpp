@@ -12,9 +12,10 @@ public:
     void generateReversedAudioAtByteLevel(qint16 pathPos) override;
     void generateReversedAudioAtBitLevel(qint16 pathPos) override;
 
-    void extractRawAudioFrames(QString generatedFilePath, QString audioFilePath);
+    void extractRawAudioFrames(QString generatedFilePath, QString audioFilePath, bool byteLevelReverse);
     void encodeAndGenerateModifiedAudioFile(const char* filePath);
     void renameReversedAudio(QString& reversedFileName, const char* prefix);
+    void reverseAudioFramesAtByteLevel(size_t byteIndexOfLastFrame);
 };
 
 #endif // MODIFYAUDIOFRAMES_HPP

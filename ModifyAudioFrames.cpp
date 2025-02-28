@@ -28,7 +28,7 @@ void ModifyAudioFrames::generateReversedAudioAtByteLevel(qint16 pathPos) {
     }
 
     // Extract and store the raw audio frames
-    extractRawAudioFrames(reversedFileName, posToPath);
+    extractRawAudioFrames(reversedFileName, posToPath, true);
 }
 
 void ModifyAudioFrames::generateReversedAudioAtBitLevel(qint16 pathPos) {
@@ -47,10 +47,10 @@ void ModifyAudioFrames::generateReversedAudioAtBitLevel(qint16 pathPos) {
     }
 
     // Extract and store the raw audio frames
-    extractRawAudioFrames(reversedFileName, posToPath);
+    extractRawAudioFrames(reversedFileName, posToPath, false);
 }
 
-void ModifyAudioFrames::extractRawAudioFrames(QString generatedFilePath, QString audioFilePath) {
+void ModifyAudioFrames::extractRawAudioFrames(QString generatedFilePath, QString audioFilePath, bool byteLevelReverse) {
     if ( ! audioPaths_.size()
         || soundsHash_.find(*audIt_) == soundsHash_.end() ) {
         return ;
@@ -72,7 +72,7 @@ void ModifyAudioFrames::extractRawAudioFrames(QString generatedFilePath, QString
     if (vptr == NULL) {
         return ;
     }
-    combinedAudioFrames_ = (char *) vptr;
+    combinedAudioFrames_ = (quint8 *) vptr;
 
     // WE WILL HOLD ROLLING HERE
 
@@ -104,9 +104,12 @@ void ModifyAudioFrames::extractRawAudioFrames(QString generatedFilePath, QString
     // If it reaches here, it means we have the audio frames now stored
     // to combinedAudioFrames_. Now we reverse based on partial or full
     // reversal.
-    // if (byteLevelReverse) {
-    //     reverseAudioFramesPartially(combinedAudioFrames_);
-    // } else {
+    size_t byteIndexOfLastFrame = device_->playback.channels * (totalFramesReaded * ma_get_bytes_per_sample(device_->playback.format));
+    if (byteLevelReverse) {
+        reverseAudioFramesAtByteLevel(byteIndexOfLastFrame);
+        qDebug() << "trr byte level reverse done ";
+    }
+    // else {
     //     reverseAudioFramesFully(combinedAudioFrames_);
     // }
 
@@ -122,6 +125,43 @@ void ModifyAudioFrames::extractRawAudioFrames(QString generatedFilePath, QString
     free(vptr);
 
     // WE WILL RELEASE ROLLING HERE
+}
+
+quint8& reverset(quint8& b) {
+    b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+    b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+    b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+    return b;
+}
+void ModifyAudioFrames::reverseAudioFramesAtByteLevel(size_t byteIndexOfLastFrame) {
+    if (byteIndexOfLastFrame == 0) {
+        return ;
+    }
+
+    // Initialize l and r pointers
+    size_t l = 0;
+    size_t r = byteIndexOfLastFrame - 1; // if it is 3 bytes for instance, we want to copy from 2, 1, 0
+    quint8 t;
+    while (l <= r) {
+        reverset(combinedAudioFrames_[l]);
+        l++;
+    }
+
+    // // Swap characters till l and r meet
+    // while (l < r) {
+
+    //     // Swap characters
+    //     t = reverset(combinedAudioFrames_[l]);
+    //     combinedAudioFrames_[l] = reverset(combinedAudioFrames_[r]);
+    //     combinedAudioFrames_[r] = t;
+
+    //     // Move pointers towards each other
+    //     l++;
+    //     r--;
+    // }
+    // l--;
+    // r++;
+    qDebug() << "trr final == " << (int)combinedAudioFrames_[l - 2] << "|" << (int)reverset(combinedAudioFrames_[l - 2]);
 }
 
 void ModifyAudioFrames::encodeAndGenerateModifiedAudioFile(const char* filePath) {

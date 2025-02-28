@@ -171,7 +171,7 @@ protected:
     ma_uint64   totalPcmFrames_;            // totalPcmFrames_ is the total number of PCM frames in focused audio file. Useful for getting the total length of focused audio in seconds with (totalPcmFrames_ / sampleRate_)
     quint32     totalAudioSecs_;            // totalAudioSecs_ == total length of focused audio in seconds
     quint32     currentFrameNumberToSec_;   // currentFrameNumberInt_ == Current frame number of now playing cursor in focused audio
-    char*       combinedAudioFrames_;       // when we're modifying an audio file's raw frame, we first retrieve the raw frames and store them here
+    quint8*     combinedAudioFrames_;       // when we're modifying an audio file's raw frame, we first retrieve the raw frames and store them here
 };
 
 #endif // MEDIA_HPP
