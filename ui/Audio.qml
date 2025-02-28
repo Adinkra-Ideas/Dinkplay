@@ -135,11 +135,9 @@ Item {
         Rectangle {
             id: overlayMenuLists
             width: parent.width
-            height: 30 + audioNameInMenu.contentHeight + removeMenu.height /* 30 for top and bottom margins */
+            height: 40 /*topMarginsCombined*/ + audioNameInMenu.contentHeight + removeMenu.height + generatePartialReversed.height + generateFullReversed.height
             anchors.bottom: parent.bottom
             color: "white"
-            // topLeftRadius: 10
-            // topRightRadius: 10
             radius: 10
             clip: true
 
@@ -214,11 +212,93 @@ Item {
                     onClicked: {
                         removeMenu.isClicked = !removeMenu.isClicked
                         Media.deleteAudioPath = overlayMenu.overlayMenuAudioIndex
-                        print(overlayMenu.overlayMenuAudioIndex, " and ", overlayMenu.overlayMenuAudioName, " will now be deleted!")
-
+                        // print(overlayMenu.overlayMenuAudioIndex, " and ", overlayMenu.overlayMenuAudioName, " will now be deleted!")
                     }
                 }
-            } // Remove menu item row END
+            } // Remove menu item row ENDS
+
+            // Generate-Partial-Reversed menu item row BEGINS
+            Rectangle {
+                id: generatePartialReversed
+                width: parent.width
+                height: 40
+                anchors {
+                    top: removeMenu.bottom
+                    topMargin: 5
+                }
+                color: "#E5E4E2"
+
+
+                Image {
+                    id: gprIcon
+                    width: 24
+                    height: 24
+                    anchors {
+                        left: parent.left
+                        leftMargin: 10
+                        verticalCenter: parent.verticalCenter
+                    }
+                    source: "qrc:/ui/images/musicIco/remove_audio.png"
+                }
+                Text {
+                    anchors {
+                        left: gprIcon.right
+                        leftMargin: 15
+                        verticalCenter: parent.verticalCenter
+                    }
+                    text: "Generate Partial Reversed"
+                    font.pointSize: 16
+                }
+                MouseArea {
+                    anchors.fill : parent
+                    onClicked: {
+                        // removeMenu.isClicked = !removeMenu.isClicked
+                        Media.generateReversedAudioAtByteLevel(overlayMenu.overlayMenuAudioIndex)
+                    }
+                }
+            } // Generate-Partial-Reversed menu item row ENDS
+
+            // Generate-Full-Reversed menu item row BEGINS
+            Rectangle {
+                id: generateFullReversed
+                width: parent.width
+                height: 40
+                anchors {
+                    top: generatePartialReversed.bottom
+                    topMargin: 5
+                }
+                color: "#E5E4E2"
+
+
+                Image {
+                    id: gfrIcon
+                    width: 24
+                    height: 24
+                    anchors {
+                        left: parent.left
+                        leftMargin: 10
+                        verticalCenter: parent.verticalCenter
+                    }
+                    source: "qrc:/ui/images/musicIco/remove_audio.png"
+                }
+                Text {
+                    anchors {
+                        left: gfrIcon.right
+                        leftMargin: 15
+                        verticalCenter: parent.verticalCenter
+                    }
+                    text: "Generate Full Reversed"
+                    font.pointSize: 16
+                }
+                MouseArea {
+                    anchors.fill : parent
+                    onClicked: {
+                        // removeMenu.isClicked = !removeMenu.isClicked
+                        Media.generateReversedAudioAtBitLevel(overlayMenu.overlayMenuAudioIndex)
+                    }
+                }
+            } // Generate-Full-Reversed menu item row ENDS
+
 
 
         } // Rectangle holding all the rows in the overlayMenu ENDS

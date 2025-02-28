@@ -47,6 +47,7 @@ qt_add_qml_module(appDinkplay
         Player.hpp Player.cpp
         SeekToTime.hpp SeekToTime.cpp
         SeekToTimeWorker.hpp SeekToTimeWorker.cpp
+        ModifyAudioFrames.hpp ModifyAudioFrames.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

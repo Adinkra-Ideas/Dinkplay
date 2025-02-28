@@ -34,9 +34,10 @@ public:
     void        deleteAudioPath(qint16 pathPos) override;
     void        preparePathsForPlay() override;
     void        addFileToDinkplay(QString oneFile) override;
+    void        indexToAudioList(QString audioFilePath) override;
 
 
-    void indexToAudioList(QString audioFilePath);
+
     void addStartupAudiosOnEmptyStartupAudioListings();
     void openDialogFromCpp();
     void pickIosAudiosFromSandboxTmpDir();

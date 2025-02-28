@@ -28,7 +28,8 @@ Top::Top(QObject * parent) :
     Directory{parent},
     ChangePlay{parent},
     Interval{parent},
-    Player{parent}
+    Player{parent},
+    ModifyAudioFrames{parent}
     #ifdef Q_OS_ANDROID
     , javaObject{"com.denkplay.states.DenkService"}
     #endif

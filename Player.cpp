@@ -58,10 +58,6 @@ Player::~Player() {
     }
     // Free engine_ memory on closing the music player
     ma_engine_uninit(&engine_);
-
-    free(holdTheFrames);
-    holdTheFrames = nullptr;
-    ma_encoder_uninit(&encoder);
 }
 // **************************************
 //          CANONICALS ENDS             *
@@ -191,41 +187,35 @@ void Player::play() {
         notifyJavaSeviceAboutPlaying(true);
     }
 
-    // Here, we have successfully copied the raw frames into holdTheFrames.
-    // Tomorrow, we will dirst try to play the data from holdTheFrames.
+    // Here, we have successfully copied the raw frames into combinedAudioFrames_.
+    // Tomorrow, we will dirst try to play the data from combinedAudioFrames_.
     // Then we will reverse the data in hold the frames
 
-    // if the ma_sound_stop() is not first called before the call to
-    // ma_data_source_read_pcm_frames(), it will crash the program.
-    pause();
-    ma_data_source* dDataSource = ((ma_sound*) soundsHash_[QString(*audIt_)])->pDataSource;
-    size_t byteSizeOfOnlyRawAudioFrames = device_->playback.channels * (totalPcmFrames_ * ma_get_bytes_per_sample(device_->playback.format)); // size in byte needed to store 1 pcm frame == numberOfOutputChannels * (numberOfPcmFrames * byteSizeOfOnePcmFrame)
-    holdTheFrames = (char *)malloc(byteSizeOfOnlyRawAudioFrames + 1);
-    ma_uint64 totalFramesReaded;
-    //
-    ma_result resulte = ma_data_source_read_pcm_frames(dDataSource, holdTheFrames, totalPcmFrames_, &totalFramesReaded);
-    qDebug() << "trr byteSizeOfOnlyRawAudioFrames" << byteSizeOfOnlyRawAudioFrames;
-    qDebug() << "trr result== " << resulte;
-    qDebug() << "trr totalFramesReaded == " << totalFramesReaded;
-    qDebug() << "trr total frame count == " << totalPcmFrames_;
+    // // if the ma_sound_stop() is not first called before the call to
+    // // ma_data_source_read_pcm_frames(), it will crash the program.
+    // pause();
+    // ma_data_source* dDataSource = ((ma_sound*) soundsHash_[QString(*audIt_)])->pDataSource;
+    // size_t byteSizeOfOnlyRawAudioFrames = device_->playback.channels * (totalPcmFrames_ * ma_get_bytes_per_sample(device_->playback.format)); // size in byte needed to store 1 pcm frame == numberOfOutputChannels * (numberOfPcmFrames * byteSizeOfOnePcmFrame)
+    // combinedAudioFrames_ = (char *)malloc(byteSizeOfOnlyRawAudioFrames + 1);
+    // ma_uint64 totalFramesReaded;
+    // //
+    // ma_result resulte = ma_data_source_read_pcm_frames(dDataSource, combinedAudioFrames_, totalPcmFrames_, &totalFramesReaded);
+    // qDebug() << "trr byteSizeOfOnlyRawAudioFrames" << byteSizeOfOnlyRawAudioFrames;
+    // qDebug() << "trr result== " << resulte;
+    // qDebug() << "trr totalFramesReaded == " << totalFramesReaded;
+    // qDebug() << "trr total frame count == " << totalPcmFrames_;
 
-    ma_encoder_config config = ma_encoder_config_init(ma_encoding_format_wav, device_->playback.format, device_->playback.channels, device_->sampleRate);
-    ma_result result2 = ma_encoder_init_file("my_file.wav", &config, &encoder);
-    if (result2 != MA_SUCCESS) {
-        qDebug() << "trr error";
-    } else qDebug() << "trr success";
+    // ma_encoder_config config = ma_encoder_config_init(ma_encoding_format_wav, device_->playback.format, device_->playback.channels, device_->sampleRate);
+    // ma_result createNewAudioFile = ma_encoder_init_file("my_file.wav", &config, &encoder);
+    // if (createNewAudioFile == MA_SUCCESS) {
+    //     qDebug() << "trr success";
 
-    ma_uint64 framesWritten;
-    ma_result result3 = ma_encoder_write_pcm_frames(&encoder, holdTheFrames, totalPcmFrames_, &framesWritten);
-    if (result3 != MA_SUCCESS) {
-        qDebug() << "trr error again";
-    } else qDebug() << "trr success again. frames written = " << framesWritten;
-
-    // ma_data_source_base* pDataSourceBase = (ma_data_source_base*) dDataSource;
-    // ma_data_source_base* pDataSourceBase = (ma_data_source_base*) ((ma_sound*) soundsHash_[QString(*audIt_)])->pDataSource;
-    // qDebug() << "trr range begin in frame == " << pDataSourceBase->rangeBegInFrames;
-    // qDebug() << "trr range end in frame == " << pDataSourceBase->rangeEndInFrames;
-    // pSound->pResourceManagerDataSource
+    //     ma_uint64 framesWritten;
+    //     ma_result storeAudioDataToNewAudioFile = ma_encoder_write_pcm_frames(&encoder, combinedAudioFrames_, totalPcmFrames_, &framesWritten);
+    //     if (storeAudioDataToNewAudioFile = MA_SUCCESS) {
+    //         qDebug() << "trr success again. frames written = " << framesWritten;
+    //     }
+    // }
 }
 
 // LEARNINGS

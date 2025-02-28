@@ -83,7 +83,7 @@ Directory::Directory(QObject *parent) :
     // }
 }
 
-Directory::~Directory(){}
+Directory::~Directory() {}
 
 /**
   * This method loads the QSettings persisted
@@ -142,10 +142,10 @@ void Directory::deleteAudioPath(qint16 pathPos) {
     // remove the posToPath from soundsHash_
     soundsHash_.erase(posToPath);
 
-    // backup the new audioPaths_ values to localStorage if not iOS.
-    #ifndef Q_OS_IOS
-    backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));
-    #endif
+    // // backup the new audioPaths_ values to localStorage if not iOS.
+    // #ifndef Q_OS_IOS
+    // backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));
+    // #endif
     // If iOS, also delete the file since it is a copied tmp file
     // in our app's sandbox
     #ifdef Q_OS_IOS
@@ -350,13 +350,14 @@ void Directory::addStartupAudiosOnEmptyStartupAudioListings() {
 void Directory::pickIosAudiosFromSandboxTmpDir() {
     QString sandboxTmpDir = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/tmp/";
     QDir tmpDir(sandboxTmpDir);
-    QStringList all = tmpDir.entryList(QStringList() << "*.mp3", QDir::Files);
+    QStringList all = tmpDir.entryList(QStringList() << "*.mp3" << "*.flac" << "*.wav", QDir::Files);
     for (QString &one: all) {
         indexToAudioList(sandboxTmpDir + one);
     }
 }
 
 /**
+ * will rename to backupAudioPathsAndPreparePathsForPlay
   * By the time this method is called,
   * audioPaths_ should already have its
   * list of filepaths that we need to
@@ -374,6 +375,15 @@ void Directory::preparePathsForPlay() {
     if (audioPaths_.isEmpty()) {
         addStartupAudiosOnEmptyStartupAudioListings();
     }
+
+    #ifndef Q_OS_IOS
+    // preparing for backup to localStorage onExit.
+    // This was also placed inside this ifdef coz iOS
+    // wont backup onExit coz the logic we used is to
+    // load only the audio files from its sandbox/tmp
+    // directory during each launch.
+    backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));
+    #endif
 
     // set iterator back to beginning
     audIt_ = audioPaths_.begin();
@@ -473,29 +483,30 @@ void Directory::openDialogFromCpp() {
             // First we retrieve the filename
             QString filename = QFileInfo(oneFile).fileName();
             // Then we save it to temporal playable location
-            if (filename.endsWith(".mp3") || filename.endsWith(".mp4")) {
+            if (filename.endsWith(".mp3") || filename.endsWith(".flac") || oneFile.endsWith(".wav")) {
                 if ( QFile::exists(QQmlFile::urlToLocalFileOrQrc(oneFile)) ) {
                     saveFilesFromMediaandDownloadFileproviderLinks(oneFile, filename);
                 }
             }
         }
         // Else it is a ExternalStorage file that the user selected from
-        // internal or sd card directly.
-        // In this case, we can trace the /storage/ path and play it directly
+        // internal or sd card directly. Or it is simply a file selected
+        // from Windows app.
+        // In first case, we can trace the /storage/ path and play it directly
         // without first copying to temp playable location
-        else if (oneFile.endsWith(".mp3") || oneFile.endsWith(".mp4")) {
+        else if (oneFile.endsWith(".mp3") || oneFile.endsWith(".flac") || oneFile.endsWith(".wav")) {
             addFileToDinkplay(oneFile);
         } 
     }
 
-    #ifndef Q_OS_IOS
-    // preparing for backup to localStorage onExit.
-    // This was also placed inside this ifdef coz iOS
-    // wont backup onExit coz the logic we used is to
-    // load only the audio files from its sandbox/tmp
-    // directory during each launch.
-    backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));
-    #endif
+    // #ifndef Q_OS_IOS
+    // // preparing for backup to localStorage onExit.
+    // // This was also placed inside this ifdef coz iOS
+    // // wont backup onExit coz the logic we used is to
+    // // load only the audio files from its sandbox/tmp
+    // // directory during each launch.
+    // backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));
+    // #endif
 
     // Now make the audio list usable after tampering
     // with audioPaths_'s data
