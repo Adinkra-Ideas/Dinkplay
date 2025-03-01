@@ -15,7 +15,7 @@ public:
     void extractRawAudioFrames(QString generatedFilePath, QString audioFilePath, bool byteLevelReverse);
     void encodeAndGenerateModifiedAudioFile(const char* filePath);
     void renameReversedAudio(QString& reversedFileName, const char* prefix);
-    void reverseAudioFramesAtByteLevel(size_t byteIndexOfLastFrame);
+    void reverseAudioFrames(size_t len, int blockSize);
 };
 
 #endif // MODIFYAUDIOFRAMES_HPP

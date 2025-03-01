@@ -105,8 +105,9 @@ void ModifyAudioFrames::extractRawAudioFrames(QString generatedFilePath, QString
     // to combinedAudioFrames_. Now we reverse based on partial or full
     // reversal.
     size_t byteIndexOfLastFrame = device_->playback.channels * (totalFramesReaded * ma_get_bytes_per_sample(device_->playback.format));
+    int byteSizePerFrame = device_->playback.channels * (1 * ma_get_bytes_per_sample(device_->playback.format));
     if (byteLevelReverse) {
-        reverseAudioFramesAtByteLevel(byteIndexOfLastFrame);
+        reverseAudioFrames(byteIndexOfLastFrame, byteSizePerFrame);
         qDebug() << "trr byte level reverse done ";
     }
     // else {
@@ -127,41 +128,50 @@ void ModifyAudioFrames::extractRawAudioFrames(QString generatedFilePath, QString
     // WE WILL RELEASE ROLLING HERE
 }
 
-quint8& reverset(quint8& b) {
-    b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
-    b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
-    b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
-    return b;
+// quint8& reverset(quint8& b) {
+//     b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+//     b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+//     b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+//     return b;
+// }
+
+void copyRange(unsigned char * dest, unsigned char * data, int len) {
+    int i = 0;
+
+    while (len > 0) {
+        dest[i] = data[i];
+        i++;
+        len--;
+    }
 }
-void ModifyAudioFrames::reverseAudioFramesAtByteLevel(size_t byteIndexOfLastFrame) {
-    if (byteIndexOfLastFrame == 0) {
+void ModifyAudioFrames::reverseAudioFrames(size_t len, int blockSize) {
+    if (len == 0 || len < blockSize) {
         return ;
     }
 
-    // Initialize l and r pointers
+    // Initialize tmp along with l and r cursor points
+    unsigned char tmp[128];
     size_t l = 0;
-    size_t r = byteIndexOfLastFrame - 1; // if it is 3 bytes for instance, we want to copy from 2, 1, 0
-    quint8 t;
-    while (l <= r) {
-        reverset(combinedAudioFrames_[l]);
-        l++;
+    size_t r = len - blockSize;
+
+    while (l < r) {
+        // Swap characters using tmp to temporarily hold the swapped data
+        copyRange(tmp, combinedAudioFrames_ + l, blockSize);
+        copyRange(combinedAudioFrames_ + l, combinedAudioFrames_ + r, blockSize);
+        copyRange(combinedAudioFrames_ + r, tmp, blockSize);
+
+        // Move pointers towards each other
+        l += blockSize;
+        r -= blockSize;
     }
+    // But there is a bug that we could choose to ignore.
+    // rotating a data that has an odd number of blocks like
+    // "abcdefghijklmnopqrst"using a blocksize of 4, means we
+    // will have "qrstmnopijklefghabcd" which means that the
+    // middle "ijkl" block will remain untouched. This is not
+    // bug for byte level aka block level reversal, the bug comes
+    // when we need to reverse the bytes inside a frame as well.
 
-    // // Swap characters till l and r meet
-    // while (l < r) {
-
-    //     // Swap characters
-    //     t = reverset(combinedAudioFrames_[l]);
-    //     combinedAudioFrames_[l] = reverset(combinedAudioFrames_[r]);
-    //     combinedAudioFrames_[r] = t;
-
-    //     // Move pointers towards each other
-    //     l++;
-    //     r--;
-    // }
-    // l--;
-    // r++;
-    qDebug() << "trr final == " << (int)combinedAudioFrames_[l - 2] << "|" << (int)reverset(combinedAudioFrames_[l - 2]);
 }
 
 void ModifyAudioFrames::encodeAndGenerateModifiedAudioFile(const char* filePath) {
@@ -181,3 +191,14 @@ void ModifyAudioFrames::encodeAndGenerateModifiedAudioFile(const char* filePath)
     }
     ma_encoder_uninit(&encoder);
 }
+
+
+// 1) A raw audio data simply consists of frames and headers. Forget the headers for now.
+// 2) A Block is one frame that has a copy for all supported channels.
+// mono == 1 speaker/channel (1 Block == 1 frame), Stereo == 2 speakers/channels (1 Block == 2 frames) USW.
+// if playback rate is z.B. 41000 hertz, it means the audio player is reading out 41000 Blocks per second.
+// 3) When reversing frames at the normal ABCD->DCBA Level, it is the Blocks that you're reversing.
+// Reversing the frames will only work if it is mono channel(but dont do this). Trying to reverse frames
+// when the channel is more than one wont work. You wont even hear shit.
+// Now we will try to reverse the block at bit level aka d->b
+
