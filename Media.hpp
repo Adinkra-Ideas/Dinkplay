@@ -117,7 +117,7 @@ public slots:
     virtual void checkForBackPress() = 0;
     virtual const QString secondsToDigitalClock(quint32 total) const = 0;
     virtual void generateReversedAudioAtByteLevel(qint16 pathPos) = 0; /* ModifyAudioFrames.cpp */
-    virtual void generateReversedAudioAtBitLevel(qint16 pathPos) = 0;  /* ModifyAudioFrames.cpp */
+    // virtual void generateReversedAudioAtBitLevel(qint16 pathPos) = 0;  /* ModifyAudioFrames.cpp */
 
 signals:
     /******* Mostly Used in Interval.hpp Begins  ********/

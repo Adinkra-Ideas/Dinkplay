@@ -135,7 +135,7 @@ Item {
         Rectangle {
             id: overlayMenuLists
             width: parent.width
-            height: 40 /*topMarginsCombined*/ + audioNameInMenu.contentHeight + removeMenu.height + generatePartialReversed.height + generateFullReversed.height
+            height: 35 /*topMarginsCombined*/ + audioNameInMenu.contentHeight + removeMenu.height + generatePartialReversed.height
             anchors.bottom: parent.bottom
             color: "white"
             radius: 10
@@ -258,46 +258,46 @@ Item {
                 }
             } // Generate-Partial-Reversed menu item row ENDS
 
-            // Generate-Full-Reversed menu item row BEGINS
-            Rectangle {
-                id: generateFullReversed
-                width: parent.width
-                height: 40
-                anchors {
-                    top: generatePartialReversed.bottom
-                    topMargin: 5
-                }
-                color: "#E5E4E2"
+            // // Generate-Full-Reversed menu item row BEGINS
+            // Rectangle {
+            //     id: generateFullReversed
+            //     width: parent.width
+            //     height: 40
+            //     anchors {
+            //         top: generatePartialReversed.bottom
+            //         topMargin: 5
+            //     }
+            //     color: "#E5E4E2"
 
 
-                Image {
-                    id: gfrIcon
-                    width: 24
-                    height: 24
-                    anchors {
-                        left: parent.left
-                        leftMargin: 10
-                        verticalCenter: parent.verticalCenter
-                    }
-                    source: "qrc:/ui/images/musicIco/remove_audio.png"
-                }
-                Text {
-                    anchors {
-                        left: gfrIcon.right
-                        leftMargin: 15
-                        verticalCenter: parent.verticalCenter
-                    }
-                    text: "Generate Full Reversed"
-                    font.pointSize: 16
-                }
-                MouseArea {
-                    anchors.fill : parent
-                    onClicked: {
-                        // removeMenu.isClicked = !removeMenu.isClicked
-                        Media.generateReversedAudioAtBitLevel(overlayMenu.overlayMenuAudioIndex)
-                    }
-                }
-            } // Generate-Full-Reversed menu item row ENDS
+            //     Image {
+            //         id: gfrIcon
+            //         width: 24
+            //         height: 24
+            //         anchors {
+            //             left: parent.left
+            //             leftMargin: 10
+            //             verticalCenter: parent.verticalCenter
+            //         }
+            //         source: "qrc:/ui/images/musicIco/remove_audio.png"
+            //     }
+            //     Text {
+            //         anchors {
+            //             left: gfrIcon.right
+            //             leftMargin: 15
+            //             verticalCenter: parent.verticalCenter
+            //         }
+            //         text: "Generate Full Reversed"
+            //         font.pointSize: 16
+            //     }
+            //     MouseArea {
+            //         anchors.fill : parent
+            //         onClicked: {
+            //             // removeMenu.isClicked = !removeMenu.isClicked
+            //             Media.generateReversedAudioAtBitLevel(overlayMenu.overlayMenuAudioIndex)
+            //         }
+            //     }
+            // } // Generate-Full-Reversed menu item row ENDS
 
 
 

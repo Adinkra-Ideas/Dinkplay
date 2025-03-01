@@ -28,29 +28,10 @@ void ModifyAudioFrames::generateReversedAudioAtByteLevel(qint16 pathPos) {
     }
 
     // Extract and store the raw audio frames
-    extractRawAudioFrames(reversedFileName, posToPath, true);
-}
-
-void ModifyAudioFrames::generateReversedAudioAtBitLevel(qint16 pathPos) {
-    // We retrieve the audio filepath if exist.
-    QString posToPath = (pathPos >= 0 && pathPos < audioPaths_.size()) ? audioPaths_.at(pathPos) : "";
-    if (posToPath.isEmpty()) {
-        return ;
-    }
-
-    // check if Bit-reversed name exists in audioPaths_.
-    // dfra_ means Dinkplay Full Reversed Audio
-    QString reversedFileName = posToPath;
-    renameReversedAudio(reversedFileName, "dfra_");
-    if (audioPaths_.contains(reversedFileName)) {
-        return ;
-    }
-
-    // Extract and store the raw audio frames
     extractRawAudioFrames(reversedFileName, posToPath, false);
 }
 
-void ModifyAudioFrames::extractRawAudioFrames(QString generatedFilePath, QString audioFilePath, bool byteLevelReverse) {
+void ModifyAudioFrames::extractRawAudioFrames(QString generatedFilePath, QString audioFilePath, bool bitLevelReverse) {
     if ( ! audioPaths_.size()
         || soundsHash_.find(*audIt_) == soundsHash_.end() ) {
         return ;
@@ -67,7 +48,7 @@ void ModifyAudioFrames::extractRawAudioFrames(QString generatedFilePath, QString
 
     // Allocate memory for storing CombinedAudioFrames of audio we're about to read
     // We had to use a void pointer so we can check for null in case malloc fails.
-    size_t byteSizeOfCombinedAudioFrames = device_->playback.channels * (totalPcmFrames_ * ma_get_bytes_per_sample(device_->playback.format)); // size in byte needed to store 1 pcm frame == numberOfOutputChannels * (numberOfPcmFrames * byteSizeOfOnePcmFrame)
+    ma_uint64 byteSizeOfCombinedAudioFrames = device_->playback.channels * (totalPcmFrames_ * ma_get_bytes_per_sample(device_->playback.format)); // size in byte needed to store 1 pcm frame == numberOfOutputChannels * (numberOfPcmFrames * byteSizeOfOnePcmFrame)
     void* vptr = malloc(byteSizeOfCombinedAudioFrames + 1);
     if (vptr == NULL) {
         return ;
@@ -104,38 +85,23 @@ void ModifyAudioFrames::extractRawAudioFrames(QString generatedFilePath, QString
     // If it reaches here, it means we have the audio frames now stored
     // to combinedAudioFrames_. Now we reverse based on partial or full
     // reversal.
-    size_t byteIndexOfLastFrame = device_->playback.channels * (totalFramesReaded * ma_get_bytes_per_sample(device_->playback.format));
-    int byteSizePerFrame = device_->playback.channels * (1 * ma_get_bytes_per_sample(device_->playback.format));
-    if (byteLevelReverse) {
-        reverseAudioFrames(byteIndexOfLastFrame, byteSizePerFrame);
-        qDebug() << "trr byte level reverse done ";
-    }
-    // else {
-    //     reverseAudioFramesFully(combinedAudioFrames_);
-    // }
+    ma_uint64 byteIndexOfLastFrame = device_->playback.channels * (totalFramesReaded * ma_get_bytes_per_sample(device_->playback.format));
+    int blockByteSizePerFrame = device_->playback.channels * (1 * ma_get_bytes_per_sample(device_->playback.format));
+
+    // reverse Blocks
+    reverseBytesByRange(byteIndexOfLastFrame, blockByteSizePerFrame, bitLevelReverse);
 
     // Now we encode and store the combinedAudioFrames_
     // to a file using the generatedFilePath as file name
     encodeAndGenerateModifiedAudioFile(generatedFilePath.toLocal8Bit().constData());
 
-    qDebug() << "trr byteSizeOfCombinedAudioFrames" << byteSizeOfCombinedAudioFrames;
-    qDebug() << "trr result== " << result;
-    qDebug() << "trr totalFramesReaded == " << totalFramesReaded;
-    qDebug() << "trr total frame count == " << totalPcmFrames_;
-
+    // free memory allocated for holding the raw audio frames
     free(vptr);
 
     // WE WILL RELEASE ROLLING HERE
 }
 
-// quint8& reverset(quint8& b) {
-//     b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
-//     b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
-//     b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
-//     return b;
-// }
-
-void copyRange(unsigned char * dest, unsigned char * data, int len) {
+static void copyRange(unsigned char * dest, unsigned char * data, int len) {
     int i = 0;
 
     while (len > 0) {
@@ -144,34 +110,45 @@ void copyRange(unsigned char * dest, unsigned char * data, int len) {
         len--;
     }
 }
-void ModifyAudioFrames::reverseAudioFrames(size_t len, int blockSize) {
-    if (len == 0 || len < blockSize) {
+void ModifyAudioFrames::reverseBytesByRange(ma_uint64 len, quint8 rangeInBytes, bool bitLevelReverse) {
+    if (len == 0 || len < rangeInBytes) {
         return ;
     }
 
     // Initialize tmp along with l and r cursor points
     unsigned char tmp[128];
-    size_t l = 0;
-    size_t r = len - blockSize;
+    ma_uint64 l = 0;
+    ma_uint64 r = len - rangeInBytes;
 
     while (l < r) {
-        // Swap characters using tmp to temporarily hold the swapped data
-        copyRange(tmp, combinedAudioFrames_ + l, blockSize);
-        copyRange(combinedAudioFrames_ + l, combinedAudioFrames_ + r, blockSize);
-        copyRange(combinedAudioFrames_ + r, tmp, blockSize);
+        // Swap blocks using tmp to temporarily hold the block being swapped
+        copyRange(tmp, combinedAudioFrames_ + l, rangeInBytes);
+        copyRange(combinedAudioFrames_ + l, combinedAudioFrames_ + r, rangeInBytes);
+        copyRange(combinedAudioFrames_ + r, tmp, rangeInBytes);
+
+        // rotate internal block if full reverse
+        // THE INTERNAL OF A BLOCK WILL NEVER WORK IF REVERSED.
+        // REMEMBER THAT AT 41000 hertz, that's 41,000 Blocks per seconds.
+        // Block is the tiniest audio sound that requires thousands to be combined
+        // just to make 1 second of sound digitally.
+        // if (bitLevelReverse) {
+        //     reverseInternalBlock(combinedAudioFrames_ + l, rangeInBytes);
+        //     reverseInternalBlock(combinedAudioFrames_ + r, rangeInBytes);
+        // }
 
         // Move pointers towards each other
-        l += blockSize;
-        r -= blockSize;
+        l += rangeInBytes;
+        r -= rangeInBytes;
     }
     // But there is a bug that we could choose to ignore.
     // rotating a data that has an odd number of blocks like
-    // "abcdefghijklmnopqrst"using a blocksize of 4, means we
+    // "abcdefghijklmnopqrst"using a rangeInBytes of 4, means we
     // will have "qrstmnopijklefghabcd" which means that the
     // middle "ijkl" block will remain untouched. This is not
     // bug for byte level aka block level reversal, the bug comes
     // when we need to reverse the bytes inside a frame as well.
-
+    // CONCLUSION: IT IS NOT A BUG, SINCE THE INTERNAL OF A BLOCK WILL BECOME
+    // CORRUPTED IF ITS BITS GETS REVERSED
 }
 
 void ModifyAudioFrames::encodeAndGenerateModifiedAudioFile(const char* filePath) {
@@ -191,6 +168,65 @@ void ModifyAudioFrames::encodeAndGenerateModifiedAudioFile(const char* filePath)
     }
     ma_encoder_uninit(&encoder);
 }
+
+
+
+
+
+
+
+
+
+
+// unsigned char& reverseBits(unsigned char& b) {
+//     b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+//     b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+//     b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+//     return b;
+// }
+// void reverseInternalBlock(unsigned char* data, unsigned char len) {
+//     if (len == 0) {
+//         return ;
+//     }
+
+//     // Initialize tmp along with l and r cursor points
+//     unsigned char tmp;
+//     unsigned char l = 0;
+//     unsigned char r = len - 1;
+
+//     // Swap characters till l and r meet
+//     while (l < r) {
+//         // Swap characters
+//         tmp = data[l];
+//         data[l] = reverseBits(data[r]);
+//         data[r] = reverseBits(tmp);
+
+//         // Move pointers towards each other
+//         l++;
+//         r--;
+//     }
+// }
+// void ModifyAudioFrames::generateReversedAudioAtBitLevel(qint16 pathPos) {
+//     // We retrieve the audio filepath if exist.
+//     QString posToPath = (pathPos >= 0 && pathPos < audioPaths_.size()) ? audioPaths_.at(pathPos) : "";
+//     if (posToPath.isEmpty()) {
+//         return ;
+//     }
+
+//     // check if Bit-reversed name exists in audioPaths_.
+//     // dfra_ means Dinkplay Full Reversed Audio
+//     QString reversedFileName = posToPath;
+//     renameReversedAudio(reversedFileName, "dfra_");
+//     if (audioPaths_.contains(reversedFileName)) {
+//         return ;
+//     }
+
+//     // Extract and store the raw audio frames
+//     extractRawAudioFrames(reversedFileName, posToPath, true);
+// }
+
+
+
 
 
 // 1) A raw audio data simply consists of frames and headers. Forget the headers for now.
