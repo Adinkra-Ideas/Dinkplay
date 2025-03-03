@@ -103,8 +103,8 @@ void Player::setSource(const char * path) {
     // paths at destructor, when the app is closed.
     if (soundsHash_[QString(path)] == nullptr) {
         soundsHash_[QString(path)] = new ma_sound;
-        result_ = ma_sound_init_from_file(&engine_, path, 0, NULL, NULL, soundsHash_[QString(path)]); //COMMENTED OUT FOR REVERSE
-        // result_ = ma_sound_init_from_file(&engine_, path, MA_SOUND_FLAG_DECODE /*| MA_SOUND_FLAG_ASYNC*/, NULL, NULL, soundsHash_[QString(path)]);
+        // result_ = ma_sound_init_from_file(&engine_, path, 0, NULL, NULL, soundsHash_[QString(path)]);
+        result_ = ma_sound_init_from_file(&engine_, path, MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_ASYNC, NULL, NULL, soundsHash_[QString(path)]); //loading the MA_SOUND_FLAG_DECODE at all might lead to future issues like suspending
         if (result_ == MA_SUCCESS) {
             // calls itself again this time with a sound to play
             setSource(path);
