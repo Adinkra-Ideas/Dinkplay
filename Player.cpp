@@ -25,8 +25,7 @@ static void my_end_callback(void* pUserData, ma_sound* pSound)
 // **************************************
 Player::Player(QObject *parent) :
     Media{parent},
-    engineInit_{false},
-    state_{0} {
+    engineInit_{false} {
 
 
     // initialize the mini audio engine object.
@@ -104,8 +103,8 @@ void Player::setSource(const char * path) {
     // paths at destructor, when the app is closed.
     if (soundsHash_[QString(path)] == nullptr) {
         soundsHash_[QString(path)] = new ma_sound;
-        // result_ = ma_sound_init_from_file(&engine_, path, 0, NULL, NULL, soundsHash_[QString(path)]); //COMMENTED OUT FOR REVERSE
-        result_ = ma_sound_init_from_file(&engine_, path, MA_SOUND_FLAG_DECODE /*| MA_SOUND_FLAG_ASYNC*/, NULL, NULL, soundsHash_[QString(path)]);
+        result_ = ma_sound_init_from_file(&engine_, path, 0, NULL, NULL, soundsHash_[QString(path)]); //COMMENTED OUT FOR REVERSE
+        // result_ = ma_sound_init_from_file(&engine_, path, MA_SOUND_FLAG_DECODE /*| MA_SOUND_FLAG_ASYNC*/, NULL, NULL, soundsHash_[QString(path)]);
         if (result_ == MA_SUCCESS) {
             // calls itself again this time with a sound to play
             setSource(path);
@@ -119,7 +118,7 @@ void Player::setSource(const char * path) {
 
     readyAudioForNewPlay(); /////
     // set cursor to beginning
-    /////ma_sound_seek_to_pcm_frame(soundsHash_[QString(path)], 0);
+    //ma_sound_seek_to_pcm_frame(soundsHash_[QString(path)], 0);
     // connect end call back
     ma_sound_set_end_callback(soundsHash_[QString(path)], my_end_callback, this);
 
@@ -135,10 +134,6 @@ void Player::setSource(const char * path) {
     notifyJavaSeviceAboutPlaying(false);
 }
 
-// TO REVERSE AUDIO
-// if (soundsHash_[QString(path)] != null) {
-//     reverseBitORByte(soundsHash_[QString(path)]->pDataSource);
-// }
 
 /**
   * Path is the sound file intended
@@ -183,6 +178,8 @@ void Player::play() {
     // emit playing only if sounds started playing
     if (ma_sound_is_playing(soundsHash_[QString(*audIt_)])) {
         state_ = 1;
+        //
+        startSeekToTimeThreadLoop();
         emit playbackStateChanged(currentPlayingPath_); // 0 stopped, 1 playing, 2 paused
         notifyJavaSeviceAboutPlaying(true);
     }
@@ -245,6 +242,8 @@ void Player::pause() {
     if (!ma_sound_is_playing(soundsHash_[QString(*audIt_)])) {
         // 0 stopped, 1 playing, 2 paused
         state_ = 2;
+        //
+        stopSeekToTimeThreadLoop();
         //
         emit playbackStateChanged(currentPlayingPath_);
         //

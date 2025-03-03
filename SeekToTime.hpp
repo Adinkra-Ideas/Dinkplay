@@ -14,12 +14,13 @@ public:
     explicit SeekToTime(QObject *parent = nullptr);
     ~SeekToTime();
 
-    const quint32 & getLengthOfFocusedAudio() const override;
+    const quint64 & getLengthOfFocusedAudio() const override;
     void            updateCursorTimeOfFocusedAudio() override;
-    const quint32 & getCursorTimeOfFocusedAudio() const override;
-    void            setCursorTimeOfFocusedAudio(const quint32 & newTime) override;
-    const QString   secondsToDigitalClock(quint32 total) const override;
-    void            killSeekToTimeThread() override;
+    const quint64 & getCursorTimeOfFocusedAudio() const override;
+    void            setCursorTimeOfFocusedAudio(const quint64 & newTime) override;
+    const QString   secondsToDigitalClock(quint64 total) const override;
+    void            startSeekToTimeThreadLoop() override;
+    void            stopSeekToTimeThreadLoop() override;
 
 protected:
 

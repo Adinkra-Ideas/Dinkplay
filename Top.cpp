@@ -75,7 +75,7 @@ Top::~Top(){
 
 void Top::killAllThreads() {
     killIntervalThread();
-    killSeekToTimeThread();
+    stopSeekToTimeThreadLoop();
 }
 
 // will comment

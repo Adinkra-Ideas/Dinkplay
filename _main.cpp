@@ -41,6 +41,7 @@ int _main(int argc, char *argv[])
 
     // For making the threads shut down gracefully
     Media & base = media;
+    QObject::connect(&app, &QGuiApplication::applicationStateChanged, &base, &Media::applicationStateChanged);
     QObject::connect(&app, &QGuiApplication::aboutToQuit, &base, &Media::killAllThreads);
 
     QObject::connect(

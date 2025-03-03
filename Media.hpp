@@ -45,8 +45,8 @@ class Media : public QObject
 
     // try adding the and sign
     /************ For Seek To Time Management Begins *********/
-    Q_PROPERTY(quint32 focusedAudioLengthInt READ getLengthOfFocusedAudio NOTIFY lengthofFocusedAudioChanged)
-    Q_PROPERTY(quint32 focusedAudioCursorTimeInt READ getCursorTimeOfFocusedAudio WRITE setCursorTimeOfFocusedAudio NOTIFY currTimeOfFocusedAudioChanged)
+    Q_PROPERTY(quint64 focusedAudioLengthInt READ getLengthOfFocusedAudio NOTIFY lengthofFocusedAudioChanged)
+    Q_PROPERTY(quint64 focusedAudioCursorTimeInt READ getCursorTimeOfFocusedAudio WRITE setCursorTimeOfFocusedAudio NOTIFY currTimeOfFocusedAudioChanged)
     /******************************************************/
 
 public:
@@ -56,6 +56,7 @@ public:
     /******** Methods Implemented here in Media.cpp ********/
     void        setRepeat(quint8 val);
     quint8      getRepeat();
+    void        changeAppLifecycleState(Qt::ApplicationState state);
     /*******************************************************/
 
     /*****  Implemented in Interval.hpp Begins  *****/
@@ -98,11 +99,12 @@ public:
     /*************************************************/
 
     /******** Implemented in SeekToTime.cpp **********/
-    virtual void            killSeekToTimeThread() = 0;
-    virtual const quint32 & getLengthOfFocusedAudio() const = 0;
+    virtual void            startSeekToTimeThreadLoop() = 0;
+    virtual void            stopSeekToTimeThreadLoop() = 0;
+    virtual const quint64 & getLengthOfFocusedAudio() const = 0;
     virtual void            updateCursorTimeOfFocusedAudio() = 0;
-    virtual const quint32 & getCursorTimeOfFocusedAudio() const = 0;
-    virtual void            setCursorTimeOfFocusedAudio(const quint32 & newTime) = 0;
+    virtual const quint64 & getCursorTimeOfFocusedAudio() const = 0;
+    virtual void            setCursorTimeOfFocusedAudio(const quint64 & newTime) = 0;
     /*************************************************/
 
     /******* Implemented in Top.cpp ***************/
@@ -115,9 +117,9 @@ public:
 
 public slots:
     virtual void checkForBackPress() = 0;
-    virtual const QString secondsToDigitalClock(quint32 total) const = 0;
-    virtual void generateReversedAudioAtByteLevel(qint16 pathPos) = 0; /* ModifyAudioFrames.cpp */
-    // virtual void generateReversedAudioAtBitLevel(qint16 pathPos) = 0;  /* ModifyAudioFrames.cpp */
+    virtual const QString secondsToDigitalClock(quint64 total) const = 0;   /* SeekToTime.cpp */
+    virtual void generateReversedAudioAtByteLevel(qint16 pathPos) = 0;      /* ModifyAudioFrames.cpp */
+    // virtual void generateReversedAudioAtBitLevel(qint16 pathPos) = 0;    /* ModifyAudioFrames.cpp */
 
 signals:
     /******* Mostly Used in Interval.hpp Begins  ********/
@@ -148,7 +150,9 @@ signals:
     // Notify mediacontrols about current time of audio
     void currTimeOfFocusedAudioChanged();
     // For starting the Blocking method in its sub thread
-    void startTheSeekToTimeThread();
+    void startTheSeekToTimeThreadLoop();
+    // for receiving app in front or in back state
+    void applicationStateChanged(Qt::ApplicationState state);
     /***************************************************/
 
 protected:
@@ -156,6 +160,7 @@ protected:
     // QStringList::iterator       vpIt_; // iterator to videoPaths_
     QString                  currDir_; // Dir selected by the user, from where media files was last added
     quint8                    repeat_; // 0 == repeat none, 1 == repeat 1, 2 == repeat all
+    quint8                     state_; // Holds the current media playback state at any given time. 0 == stopped, 1 == playing, 2 == paused
 
     QStringList           audioPaths_;  // holds path to each mp3 files found in directory selected by the user for media search
     QStringList::iterator      audIt_;  // iterator to audioPaths_
@@ -169,8 +174,8 @@ protected:
     ma_device*  device_;                    // After the ma_engine_init() ints our engine, we backup the device it created for us here so we can use it when necessary
     ma_uint32   sampleRate_;                // sampleRate is the number of PCM frames that are processed per second. Useful for converting PCM frames to seconds or milliseconds since ma_sound_seek_to_pcm_frame() has no seek to seconds alt. To jump to 2 secs just do (sampleRate * 2)
     ma_uint64   totalPcmFrames_;            // totalPcmFrames_ is the total number of PCM frames in focused audio file. Useful for getting the total length of focused audio in seconds with (totalPcmFrames_ / sampleRate_)
-    quint32     totalAudioSecs_;            // totalAudioSecs_ == total length of focused audio in seconds
-    quint32     currentFrameNumberToSec_;   // currentFrameNumberInt_ == Current frame number of now playing cursor in focused audio
+    quint64     totalAudioSecs_;            // totalAudioSecs_ == total length of focused audio in seconds
+    quint64     currentFrameNumberToSec_;   // currentFrameNumberInt_ == Current frame number of now playing cursor in focused audio
     quint8*     combinedAudioFrames_;       // when we're modifying an audio file's raw frame, we first retrieve the raw frames and store them here
 };
 

@@ -16,6 +16,7 @@ void ModifyAudioFrames::generateReversedAudioAtByteLevel(qint16 pathPos) {
     // We retrieve the audio filepath if exist.
     QString posToPath = (pathPos >= 0 && pathPos < audioPaths_.size()) ? audioPaths_.at(pathPos) : "";
     if (posToPath.isEmpty()) {
+        qDebug() << "trr at least we got here0";
         return ;
     }
 
@@ -24,9 +25,11 @@ void ModifyAudioFrames::generateReversedAudioAtByteLevel(qint16 pathPos) {
     QString reversedFileName = posToPath;
     renameReversedAudio(reversedFileName, "dpra_");
     if (audioPaths_.contains(reversedFileName)) {
+        qDebug() << "trr at least we got 0.1";
         return ;
     }
 
+    qDebug() << "trr at least we got here1";
     // Extract and store the raw audio frames
     extractRawAudioFrames(reversedFileName, posToPath, false);
 }
@@ -36,7 +39,7 @@ void ModifyAudioFrames::extractRawAudioFrames(QString generatedFilePath, QString
         || soundsHash_.find(*audIt_) == soundsHash_.end() ) {
         return ;
     }
-
+    qDebug() << "trr at least we got here1.1";
     // Now we ensure the audio that we're trying to copy its audio
     // frames has actually been loaded and decoded by setSource.
     // Also, if the ma_sound_stop() is not first called before the call to
@@ -50,6 +53,7 @@ void ModifyAudioFrames::extractRawAudioFrames(QString generatedFilePath, QString
     // We had to use a void pointer so we can check for null in case malloc fails.
     ma_uint64 byteSizeOfCombinedAudioFrames = device_->playback.channels * (totalPcmFrames_ * ma_get_bytes_per_sample(device_->playback.format)); // size in byte needed to store 1 pcm frame == numberOfOutputChannels * (numberOfPcmFrames * byteSizeOfOnePcmFrame)
     void* vptr = malloc(byteSizeOfCombinedAudioFrames + 1);
+    qDebug() << "trr at least we got here1.2";
     if (vptr == NULL) {
         return ;
     }
@@ -68,10 +72,13 @@ void ModifyAudioFrames::extractRawAudioFrames(QString generatedFilePath, QString
     copiedDataSource = new ma_sound;
     ma_result result = ma_sound_init_copy(&engine_, soundsHash_[QString(*audIt_)], MA_SOUND_FLAG_DECODE, NULL, copiedDataSource);
     if (result != MA_SUCCESS) {
+        qDebug() << "trr at least we got here1.12";
         delete copiedDataSource;
         free(vptr);
         return ;
     }
+
+    qDebug() << "trr at least we got here2";
 
     // Now we read the audio frames into combinedAudioFrames_
     ma_data_source* dDataSource = copiedDataSource->pDataSource;
@@ -230,7 +237,13 @@ void ModifyAudioFrames::encodeAndGenerateModifiedAudioFile(const char* filePath)
 
 
 // 1) A raw audio data simply consists of frames and headers. Forget the headers for now.
-// 2) A Block is one frame that has a copy for all supported channels.
+// The audio format determines how many bytes a frame carries
+// ma_format u8: 1 byte
+// ma_format_s16: 2 byte
+// ma_format_s24: 3 byte
+// ma_format_s32: 4 byte
+// ma_format_f32: 4 byte
+// 2) A Block is one frame that has a separate copy for each additional channel.
 // mono == 1 speaker/channel (1 Block == 1 frame), Stereo == 2 speakers/channels (1 Block == 2 frames) USW.
 // if playback rate is z.B. 41000 hertz, it means the audio player is reading out 41000 Blocks per second.
 // 3) When reversing frames at the normal ABCD->DCBA Level, it is the Blocks that you're reversing.

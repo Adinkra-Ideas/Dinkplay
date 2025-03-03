@@ -142,10 +142,6 @@ void Directory::deleteAudioPath(qint16 pathPos) {
     // remove the posToPath from soundsHash_
     soundsHash_.erase(posToPath);
 
-    // // backup the new audioPaths_ values to localStorage if not iOS.
-    // #ifndef Q_OS_IOS
-    // backups_.setValue("soundPaths", QVariant::fromValue(audioPaths_));
-    // #endif
     // If iOS, also delete the file since it is a copied tmp file
     // in our app's sandbox
     #ifdef Q_OS_IOS

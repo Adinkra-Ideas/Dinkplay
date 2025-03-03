@@ -7,7 +7,7 @@ SeekToTimeWorker::SeekToTimeWorker(Media * media, bool & threadLoopState) :
 
 SeekToTimeWorker::~SeekToTimeWorker() {}
 
-void SeekToTimeWorker::startTheSeekToTimethreadLoop() {
+void SeekToTimeWorker::startTheSeekToTimethreadLoop() {  
     while (threadLoopState_) {
         // Set the Breakpoint to end of one lapDuration + now()
         gettimeofday(&clock_, 0);

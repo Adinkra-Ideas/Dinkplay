@@ -2,16 +2,17 @@
 
 SeekToTime::SeekToTime(QObject *parent) :
         Media{parent},
-        threadLoopState_{true},
+        threadLoopState_{false},
         seekToTimeWorker_{this, threadLoopState_}
 {
-    connect(this, &Media::startTheSeekToTimeThread, &seekToTimeWorker_, &SeekToTimeWorker::startTheSeekToTimethreadLoop);
+    connect(this, &Media::startTheSeekToTimeThreadLoop, &seekToTimeWorker_, &SeekToTimeWorker::startTheSeekToTimethreadLoop);
+    connect(this, &Media::applicationStateChanged, this, &Media::changeAppLifecycleState);
     connect(&seekToTimeWorker_, &SeekToTimeWorker::oneSecondReached, this, &Media::updateCursorTimeOfFocusedAudio);
     seekToTimeWorker_.moveToThread(&theSeekToTimeThread);
     theSeekToTimeThread.start();
 
     // This signal will start the blocking method inside the thread
-    emit startTheSeekToTimeThread();
+    // emit startTheSeekToTimeThreadLoop(); // commented out to test startup hooking
 }
 
 SeekToTime::~SeekToTime() {
@@ -28,12 +29,12 @@ SeekToTime::~SeekToTime() {
   * @returns QString the converted
   * digital clock.
   */
-const QString SeekToTime::secondsToDigitalClock(quint32 total) const {
+const QString SeekToTime::secondsToDigitalClock(quint64 total) const {
     QString digitaltime;
 
-    quint32 minutes = total / 60;
-    quint32 seconds = total % 60;
-    quint32 hours = minutes / 60;
+    quint64 minutes = total / 60;
+    quint64 seconds = total % 60;
+    quint64 hours = minutes / 60;
     minutes = minutes % 60;
 
     digitaltime = (hours) ? QString::number(hours) + ':' : "";
@@ -52,15 +53,15 @@ const QString SeekToTime::secondsToDigitalClock(quint32 total) const {
   * @param none
   * @returns quint32 the Audio length
   */
-const quint32 & SeekToTime::getLengthOfFocusedAudio() const {
+const quint64 & SeekToTime::getLengthOfFocusedAudio() const {
     return totalAudioSecs_;
 }
 
-const quint32 & SeekToTime::getCursorTimeOfFocusedAudio() const {
+const quint64 & SeekToTime::getCursorTimeOfFocusedAudio() const {
     return currentFrameNumberToSec_;
 }
 // for seeking to time by dragging slider in front view
-void  SeekToTime::setCursorTimeOfFocusedAudio(const quint32 & newTime) {
+void  SeekToTime::setCursorTimeOfFocusedAudio(const quint64 & newTime) {
     // we can move to any time in seconds using sampleRate * numberOFseconds
     if (audioPaths_.size() && soundsHash_.find(*audIt_) != soundsHash_.end()) {
         ma_sound_seek_to_pcm_frame(soundsHash_[QString(*audIt_)], sampleRate_ * newTime);
@@ -82,8 +83,19 @@ void SeekToTime::updateCursorTimeOfFocusedAudio() {
     emit currTimeOfFocusedAudioChanged();
 }
 
-void SeekToTime::killSeekToTimeThread() {
-    // Stop any loop in thread and
-    // destroy the thread
+void SeekToTime::startSeekToTimeThreadLoop() {
+    // Since this method is either called from
+    // play() or when the user is bringing the
+    // app to front AKA active app.
+    // In the later case, we cant just start
+    // the thread. Therefore, we check if
+    // media is playing first.
+    if (state_ == 1) {
+        threadLoopState_ = true;
+        emit startTheSeekToTimeThreadLoop();
+    }
+}
+void SeekToTime::stopSeekToTimeThreadLoop() {
+    // Stop blocking loop in thread
     seekToTimeWorker_.stopTheSeekToTimethreadLoop();
 }

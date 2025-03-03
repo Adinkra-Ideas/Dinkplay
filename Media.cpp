@@ -3,8 +3,12 @@
 Media::Media(QObject *parent) :
     QObject{parent},
     repeat_{2},
+    state_{0},
     suspended_{false},
-    currentFrameNumberToSec_{0} {
+    sampleRate_{0},
+    currentFrameNumberToSec_{0},
+    totalPcmFrames_{0},
+    totalAudioSecs_{0} {
     // set iterator accordingly
     audIt_ = audioPaths_.begin();
 }
@@ -31,3 +35,11 @@ quint8  Media::getRepeat() {
 // ******************************************
 //       GETTERS AND SETTERS ENDS           *
 // ******************************************
+
+void  Media::changeAppLifecycleState(Qt::ApplicationState newState) {
+    if (newState == Qt::ApplicationSuspended) {
+        stopSeekToTimeThreadLoop();
+    } else if (newState == Qt::ApplicationActive) {
+        startSeekToTimeThreadLoop();
+    }
+}
