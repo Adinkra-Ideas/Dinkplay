@@ -4,6 +4,7 @@ Media::Media(QObject *parent) :
     QObject{parent},
     repeat_{2},
     state_{0},
+    taskRunningDontPlay_{false},
     suspended_{false},
     sampleRate_{0},
     currentFrameNumberToSec_{0},

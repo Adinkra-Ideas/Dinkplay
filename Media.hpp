@@ -7,7 +7,9 @@
 #include <QUrl>
 #include <Qt>
 #include <unordered_map>
-#include <QDebug> //
+#include <QFileInfo>
+#include <QTemporaryDir>
+// #include <QDebug> //
 
 #ifndef MINIAUDIO_IMPLEMENTATION
 #define MINIAUDIO_IMPLEMENTATION
@@ -161,7 +163,7 @@ protected:
     QString                  currDir_; // Dir selected by the user, from where media files was last added
     quint8                    repeat_; // 0 == repeat none, 1 == repeat 1, 2 == repeat all
     quint8                     state_; // Holds the current media playback state at any given time. 0 == stopped, 1 == playing, 2 == paused
-
+    bool         taskRunningDontPlay_; // mostly needed for preventing play while reverse audio is being generated. Coy if miniaudio plays, the app will crash
     QStringList           audioPaths_;  // holds path to each mp3 files found in directory selected by the user for media search
     QStringList::iterator      audIt_;  // iterator to audioPaths_
     QString       currentPlayingPath_;  // stores the filepath of currently active audio

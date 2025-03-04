@@ -15,9 +15,7 @@
 #include <QStringList>
 #include <QSettings>
 #include <QStandardPaths>
-#include <QTemporaryDir>
 #include <QFileDialog>
-#include <QFileInfo>
 #include <QQmlFile>
 
 #include "Media.hpp"

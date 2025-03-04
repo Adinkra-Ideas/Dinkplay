@@ -100,6 +100,19 @@ void Directory::loadSavedPaths() {
     audioPaths_ = backups_.value("soundPaths").value<QList<QString>>();
 
     for (QString &aPath: audioPaths_) {
+        // If you add this one to try to auto remove temp onstartup,
+        // it will end up hanging your gui
+        // #ifdef Q_OS_ANDROID
+        // // we delete all tmp paths because sometimes
+        // // they wont play again on load.
+        // if (aPath.indexOf("/storage/") != 0) {
+        //     QFile::remove(aPath);
+        //     audioPaths_.removeOne(aPath);
+        //     audioPaths_.squeeze();
+        //     continue ;
+        // }
+        // #endif
+
         soundsHash_[aPath] = nullptr;
     }
 
@@ -147,6 +160,11 @@ void Directory::deleteAudioPath(qint16 pathPos) {
     #ifdef Q_OS_IOS
     QFile::remove(posToPath);
     #endif
+    // If android, the file will be deleted if temp
+    #ifdef Q_OS_ANDROID
+        QFile::remove(posToPath);
+    #endif
+
 
     // After delete, now prepare audio for play once again
     preparePathsForPlay();

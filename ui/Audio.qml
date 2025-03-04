@@ -135,7 +135,7 @@ Item {
         Rectangle {
             id: overlayMenuLists
             width: parent.width
-            height: 35 /*topMarginsCombined*/ + audioNameInMenu.contentHeight + removeMenu.height + generatePartialReversed.height
+            height: 35 /*topMarginsCombined*/ + audioNameInMenu.contentHeight + removeMenu.height + generateReversed.height
             anchors.bottom: parent.bottom
             color: "white"
             radius: 10
@@ -186,6 +186,14 @@ Item {
                         NumberAnimation { target: removeMenu; property: "doHide"; to: (!removeMenu.doHide) ? 1 : 0 ; duration: 5 }
                     }
                 }
+                MouseArea {
+                    anchors.fill : parent
+                    onClicked: {
+                        removeMenu.isClicked = !removeMenu.isClicked
+                        Media.deleteAudioPath = overlayMenu.overlayMenuAudioIndex
+                        // print(overlayMenu.overlayMenuAudioIndex, " and ", overlayMenu.overlayMenuAudioName, " will now be deleted!")
+                    }
+                }
 
                 Image {
                     id: removeMenuIcon
@@ -207,19 +215,12 @@ Item {
                     text: "Remove"
                     font.pointSize: 16
                 }
-                MouseArea {
-                    anchors.fill : parent
-                    onClicked: {
-                        removeMenu.isClicked = !removeMenu.isClicked
-                        Media.deleteAudioPath = overlayMenu.overlayMenuAudioIndex
-                        // print(overlayMenu.overlayMenuAudioIndex, " and ", overlayMenu.overlayMenuAudioName, " will now be deleted!")
-                    }
-                }
+
             } // Remove menu item row ENDS
 
-            // Generate-Partial-Reversed menu item row BEGINS
+            // Generate-Reversed menu item row BEGINS
             Rectangle {
-                id: generatePartialReversed
+                id: generateReversed
                 width: parent.width
                 height: 40
                 anchors {
@@ -227,6 +228,31 @@ Item {
                     topMargin: 5
                 }
                 color: "#E5E4E2"
+
+                property bool isClicked: true
+                property int doHide: 0
+
+                onDoHideChanged: {
+                    overlayMenu.toggleOverlayMenuVisibility()
+                }
+
+                Behavior on isClicked {
+                    SequentialAnimation {
+                        ColorAnimation { target: generateReversed; property: "color"; to: "#1777B7"; duration: 200 }
+                        ColorAnimation { target: generateReversed; property: "color"; to: "#E5E4E2"; duration: 200 }
+                        // The below line is intended to change generateReversed.doHide after the clicked generateReversed
+                        // has displayed clicked animation color. Now Changing the value of generateReversed.doHide
+                        // will trigger onDoHideChanged which will hide the overlayMenu box
+                        NumberAnimation { target: generateReversed; property: "doHide"; to: (!generateReversed.doHide) ? 1 : 0 ; duration: 5 }
+                    }
+                }
+                MouseArea {
+                    anchors.fill : parent
+                    onClicked: {
+                        generateReversed.isClicked = !generateReversed.isClicked
+                        Media.generateReversedAudioAtByteLevel(overlayMenu.overlayMenuAudioIndex)
+                    }
+                }
 
 
                 Image {
@@ -238,7 +264,7 @@ Item {
                         leftMargin: 10
                         verticalCenter: parent.verticalCenter
                     }
-                    source: "qrc:/ui/images/musicIco/remove_audio.png"
+                    source: "qrc:/ui/images/musicIco/gen_reverse.png"
                 }
                 Text {
                     anchors {
@@ -246,17 +272,10 @@ Item {
                         leftMargin: 15
                         verticalCenter: parent.verticalCenter
                     }
-                    text: "Generate Partial Reversed"
+                    text: "Generate Reversed"
                     font.pointSize: 16
                 }
-                MouseArea {
-                    anchors.fill : parent
-                    onClicked: {
-                        // removeMenu.isClicked = !removeMenu.isClicked
-                        Media.generateReversedAudioAtByteLevel(overlayMenu.overlayMenuAudioIndex)
-                    }
-                }
-            } // Generate-Partial-Reversed menu item row ENDS
+            } // Generate-Reversed menu item row ENDS
 
             // // Generate-Full-Reversed menu item row BEGINS
             // Rectangle {
@@ -264,7 +283,7 @@ Item {
             //     width: parent.width
             //     height: 40
             //     anchors {
-            //         top: generatePartialReversed.bottom
+            //         top: generateReversed.bottom
             //         topMargin: 5
             //     }
             //     color: "#E5E4E2"

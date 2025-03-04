@@ -104,7 +104,7 @@ void Player::setSource(const char * path) {
     if (soundsHash_[QString(path)] == nullptr) {
         soundsHash_[QString(path)] = new ma_sound;
         // result_ = ma_sound_init_from_file(&engine_, path, 0, NULL, NULL, soundsHash_[QString(path)]);
-        result_ = ma_sound_init_from_file(&engine_, path, MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_ASYNC, NULL, NULL, soundsHash_[QString(path)]); //loading the MA_SOUND_FLAG_DECODE at all might lead to future issues like suspending
+        result_ = ma_sound_init_from_file(&engine_, path, MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_ASYNC, NULL, NULL, soundsHash_[QString(path)]); //loading the MA_SOUND_FLAG_DECODE at all might lead to future issues like suspending the gui when it gets here
         if (result_ == MA_SUCCESS) {
             // calls itself again this time with a sound to play
             setSource(path);
@@ -159,7 +159,7 @@ void Player::playSource(QString path) {
   * @returns void
   */
 void Player::play() {
-    if (!engineInit_ || audioPaths_.isEmpty()) {
+    if (!engineInit_ || audioPaths_.isEmpty() || taskRunningDontPlay_) {
         return ;
     }
 

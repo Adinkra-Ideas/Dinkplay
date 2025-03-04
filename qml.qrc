@@ -31,5 +31,6 @@
         <file>ui/audios/Default.mp3</file>
         <file>ui/images/musicIco/menu_white.png</file>
         <file>ui/images/musicIco/remove_audio.png</file>
+        <file>ui/images/musicIco/gen_reverse.png</file>
     </qresource>
 </RCC>

@@ -16,20 +16,44 @@ void ModifyAudioFrames::generateReversedAudioAtByteLevel(qint16 pathPos) {
     // We retrieve the audio filepath if exist.
     QString posToPath = (pathPos >= 0 && pathPos < audioPaths_.size()) ? audioPaths_.at(pathPos) : "";
     if (posToPath.isEmpty()) {
-        qDebug() << "trr at least we got here0";
         return ;
     }
 
+    // reversedFileName.prepend("/storage/emulated/0/");
+
+    // WE HAVE TO CHANGE THIS REVERSE FILENAME TO TMP. THEN AT BACKUP POINT, ONLY BACJUP STORAGE/ beginning paths
     // check if Bit-reversed name exists in audioPaths_.
     // dpra_ means Dinkplay Partial Reversed Audio
-    QString reversedFileName = posToPath;
+    QString reversedFileName;
+
+    #ifdef Q_OS_WIN32
+    reversedFileName = posToPath;
     renameReversedAudio(reversedFileName, "dpra_");
+    #endif
+    // on windows, the file can be created in same directory
+    // it was copied from without requesting any permission.
+    // But for android and iOS, it is easier to just use the
+    // tmp directory
+    #ifndef Q_OS_WIN32
+    // First we retrieve the filename
+    reversedFileName = QFileInfo(posToPath).fileName();
+    reversedFileName.prepend("dpra_");
+    reversedFileName.truncate(reversedFileName.lastIndexOf('.'));
+    reversedFileName.append(".wav");
+    // Then we get a temp dirextory
+    QTemporaryDir tempDir;
+    if (tempDir.isValid()) {
+        reversedFileName = tempDir.path().append("/") + reversedFileName;
+        tempDir.setAutoRemove(false);
+    } else {
+        return ;
+    }
+    #endif
+
     if (audioPaths_.contains(reversedFileName)) {
-        qDebug() << "trr at least we got 0.1";
         return ;
     }
 
-    qDebug() << "trr at least we got here1";
     // Extract and store the raw audio frames
     extractRawAudioFrames(reversedFileName, posToPath, false);
 }
@@ -39,7 +63,6 @@ void ModifyAudioFrames::extractRawAudioFrames(QString generatedFilePath, QString
         || soundsHash_.find(*audIt_) == soundsHash_.end() ) {
         return ;
     }
-    qDebug() << "trr at least we got here1.1";
     // Now we ensure the audio that we're trying to copy its audio
     // frames has actually been loaded and decoded by setSource.
     // Also, if the ma_sound_stop() is not first called before the call to
@@ -53,13 +76,13 @@ void ModifyAudioFrames::extractRawAudioFrames(QString generatedFilePath, QString
     // We had to use a void pointer so we can check for null in case malloc fails.
     ma_uint64 byteSizeOfCombinedAudioFrames = device_->playback.channels * (totalPcmFrames_ * ma_get_bytes_per_sample(device_->playback.format)); // size in byte needed to store 1 pcm frame == numberOfOutputChannels * (numberOfPcmFrames * byteSizeOfOnePcmFrame)
     void* vptr = malloc(byteSizeOfCombinedAudioFrames + 1);
-    qDebug() << "trr at least we got here1.2";
     if (vptr == NULL) {
         return ;
     }
     combinedAudioFrames_ = (quint8 *) vptr;
 
     // WE WILL HOLD ROLLING HERE
+    taskRunningDontPlay_ = true;
 
     // if we pass soundsHash_[QString(*audIt_)]->pDataSource
     // directly to ma_data_source_read_pcm_frames(), it will
@@ -72,13 +95,11 @@ void ModifyAudioFrames::extractRawAudioFrames(QString generatedFilePath, QString
     copiedDataSource = new ma_sound;
     ma_result result = ma_sound_init_copy(&engine_, soundsHash_[QString(*audIt_)], MA_SOUND_FLAG_DECODE, NULL, copiedDataSource);
     if (result != MA_SUCCESS) {
-        qDebug() << "trr at least we got here1.12";
         delete copiedDataSource;
         free(vptr);
+        taskRunningDontPlay_ = false;
         return ;
     }
-
-    qDebug() << "trr at least we got here2";
 
     // Now we read the audio frames into combinedAudioFrames_
     ma_data_source* dDataSource = copiedDataSource->pDataSource;
@@ -106,6 +127,7 @@ void ModifyAudioFrames::extractRawAudioFrames(QString generatedFilePath, QString
     free(vptr);
 
     // WE WILL RELEASE ROLLING HERE
+    taskRunningDontPlay_ = false;
 }
 
 static void copyRange(unsigned char * dest, unsigned char * data, int len) {
