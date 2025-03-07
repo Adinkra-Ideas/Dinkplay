@@ -88,7 +88,7 @@ Item {
             SequentialAnimation {
                 id: audioNameAnim
                 loops: Animation.Infinite
-                running: (audioName.width > audioNameAligner.width) && theListView.currentIndex === index
+                running: (audioName.width > audioNameAligner.width && theListView.currentIndex === index && !Media.appMinimizedStatus)
                 NumberAnimation { target: audioName; property: "x"; to: -audioName.width; duration: (audioName.width / 25) * 1000 }
                 NumberAnimation { target: audioName; property: "x"; to: 5; duration: 5000 }
                 onStopped: {

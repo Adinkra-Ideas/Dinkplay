@@ -25,7 +25,7 @@ Item {
                 anchors.centerIn: parent
                 source: "qrc:/ui/images/musicSpin.gif"
                 fillMode: AnimatedImage.PreserveAspectFit
-                paused: Media.player !== 1
+                paused: (Media.player !== 1 || Media.appMinimizedStatus)
             }
         }
 
@@ -45,7 +45,7 @@ Item {
                 SequentialAnimation {
                     id: songTitleAnim
                     loops: Animation.Infinite
-                    running: (songTitle.width > child2.width) // && (playMusic.playbackState === MediaPlayer.PlayingState)
+                    running: (songTitle.width > child2.width && !Media.appMinimizedStatus) // && (playMusic.playbackState === MediaPlayer.PlayingState)
                     NumberAnimation { target: songTitle; property: "x"; to: -songTitle.width; duration: (songTitle.width / 40) * 1000 }
                     NumberAnimation { target: songTitle; property: "x"; to: 0; duration: 5000 }
                 }
@@ -69,7 +69,7 @@ Item {
             }
             SequentialAnimation {
                 id: artistNameAnim
-                running: (artistName.width > child2.width) // && (playMusic.playbackState === MediaPlayer.PlayingState)
+                running: (artistName.width > child2.width && !Media.appMinimizedStatus) // && (playMusic.playbackState === MediaPlayer.PlayingState)
                 NumberAnimation { target: artistName; property: "x"; to: -artistName.width; duration: (artistName.width / 50) * 1000 }
                 NumberAnimation { target: artistName; property: "x"; to: 0; duration: 5000 }
             }

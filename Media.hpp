@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <QFileInfo>
 #include <QTemporaryDir>
+#include <QStandardPaths>
 // #include <QDebug> //
 
 #ifndef MINIAUDIO_IMPLEMENTATION
@@ -22,6 +23,8 @@ extern "C"
 class Media : public QObject
 {
     Q_OBJECT
+
+    Q_PROPERTY(bool appMinimizedStatus READ getAppMinimizedStatus NOTIFY appMinimizedStatusChanged)
 
     /********* For Interval Controls Begins *************/
     Q_PROPERTY(bool intervalStatus READ getIntervalStatus WRITE setIntervalStatus NOTIFY intervalStatusChanged)
@@ -59,6 +62,7 @@ public:
     void        setRepeat(quint8 val);
     quint8      getRepeat();
     void        changeAppLifecycleState(Qt::ApplicationState state);
+    bool        getAppMinimizedStatus();
     /*******************************************************/
 
     /*****  Implemented in Interval.hpp Begins  *****/
@@ -146,6 +150,7 @@ signals:
     /******** Mostly used from here in media.cpp *******/
     // For notifying frontend that repeat-X changed
     void repeatChanged();
+    void appMinimizedStatusChanged();
     /***************************************************/
 
     /******** Mostly used from SeekToTime.cpp **********/
@@ -158,6 +163,7 @@ signals:
     /***************************************************/
 
 protected:
+    bool                   appMinimizedStatus_;
     // QStringList           videoPaths_;
     // QStringList::iterator       vpIt_; // iterator to videoPaths_
     QString                  currDir_; // Dir selected by the user, from where media files was last added

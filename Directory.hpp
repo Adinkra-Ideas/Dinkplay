@@ -8,13 +8,12 @@
 #include <QtCore/private/qandroidextras_p.h>
 #endif
 
-#include <QObject>
+// #include <QObject>
 #include <QString>
-#include <QUrl>
+// #include <QUrl>
 #include <QDir>
-#include <QStringList>
+// #include <QStringList>
 #include <QSettings>
-#include <QStandardPaths>
 #include <QFileDialog>
 #include <QQmlFile>
 

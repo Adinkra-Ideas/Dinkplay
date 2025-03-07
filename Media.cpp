@@ -2,6 +2,7 @@
 
 Media::Media(QObject *parent) :
     QObject{parent},
+    appMinimizedStatus_{false},
     repeat_{2},
     state_{0},
     taskRunningDontPlay_{false},
@@ -37,10 +38,28 @@ quint8  Media::getRepeat() {
 //       GETTERS AND SETTERS ENDS           *
 // ******************************************
 
+/* this method is triggered when Qt::ApplicationState
+ * signal is emitted by qt.
+ * It then sets the appMinimizedStatus_ value accordingly
+ * and emits the appMinimizedStatusChanged() signal afterwards,
+ * which will cause UI to refresh by pulling data from Q_PROPERTY
+ * calling the Media::getAppMinimizedStatus() method.
+*/
 void  Media::changeAppLifecycleState(Qt::ApplicationState newState) {
     if (newState == Qt::ApplicationSuspended) {
+        appMinimizedStatus_ = true;
+        // stop thread running the seek timer
         stopSeekToTimeThreadLoop();
     } else if (newState == Qt::ApplicationActive) {
+        appMinimizedStatus_ = false;
+        // start thread running the seek timer
         startSeekToTimeThreadLoop();
     }
+
+    // refresh UI
+    emit appMinimizedStatusChanged();
+}
+
+bool Media::getAppMinimizedStatus() {
+    return appMinimizedStatus_;
 }

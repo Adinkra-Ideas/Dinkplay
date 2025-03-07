@@ -12,6 +12,13 @@ void ModifyAudioFrames::renameReversedAudio(QString& reversedFileName, const cha
     reversedFileName.append(".wav");
 }
 
+/**
+  * This is called from frontend.
+  * to reverse the playing audio sound.
+  * @param pathPos the indexof() of the
+  * audio sound in audioPaths_
+  * @returns void
+  */
 void ModifyAudioFrames::generateReversedAudioAtByteLevel(qint16 pathPos) {
     // We retrieve the audio filepath if exist.
     QString posToPath = (pathPos >= 0 && pathPos < audioPaths_.size()) ? audioPaths_.at(pathPos) : "";
@@ -40,14 +47,16 @@ void ModifyAudioFrames::generateReversedAudioAtByteLevel(qint16 pathPos) {
     reversedFileName.prepend("dpra_");
     reversedFileName.truncate(reversedFileName.lastIndexOf('.'));
     reversedFileName.append(".wav");
+    // WE COMMENTED THIS OUT DURING iOS UPDATE
     // Then we get a temp dirextory
-    QTemporaryDir tempDir;
-    if (tempDir.isValid()) {
-        reversedFileName = tempDir.path().append("/") + reversedFileName;
-        tempDir.setAutoRemove(false);
-    } else {
-        return ;
-    }
+    // QTemporaryDir tempDir;
+    // if (tempDir.isValid()) {
+    //     reversedFileName = tempDir.path().append("/") + reversedFileName;
+    //     tempDir.setAutoRemove(false);
+    // } else {
+    //     return ;
+    // }
+    reversedFileName = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/" + reversedFileName;
     #endif
 
     if (audioPaths_.contains(reversedFileName)) {

@@ -37,7 +37,7 @@ Item {
                 height: parent.height
                 source: "qrc:/ui/images/musicIco/exercise.gif"
                 fillMode: AnimatedImage.PreserveAspectFit
-                paused: Media.player !== 1 /* pause when music player is paused */
+                paused: (Media.player !== 1 || Media.appMinimizedStatus) /* pause when music player is paused */
             }
         }
 
