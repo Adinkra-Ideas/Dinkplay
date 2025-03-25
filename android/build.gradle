@@ -81,8 +81,8 @@ android {
         resConfig "en"
         minSdkVersion 28
         targetSdkVersion 34
-         versionCode 03217 /* armeabi == 32bit arm */
-        // versionCode 06417 /* arm64 == 64bit arm */
+         versionCode 032200 /* armeabi == 32bit arm */
+        // versionCode 064200 /* arm64 == 64bit arm */
         // versionCode 13218 /* intel_x86 == 32bit intel */
         // versionCode 16418 /* intel_x86_64 == 64bit intel */
         versionName "1.0.8"
