@@ -8,7 +8,7 @@
 #include <Qt>
 #include <unordered_map>
 #include <QFileInfo>
-#include <QTemporaryDir>
+// #include <QTemporaryDir>
 #include <QStandardPaths>
 // #include <QDebug> //
 
@@ -24,7 +24,9 @@ class Media : public QObject
 {
     Q_OBJECT
 
+    /********* For Optimizing Battery Begins *************/
     Q_PROPERTY(bool appMinimizedStatus READ getAppMinimizedStatus NOTIFY appMinimizedStatusChanged)
+    /****************************************************/
 
     /********* For Interval Controls Begins *************/
     Q_PROPERTY(bool intervalStatus READ getIntervalStatus WRITE setIntervalStatus NOTIFY intervalStatusChanged)
@@ -164,19 +166,17 @@ signals:
 
 protected:
     bool                   appMinimizedStatus_;
-    // QStringList           videoPaths_;
-    // QStringList::iterator       vpIt_; // iterator to videoPaths_
-    QString                  currDir_; // Dir selected by the user, from where media files was last added
-    quint8                    repeat_; // 0 == repeat none, 1 == repeat 1, 2 == repeat all
-    quint8                     state_; // Holds the current media playback state at any given time. 0 == stopped, 1 == playing, 2 == paused
-    bool         taskRunningDontPlay_; // mostly needed for preventing play while reverse audio is being generated. Coy if miniaudio plays, the app will crash
+    QString                  currDir_;  // Dir selected by the user, from where media files was last added
+    quint8                    repeat_;  // 0 == repeat none, 1 == repeat 1, 2 == repeat all
+    quint8                     state_;  // Holds the current media playback state at any given time. 0 == stopped, 1 == playing, 2 == paused
+    bool         taskRunningDontPlay_;  // mostly needed for preventing play while reverse audio is being generated. Coy if miniaudio plays, the app will crash
     QStringList           audioPaths_;  // holds path to each mp3 files found in directory selected by the user for media search
     QStringList::iterator      audIt_;  // iterator to audioPaths_
     QString       currentPlayingPath_;  // stores the filepath of currently active audio
     QString      currentPlayingTitle_;  // stores the title of currently active audio
     QString     currentPlayingArtist_;  // stores the Artist of currently active audio
-    std::unordered_map<QString, ma_sound *> soundsHash_; // used as a storage for Holding one path from audioPaths_ as keys and their associated values == their decoded ma_sound.
-    bool                    suspended_; // if true, it means the current nowPlaying audio is suspended. In this case, calling unsuspendAudio() will play it. If false, calling unsuspendAudio will do nothing.
+    std::unordered_map<QString, ma_sound *> soundsHash_;    // used as a storage for Holding one path from audioPaths_ as keys and their associated values == their decoded ma_sound.
+    bool                    suspended_;                     // if true, it means the current nowPlaying audio is suspended. In this case, calling unsuspendAudio() will play it. If false, calling unsuspendAudio will do nothing.
 
     ma_engine   engine_;
     ma_device*  device_;                    // After the ma_engine_init() ints our engine, we backup the device it created for us here so we can use it when necessary

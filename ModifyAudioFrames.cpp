@@ -47,15 +47,7 @@ void ModifyAudioFrames::generateReversedAudioAtByteLevel(qint16 pathPos) {
     reversedFileName.prepend("dpra_");
     reversedFileName.truncate(reversedFileName.lastIndexOf('.'));
     reversedFileName.append(".wav");
-    // WE COMMENTED THIS OUT DURING iOS UPDATE
-    // Then we get a temp dirextory
-    // QTemporaryDir tempDir;
-    // if (tempDir.isValid()) {
-    //     reversedFileName = tempDir.path().append("/") + reversedFileName;
-    //     tempDir.setAutoRemove(false);
-    // } else {
-    //     return ;
-    // }
+    // Get a proposed temporary filepath + name for our to-be created .wav file
     reversedFileName = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/" + reversedFileName;
     #endif
 

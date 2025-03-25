@@ -6,14 +6,6 @@
 
 #include "Media.hpp"
 
-// #ifndef MINIAUDIO_IMPLEMENTATION
-// #define MINIAUDIO_IMPLEMENTATION
-// extern "C"
-// {
-// #include "ma_lib/miniaudio.h"
-// }
-// #endif // MINIAUDIO_IMPLEMENTATION
-
 class Player : virtual public Media
 {
 public:

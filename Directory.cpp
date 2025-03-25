@@ -100,19 +100,6 @@ void Directory::loadSavedPaths() {
     audioPaths_ = backups_.value("soundPaths").value<QList<QString>>();
 
     for (QString &aPath: audioPaths_) {
-        // If you add this one to try to auto remove temp onstartup,
-        // it will end up hanging your gui
-        // #ifdef Q_OS_ANDROID
-        // // we delete all tmp paths because sometimes
-        // // they wont play again on load.
-        // if (aPath.indexOf("/storage/") != 0) {
-        //     QFile::remove(aPath);
-        //     audioPaths_.removeOne(aPath);
-        //     audioPaths_.squeeze();
-        //     continue ;
-        // }
-        // #endif
-
         soundsHash_[aPath] = nullptr;
     }
 
@@ -308,45 +295,23 @@ QStringList Directory::getAudioPaths() {
 //     preparePathsForPlay();
 // }
 
+
 void Directory::addStartupAudiosOnEmptyStartupAudioListings() {
-    // For Android, simply add the single factory audio file.
-    // We had to copy it first into a temp directory created
-    // by qt coz c cannot open(""assets:/Dinkplay_Tone.mp3")
+    // if no audio on startup, add the factory audio file.
+    // We had to copy it into a temp directory created
+    // by qt coz c cannot open(""assets:/Default.mp3")
     // for miniaudio to play the file.
-    #ifdef Q_OS_ANDROID
-    QTemporaryDir tempDir;
-    QString tempFile;
-    if (tempDir.isValid()) {
-        tempFile = tempDir.path() + "/DinkplayTone.mp3";
-        if (QFile::copy("assets:/Dinkplay_Tone.mp3", tempFile)) {
-            tempDir.setAutoRemove(false);
-        } else {
-            tempFile.clear();
-        }
-    }
-    if (! tempFile.isEmpty()) {
-        indexToAudioList(tempFile);
-    }
-    #endif
-// THIS ANDROID WILL BE MERGED INTO IOS PART BELOW
-    // For iOS, first we add the single factory sound,
-    // Then we check whether sounds exists in our
-    // sandbox/tmp directory. if yes, we add them too.
-    #ifdef Q_OS_IOS
-    QTemporaryDir tempDir;
-    QString tempFile;
-    if (tempDir.isValid()) {
-        tempFile = tempDir.path() + "/Default.mp3";
-        if (QFile::copy(":/ui/audios/Default.mp3", tempFile)) {
-            tempDir.setAutoRemove(false);
-        } else {
-            tempFile.clear();
-        }
+    QString tempFile = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/Default.mp3";
+    if (! QFile::copy(":/ui/audios/Default.mp3", tempFile)) {
+        tempFile.clear();
     }
     if (! tempFile.isEmpty()) {
         indexToAudioList(tempFile);
     }
 
+    // For iOS, we now check whether sounds exists in our
+    // sandbox/tmp directory. if yes, we add them too.
+    #ifdef Q_OS_IOS
     // Now we check whether more sounds exists in our
     // iOS sandbox/tmp directory, so we add them too.
     pickIosAudiosFromSandboxTmpDir();
@@ -529,15 +494,9 @@ void Directory::openDialogFromCpp() {
 
 void Directory::saveFilesFromMediaandDownloadFileproviderLinks(QString filePath, QString filename) {
     #ifdef Q_OS_ANDROID
-    QTemporaryDir tempDir;
-    QString tempFile;
-    if (tempDir.isValid()) {
-        tempFile = tempDir.path().append("/") + filename;
-        if (QFile::copy(filePath, tempFile)) {
-            tempDir.setAutoRemove(false);
-        } else {
-            tempFile.clear();
-        }
+    QString tempFile = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/" + filename;
+    if (! QFile::copy(filePath, tempFile)) {
+        tempFile.clear();
     }
     if (! tempFile.isEmpty()) {
         indexToAudioList(tempFile);

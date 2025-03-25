@@ -183,47 +183,7 @@ void Player::play() {
         emit playbackStateChanged(currentPlayingPath_); // 0 stopped, 1 playing, 2 paused
         notifyJavaSeviceAboutPlaying(true);
     }
-
-    // Here, we have successfully copied the raw frames into combinedAudioFrames_.
-    // Tomorrow, we will dirst try to play the data from combinedAudioFrames_.
-    // Then we will reverse the data in hold the frames
-
-    // // if the ma_sound_stop() is not first called before the call to
-    // // ma_data_source_read_pcm_frames(), it will crash the program.
-    // pause();
-    // ma_data_source* dDataSource = ((ma_sound*) soundsHash_[QString(*audIt_)])->pDataSource;
-    // size_t byteSizeOfOnlyRawAudioFrames = device_->playback.channels * (totalPcmFrames_ * ma_get_bytes_per_sample(device_->playback.format)); // size in byte needed to store 1 pcm frame == numberOfOutputChannels * (numberOfPcmFrames * byteSizeOfOnePcmFrame)
-    // combinedAudioFrames_ = (char *)malloc(byteSizeOfOnlyRawAudioFrames + 1);
-    // ma_uint64 totalFramesReaded;
-    // //
-    // ma_result resulte = ma_data_source_read_pcm_frames(dDataSource, combinedAudioFrames_, totalPcmFrames_, &totalFramesReaded);
-    // qDebug() << "trr byteSizeOfOnlyRawAudioFrames" << byteSizeOfOnlyRawAudioFrames;
-    // qDebug() << "trr result== " << resulte;
-    // qDebug() << "trr totalFramesReaded == " << totalFramesReaded;
-    // qDebug() << "trr total frame count == " << totalPcmFrames_;
-
-    // ma_encoder_config config = ma_encoder_config_init(ma_encoding_format_wav, device_->playback.format, device_->playback.channels, device_->sampleRate);
-    // ma_result createNewAudioFile = ma_encoder_init_file("my_file.wav", &config, &encoder);
-    // if (createNewAudioFile == MA_SUCCESS) {
-    //     qDebug() << "trr success";
-
-    //     ma_uint64 framesWritten;
-    //     ma_result storeAudioDataToNewAudioFile = ma_encoder_write_pcm_frames(&encoder, combinedAudioFrames_, totalPcmFrames_, &framesWritten);
-    //     if (storeAudioDataToNewAudioFile = MA_SUCCESS) {
-    //         qDebug() << "trr success again. frames written = " << framesWritten;
-    //     }
-    // }
 }
-
-// LEARNINGS
-// 1) pDataSourceBase->rangeEndInFrames just holds the max value of uint64 so that all
-// possible decoded audio will be accommodated. It doesnt return the end in frame.
-// It is only passed as param3 to ma_data_source_read_pcm_frames so that
-// ma_data_source_read_pcm_frames will stop when it has read the full source from param1
-// 2) One frame in mp3 is equivalent to one byte. The reason a raw audio size in byte
-// is different from the totalPcmFrames_ is because of the number of output channels. If 2
-// channels. then 1 frame will equal 2 bytes. 2 channels == 3 bytes and so on.
-// This was tested using mp3. I dont know about wav or the rest formats' byte size per frame.
 
 /**
   * Simply pauses the active sound
