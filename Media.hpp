@@ -8,7 +8,6 @@
 #include <Qt>
 #include <unordered_map>
 #include <QFileInfo>
-// #include <QTemporaryDir>
 #include <QStandardPaths>
 // #include <QDebug> //
 
