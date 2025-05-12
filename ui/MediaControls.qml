@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import com.adinkra.dinkplay 1.0
 
 Rectangle {
     Item {
@@ -177,7 +178,7 @@ Rectangle {
             Layout.fillWidth: true;
             Layout.fillHeight: true;
             Image {
-                source: (Media.player === 1) ? "qrc:/ui/images/musicIco/pause.png" : "qrc:/ui/images/musicIco/play.png"
+                source: (Media.player === MediaEnum.PLAYBACK_PLAYING) ? "qrc:/ui/images/musicIco/pause.png" : "qrc:/ui/images/musicIco/play.png"
                 width: 40
                 height: 40
                 anchors.centerIn: parent
@@ -187,7 +188,7 @@ Rectangle {
                     anchors.fill: parent
                     onPressed: {
                         // If current State is stopped or paused, play. Else pause
-                        Media.player = (Media.player === 0 || Media.player === 2) ? 1 : 2
+                        Media.player = (Media.player === MediaEnum.PLAYBACK_STOPPED || Media.player === MediaEnum.PLAYBACK_PAUSED) ? MediaEnum.PLAYBACK_PLAYING : MediaEnum.PLAYBACK_PAUSED
                     }
                 }
             }

@@ -1,10 +1,17 @@
 #include "Media.hpp"
 
+/**
+ * @brief Media class constructor.
+ * @param parent Parent QObject for Qt's object hierarchy.
+ *
+ * Initializes media player state and audio processing parameters.
+ * Sets up iterator for audio paths list.
+ */
 Media::Media(QObject *parent) :
     QObject{parent},
     appMinimizedStatus_{false},
     repeat_{2},
-    state_{0},
+    state_{PLAYBACK_STOPPED},
     taskRunningDontPlay_{false},
     suspended_{false},
     sampleRate_{0},

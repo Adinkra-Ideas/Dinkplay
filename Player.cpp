@@ -177,7 +177,7 @@ void Player::play() {
     ma_sound_start(soundsHash_[QString(*audIt_)]);
     // emit playing only if sounds started playing
     if (ma_sound_is_playing(soundsHash_[QString(*audIt_)])) {
-        state_ = 1;
+        state_ = PLAYBACK_PLAYING;
         //
         startSeekToTimeThreadLoop();
         emit playbackStateChanged(currentPlayingPath_); // 0 stopped, 1 playing, 2 paused
@@ -200,8 +200,7 @@ void Player::pause() {
     ma_sound_stop(soundsHash_[QString(*audIt_)]);
     // emit paused only if sounds paused
     if (!ma_sound_is_playing(soundsHash_[QString(*audIt_)])) {
-        // 0 stopped, 1 playing, 2 paused
-        state_ = 2;
+        state_ = PLAYBACK_PAUSED;
         //
         stopSeekToTimeThreadLoop();
         //
@@ -277,18 +276,17 @@ void Player::playOrPause() {
   * pause and play to sound
   * @returns void
   */
-void Player::setPlaybackState(quint8 state) {
+void Player::setPlaybackState(PlaybackState state) {
     if (!engineInit_ || audioPaths_.isEmpty()) {
         return ;
     }
 
-    if (state == 0) {
+    if (state == PLAYBACK_STOPPED) {
         // this will tell endOfCurrentAudio() to stop completely
-        // state_ = 0;  // 1 GREAT CHANGE CHNAGED THIS TO COMMENTED OUT
-        endOfCurrentAudio(true);     // 2 GREAT CHANGE CHNAGED THIS TO HAVING AN ARG
-    } else if (state == 1) {
+        endOfCurrentAudio(true);
+    } else if (state == PLAYBACK_PLAYING) {
         play();
-    } else if (state == 2) {
+    } else if (state == PLAYBACK_PAUSED) {
         pause();
     }
 }
@@ -309,7 +307,7 @@ void    Player::stopAnyCurrentPlaying() {
         && soundsHash_[QString(*audIt_)] != nullptr
         ) {
         // stop any currently playing if any
-        setPlaybackState(0);
+        setPlaybackState(PLAYBACK_STOPPED);
     }
 }
 
@@ -354,7 +352,7 @@ void Player::endOfCurrentAudio(bool shouldStopCompletely) { // 4 GREAT CHANGE CH
         readyAudioForNewPlay();
 
         // Refresh UI
-        emit playbackStateChanged(currentPlayingPath_);   // 0 stopped, 1 playing, 2 paused
+        emit playbackStateChanged(currentPlayingPath_);
         //
         notifyJavaSeviceAboutPlaying(false);
     }
@@ -365,7 +363,7 @@ void Player::endOfCurrentAudio(bool shouldStopCompletely) { // 4 GREAT CHANGE CH
   * status.
   * @returns the current sound_ play status.
   */
-quint8  Player::playbackState() {
+Media::PlaybackState  Player::playbackState() {
     return state_;
 }
 
@@ -405,8 +403,7 @@ void Player::readyAudioForNewPlay() {
     // audio engine.
     pause();
 
-    // current playing state. 0 stopped, 1 playing, 2 paused
-    state_ = 0;
+    state_ = PLAYBACK_STOPPED;
 
     // now we can extract All details of current active audio here
     currentPlayingTitle_ = getTitle();

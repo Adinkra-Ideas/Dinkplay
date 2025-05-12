@@ -19,6 +19,25 @@ extern "C"
 }
 #endif // MINIAUDIO_IMPLEMENTATION
 
+
+/**
+ * @enum Media::RepeatMode
+ * @brief Defines the repeat behavior for media playback
+ *
+ * Used in repeat functionality and QML property binding.
+ * Q_ENUM registered for Qt meta-system integration.
+ */
+enum class RepeatMode : quint8
+{
+    REPEAT_NONE = 0,      // Play through list once without repeating
+    REPEAT_SINGLE = 1,    // Continuously repeat current track
+    REPEAT_ALL = 2        // Repeat entire playlist indefinitely
+};
+
+
+
+
+
 class Media : public QObject
 {
     Q_OBJECT
@@ -35,7 +54,7 @@ class Media : public QObject
     /****************************************************/
 
     /* ******* For The Media Player Begins ***************/
-    Q_PROPERTY(quint8 player READ playbackState WRITE setPlaybackState NOTIFY playbackStateChanged) // rename to getCurrAudio
+    Q_PROPERTY(PlaybackState player READ playbackState WRITE setPlaybackState NOTIFY playbackStateChanged)
     Q_PROPERTY(QString playSource WRITE playSource NOTIFY playbackStateChanged) // For when a link is clicked in audio listings
     Q_PROPERTY(bool change WRITE changePlay NOTIFY playbackStateChanged)        // When prevOrNext clicked by user
     Q_PROPERTY(QString title READ getTitle NOTIFY playbackStateChanged)         // Get the filename when new sound starts playing
@@ -56,8 +75,26 @@ class Media : public QObject
     /******************************************************/
 
 public:
+    /*
+     * @enum Media::PlaybackState
+     * @brief Represents the current state of media playback
+     *
+     * Used in Q_PROPERTY and state management throughout the media system.
+     */
+    enum PlaybackState : quint8
+    {
+        PLAYBACK_STOPPED = 0,   // No audio is playing
+        PLAYBACK_PLAYING = 1,   // Audio is actively playing
+        PLAYBACK_PAUSED = 2     // Audio is paused (retains playback position)
+    };
+    Q_ENUM(PlaybackState)       // Q_ENUM registered to enable PlaybackState be recognized as a typedef from QML / Qt meta-object system integration.
+
+
+
+    /******** Constructor && Destructor ********/
     explicit Media(QObject *parent = nullptr);
     virtual  ~Media() = 0;
+    /*******************************************/
 
     /******** Methods Implemented here in Media.cpp ********/
     void        setRepeat(quint8 val);
@@ -76,18 +113,18 @@ public:
     /***********************************************/
 
     /********** implemented in Player.cpp ***********/
-    virtual quint8  playbackState() = 0;
-    virtual void    setPlaybackState(quint8) = 0;
-    virtual void    setSource(const char * path) = 0;
-    virtual void    playSource(QString path) = 0;
-    virtual void    stopAnyCurrentPlaying() = 0;
-    virtual void    play() = 0;
-    virtual void    pause() = 0;
-    virtual void    suspendAudio() = 0;
-    virtual void    unsuspendAudio() = 0;
-    virtual void    playOrPause() = 0;
-    virtual QString getTitle() = 0;
-    virtual void    readyAudioForNewPlay() = 0;
+    virtual PlaybackState   playbackState() = 0;
+    virtual void            setPlaybackState(PlaybackState) = 0;
+    virtual void            setSource(const char * path) = 0;
+    virtual void            playSource(QString path) = 0;
+    virtual void            stopAnyCurrentPlaying() = 0;
+    virtual void            play() = 0;
+    virtual void            pause() = 0;
+    virtual void            suspendAudio() = 0;
+    virtual void            unsuspendAudio() = 0;
+    virtual void            playOrPause() = 0;
+    virtual QString         getTitle() = 0;
+    virtual void            readyAudioForNewPlay() = 0;
     /*************************************************/
 
     /******** implemented in Directory.cpp ***********/
@@ -167,7 +204,7 @@ protected:
     bool                   appMinimizedStatus_;
     QString                  currDir_;  // Dir selected by the user, from where media files was last added
     quint8                    repeat_;  // 0 == repeat none, 1 == repeat 1, 2 == repeat all
-    quint8                     state_;  // Holds the current media playback state at any given time. 0 == stopped, 1 == playing, 2 == paused
+    PlaybackState              state_;  // Holds the current media playback state at any given time.
     bool         taskRunningDontPlay_;  // mostly needed for preventing play while reverse audio is being generated. Coy if miniaudio plays, the app will crash
     QStringList           audioPaths_;  // holds path to each mp3 files found in directory selected by the user for media search
     QStringList::iterator      audIt_;  // iterator to audioPaths_

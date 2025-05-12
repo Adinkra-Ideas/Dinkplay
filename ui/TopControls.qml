@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import com.adinkra.dinkplay 1.0
 // import QtQuick.Dialogs
 // import QtCore
 // import QtMultimedia
@@ -25,7 +26,7 @@ Rectangle {
             id: playing
             Layout.fillWidth: true;
             Layout.fillHeight: true;
-            visible: Media.player !== 0
+            visible: Media.player !== MediaEnum.PLAYBACK_STOPPED
             // un-commenting this will cause the page
             // to jump into nowPlaying page whenever
             // a new sound starts playing

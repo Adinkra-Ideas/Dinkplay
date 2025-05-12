@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Effects
+import com.adinkra.dinkplay 1.0
 
 Item {
     property bool isLandscape: Window.width > Window.height
@@ -25,7 +26,7 @@ Item {
                 anchors.centerIn: parent
                 source: "qrc:/ui/images/musicSpin.gif"
                 fillMode: AnimatedImage.PreserveAspectFit
-                paused: (Media.player !== 1 || Media.appMinimizedStatus)
+                paused: (Media.player !== MediaEnum.PLAYBACK_PLAYING || Media.appMinimizedStatus)
             }
         }
 

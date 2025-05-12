@@ -12,13 +12,13 @@ public:
     explicit Player(QObject *parent = nullptr);
     ~Player();
 
-    quint8  playbackState() override;
-    void    setSource(const char * path) override;
-    void    playSource(QString) override;
-    void    setPlaybackState(quint8 state) override;
-    void    stopAnyCurrentPlaying() override;
-    QString getTitle() override;
-    void    readyAudioForNewPlay() override;
+    void            setSource(const char * path) override;
+    void            playSource(QString) override;
+    PlaybackState   playbackState() override;
+    void            setPlaybackState(PlaybackState state) override;
+    void            stopAnyCurrentPlaying() override;
+    QString         getTitle() override;
+    void            readyAudioForNewPlay() override;
 
     void    play() override;
     void    pause() override;

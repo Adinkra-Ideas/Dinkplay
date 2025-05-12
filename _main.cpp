@@ -38,6 +38,7 @@ int _main(int argc, char *argv[])
     Top media(&app);
     QQmlContext* rootContext = engine.rootContext();
     rootContext->setContextProperty("Media", &media);
+    qmlRegisterUncreatableType<Media>("com.adinkra.dinkplay", 1, 0, "MediaEnum", "Not creatable as it is an enum type");
 
     // For making the threads shut down gracefully
     Media & base = media;
