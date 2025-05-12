@@ -20,21 +20,20 @@ extern "C"
 #endif // MINIAUDIO_IMPLEMENTATION
 
 
-/**
- * @enum Media::RepeatMode
- * @brief Defines the repeat behavior for media playback
- *
- * Used in repeat functionality and QML property binding.
- * Q_ENUM registered for Qt meta-system integration.
- */
-enum class RepeatMode : quint8
-{
-    REPEAT_NONE = 0,      // Play through list once without repeating
-    REPEAT_SINGLE = 1,    // Continuously repeat current track
-    REPEAT_ALL = 2        // Repeat entire playlist indefinitely
-};
-
-
+// /**
+//  * @enum Media::RepeatMode
+//  * @brief Defines the repeat behavior for media playback
+//  *
+//  * Used in repeat functionality and QML property binding.
+//  * Q_ENUM registered for Qt meta-system integration.
+//  */
+// enum class RepeatMode : quint8
+// {
+//     REPEAT_NONE = 0,      // Play through list once without repeating
+//     REPEAT_SINGLE = 1,    // Continuously repeat current track
+//     REPEAT_ALL = 2        // Repeat entire playlist indefinitely
+// };
+// CONTINUE: USE THE REPEAT STATE ENUM TO ELIMINATE REPEAT MAGIC NUMBER
 
 
 
