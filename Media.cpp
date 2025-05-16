@@ -1,6 +1,6 @@
 #include "Media.hpp"
 
-/**
+/***
  * @brief Media class constructor.
  * @param parent Parent QObject for Qt's object hierarchy.
  *
